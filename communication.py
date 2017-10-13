@@ -8,7 +8,7 @@ class Communication (object):
         Parametrina annetaan comtype (yhteystyyppi): BT tai RS-232         
         toteutetaan ensin RS-232, mutta tehdään jo optio BT:lle. Palauttaa yhteyden tilan"""
         
-        self.ser = serial.Serial(port='COM1', baudrate=9600, parity=serial.PARITY_ODD, stopbits=serial.STOPBITS_TWO, bytesize=serial.SEVENBITS, timeout=1)
+        self.ser = serial.Serial(port='COM1', baudrate=9600, parity=serial.PARITY_ODD, stopbits=serial.STOPBITS_TWO, bytesize=serial.SEVENBITS)
         #ser.open()
 
         return ser.isOpen()
@@ -32,6 +32,7 @@ class Communication (object):
         
     def readValues(self):
         value = ser.read()
+		return value
     
     
     #ser.open()
