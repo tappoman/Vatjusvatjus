@@ -1,4 +1,9 @@
 ﻿#class which handles all the communication between computer and adapter
+#****************************************
+#******pySerial MUST be installed********
+#******pip install pyserial**************
+#****************************************
+
 import sys, time, serial
 
 class Communication (object):
