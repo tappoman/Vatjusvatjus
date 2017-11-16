@@ -6,9 +6,11 @@ style.use('fivethirtyeight')
 
 fig = plt.figure()
 ax1 = fig.add_subplot(1,1,1)
+plt.gca().invert_xaxis()
+plt.gca().invert_yaxis()
 
 def animate(i):
-    graph_data = open('example.txt', 'r').read()
+    graph_data = open('Piirtopisteiden_example.txt', 'r').read()
     lines = graph_data.split('\n')
     xs = []
     ys = []
@@ -24,5 +26,3 @@ ani = animation.FuncAnimation(fig, animate, interval = 100)
 
 plt.show()
 
-
-# https://stackoverflow.com/questions/18176591/importerror-no-module-named-matplotlib-pyplot
