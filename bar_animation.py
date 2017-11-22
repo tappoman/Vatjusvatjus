@@ -9,6 +9,7 @@ voima = []
 syvyys =  []
 fig, ax = plt.subplots()
 
+# jaetaan tuleva data akseleille
 def linesplitter(line):
 
         linex = int(line[0])
@@ -20,12 +21,14 @@ def linesplitter(line):
         else:
             return linex, liney, liney2
 
-def get_values(i):
-    if voima[i] != 0:
-        return syvyys[i], voima[i]
-    else:
-        return syvyys[i], puolikierrokset[i]
+# höpöhöpöä, ehkä käyttistä kun saadaan oikeannäköstä dataa
+# def get_values(i):
+#     if voima[i] != 0:
+#         return syvyys[i], voima[i]
+#     else:
+#         return syvyys[i], puolikierrokset[i]
 
+# luetaan data tekstitiedostosta ja lisätään piirrettäviin arvoihin
 def read_values():
     with open("testfile.txt", "r") as testfile:
         for line in testfile:
@@ -42,46 +45,47 @@ def read_values():
         #print("pkierr: " + str(puolikierrokset))
         #print("voima: " + str(voima))
 
-def chart_setup_vertical():
-    #fig, ax = plt.subplots()
+# vanha datan piirto, akselit toimii paremmin kun horisontaalisella
+# def chart_setup_vertical():
+#     #fig, ax = plt.subplots()
+#
+#     # x_labels = range(0, 500, 20)
+#     ax.axhline(syvyys == 0, color='k')
+#
+#     plt.xlabel('syvyys')
+#     plt.ylabel('voima           puolikierrokset')
+#
+#     # ax.set_xticklabels(syvyys, rotation = 90)
+#     ax.xaxis.label.set_rotation(90)
+#     for label in ax.xaxis.get_ticklabels():
+#         label.set_rotation(90)
+#     for label in ax.yaxis.get_ticklabels():
+#         label.set_rotation(90)
+#     plt.subplots_adjust(left = 0.12, bottom = 0.3, right = 0.94, top = 0.90, wspace = 0.2, hspace = 0)
 
-    # x_labels = range(0, 500, 20)
-    ax.axhline(syvyys == 0, color='k')
-
-    plt.xlabel('syvyys')
-    plt.ylabel('voima           puolikierrokset')
-
-    # ax.set_xticklabels(syvyys, rotation = 90)
-    ax.xaxis.label.set_rotation(90)
-    for label in ax.xaxis.get_ticklabels():
-        label.set_rotation(90)
-    for label in ax.yaxis.get_ticklabels():
-        label.set_rotation(90)
-    plt.subplots_adjust(left = 0.12, bottom = 0.3, right = 0.94, top = 0.90, wspace = 0.2, hspace = 0)
 
 def chart_setup_horizontal():
 
     plt.gca().invert_yaxis()
     ax.axvline(syvyys == 0, color='k')
     plt.ylabel('syvyys           ')
-    ax.annotate('voima / puolikierrokset',
-                xy=(-30, -2))
+    plt.xlabel('voima        puolikierrokset')
     ax.yaxis.label.set_rotation(360)
     plt.subplots_adjust(left = 0.25, bottom = 0.15, right = 0.94, top = 0.90, wspace = 0.2, hspace = 0.2)
 
-'''
-def draw_graph():
+# datan piirto ilman animaatiota
+# def draw_graph():
+#
+#     p = 0
+#     for s in syvyys:
+#         if voima[p] != 0:
+#             ax.bar(syvyys[p], voima[p], width=5, align='center', color='g', label='voima')
+#             p = p + 1
+#         else:
+#             ax.bar(syvyys[p], puolikierrokset[p], width=5, align='center', color='b', label='puolikierrokset')
+#             p = p + 1
 
-    p = 0
-    for s in syvyys:
-        if voima[p] != 0:
-            ax2.bar(syvyys[p], voima[p], width=5, align='center', color='g', label='voima')
-            p = p + 1
-        else:
-            ax.bar(syvyys[p], puolikierrokset[p], width=5, align='center', color='b', label='puolikierrokset')
-            p = p + 1
-'''
-
+#datan animointi, arvo i= intervalli joka annetaan mainissa.
 def animate_horizontal(i):
 
     read_values()
@@ -95,19 +99,19 @@ def animate_horizontal(i):
             p = p + 1
 
 
-def animate_vertical(i):
-
-    read_values()
-    p = 0
-    for s in syvyys:
-        if voima[p] != 0:
-
-            ax.bar(syvyys[p], voima[p], width=5, align='center', color='g')
-            p = p + 1
-        else:
-            ax.bar(syvyys[p], puolikierrokset[p], width=5, align='center', color='b')
-            p = p + 1
-
+# vanha animointi, ehkä käyttistä ehkä ei
+# def animate_vertical(i):
+#
+#     read_values()
+#     p = 0
+#     for s in syvyys:
+#         if voima[p] != 0:
+#
+#             ax.bar(syvyys[p], voima[p], width=5, align='center', color='g')
+#             p = p + 1
+#         else:
+#             ax.bar(syvyys[p], puolikierrokset[p], width=5, align='center', color='b')
+#             p = p + 1
 
 
 def main():
@@ -122,7 +126,5 @@ def main():
     anim = animation.FuncAnimation(fig, animate_horizontal, interval=2000)
     plt.show()
 
-
-# muutit syvyyden piirron ax2
 
 main()
