@@ -86,6 +86,7 @@ def chart_setup_horizontal():
 #             p = p + 1
 
 #datan animointi, arvo i= intervalli joka annetaan mainissa.
+
 def animate_horizontal(i):
 
     read_values()
@@ -127,4 +128,4 @@ def main():
     plt.show()
 
 
-main()
+# main()

@@ -2,6 +2,7 @@
 import numpy as np
 import wx
 import gui
+import bar_animation
 import collections
 import matplotlib
 matplotlib.use('WXAgg')
@@ -15,10 +16,12 @@ class MyFrameSub(gui.MainFrame):
    self.buttons[K].Hide()
   self.buttons[p].Show()
   self.Layout()
+
  def clickbutton(self,event):
   btn=event.GetEventObject().GetLabelText()
   self.showpanel(btn)
   event.Skip()
+
  def __init__(self,parent):
   self.labels=collections.OrderedDict([("TIEDOSTO","red"),("PISTE","blue"),("OHJELMA","black"),("HALLINTA","orange"),("MAALAJI","yellow")])
   self.menuButton={}
@@ -27,6 +30,7 @@ class MyFrameSub(gui.MainFrame):
   self.CreatePlot()
   self.showpanel('TIEDOSTO')
   return
+
  def CreatePlot(self):
   self.figure=Figure(figsize=(7,8),dpi=80,frameon=False)
   self.axes=self.figure.add_axes([0,0,1,1])
@@ -37,6 +41,7 @@ class MyFrameSub(gui.MainFrame):
   size=self.buttons["TIEDOSTO"].GetSize()
   self.SetMinSize((size[0] / 1,size[1] / 1))
   return
+
  def OnCalculate(self,event):
   print ("%s" % self.m_value1.GetValue())
   return
