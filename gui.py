@@ -1,88 +1,469 @@
-# -*- coding: utf-8 -*- 
+'''
+luokka käyttöliittymän hallintaan
+parsii tiedot communications luokalta
+ja siirtää ne bar_graph luokalle
+
+tarvittavat kirjastot:
+wxpython
+wx.lib.scrolledpanel
+'''
+
 import wx
-import wx.xrc
-class MainFrame (wx.Frame):
- def __init__(self,parent):
-  wx.Frame.__init__ (self,parent,id=wx.ID_ANY,title=u"Vatjus 3000",pos=wx.DefaultPosition,size=wx.Size(540,960),style=wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
-  self.SetSizeHints(wx.DefaultSize,wx.DefaultSize)
-  self.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
-  bSizer1=wx.BoxSizer(wx.VERTICAL)
-  bSizer2=wx.BoxSizer(wx.HORIZONTAL)
-  for K in self.labels:
-   self.menuButton[K]=wx.Button(self,wx.ID_ANY,K,wx.DefaultPosition,wx.Size(-1,50),0)
-   bSizer2.Add(self.menuButton[K],1,wx.ALL,5)
-   self.menuButton[K].Bind(wx.EVT_BUTTON,self.clickbutton)
-  bSizer1.Add(bSizer2,0,wx.EXPAND,5)
-  bSizer5=wx.BoxSizer(wx.VERTICAL)
-  self.fileIndikaattori=wx.StaticText(self,wx.ID_ANY,u"FILE: 1234A579-JK",wx.Point(-1,-1),wx.Size(-1,-1),wx.ALIGN_LEFT)
-  self.fileIndikaattori.Wrap(-1)
-  self.fileIndikaattori.SetFont(wx.Font(15,wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL,wx.FONTWEIGHT_NORMAL,False,wx.EmptyString))
-  self.fileIndikaattori.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
-  bSizer5.Add(self.fileIndikaattori,1,wx.ALL|wx.EXPAND,16)
-  bSizer1.Add(bSizer5,0,wx.EXPAND,5)
-  bSizer6=wx.BoxSizer(wx.HORIZONTAL)
-  self.m_staticText10=wx.StaticText(self,wx.ID_ANY,u"PISTE: PK 1234",wx.DefaultPosition,wx.DefaultSize,0)
-  self.m_staticText10.Wrap(-1)
-  self.m_staticText10.SetFont(wx.Font(15,wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL,wx.FONTWEIGHT_NORMAL,False,wx.EmptyString))
-  bSizer6.Add(self.m_staticText10,1,wx.ALL,16)
-  self.nayttoButton=wx.Button(self,wx.ID_ANY,u"NÄYTTÖ",wx.DefaultPosition,wx.Size(-1,50),0)
-  bSizer6.Add(self.nayttoButton,1,wx.ALL,5)
-  self.tankoButton=wx.Button(self,wx.ID_ANY,u"TANKO",wx.DefaultPosition,wx.Size(-1,50),0)
-  bSizer6.Add(self.tankoButton,1,wx.ALL,5)
-  bSizer1.Add(bSizer6,0,wx.EXPAND,5)
-  bSizer7=wx.BoxSizer(wx.VERTICAL)
-  for K in self.labels:
-   self.buttons[K]=wx.Panel(self,wx.ID_ANY,wx.DefaultPosition,wx.DefaultSize,wx.TAB_TRAVERSAL)
-   self.buttons[K].SetBackgroundColour(self.labels[K])#wx.SystemSettings.GetColour(wx.SYS_COLOUR_ACTIVECAPTION)
-   self.buttons[K].SetMaxSize(wx.Size(540,-1))
-   bSizer7.Add(self.buttons[K],1,wx.EXPAND|wx.ALL|wx.ALIGN_CENTER_HORIZONTAL,5)
-  gSizer2=wx.GridSizer(2,5,0,0)
-  self.syvyys_Label=wx.StaticText(self,wx.ID_ANY,u"SYVYYS",wx.DefaultPosition,wx.DefaultSize,wx.ALIGN_CENTRE)
-  self.syvyys_Label.Wrap(-1)
-  self.syvyys_Label.SetFont(wx.Font(15,wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL,wx.FONTWEIGHT_NORMAL,False,wx.EmptyString))
-  gSizer2.Add(self.syvyys_Label,0,wx.ALL|wx.EXPAND,5)
-  self.voimaLabel=wx.StaticText(self,wx.ID_ANY,u"VOIMA",wx.DefaultPosition,wx.DefaultSize,wx.ALIGN_CENTRE)
-  self.voimaLabel.Wrap(-1)
-  self.voimaLabel.SetFont(wx.Font(15,wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL,wx.FONTWEIGHT_NORMAL,False,wx.EmptyString))
-  gSizer2.Add(self.voimaLabel,0,wx.ALL|wx.EXPAND,5)
-  self.puolikLabel=wx.StaticText(self,wx.ID_ANY,u"PUOLIK",wx.DefaultPosition,wx.DefaultSize,wx.ALIGN_CENTRE)
-  self.puolikLabel.Wrap(-1)
-  self.puolikLabel.SetFont(wx.Font(15,wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL,wx.FONTWEIGHT_NORMAL,False,wx.EmptyString))
-  gSizer2.Add(self.puolikLabel,0,wx.ALL|wx.EXPAND,5)
-  self.maaLabel=wx.StaticText(self,wx.ID_ANY,u"MAALAJI",wx.DefaultPosition,wx.DefaultSize,wx.ALIGN_CENTRE)
-  self.maaLabel.Wrap(-1)
-  self.maaLabel.SetFont(wx.Font(15,wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL,wx.FONTWEIGHT_NORMAL,False,wx.EmptyString))
-  gSizer2.Add(self.maaLabel,0,wx.ALL|wx.EXPAND,5)
-  self.iskuLabel=wx.StaticText(self,wx.ID_ANY,u"ISKU",wx.DefaultPosition,wx.DefaultSize,wx.ALIGN_CENTRE)
-  self.iskuLabel.Wrap(-1)
-  self.iskuLabel.SetFont(wx.Font(15,wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL,wx.FONTWEIGHT_NORMAL,False,wx.EmptyString))
-  gSizer2.Add(self.iskuLabel,0,wx.ALL|wx.EXPAND,5)
-  self.syvyysArvo=wx.StaticText(self,wx.ID_ANY,u"295",wx.DefaultPosition,wx.DefaultSize,wx.ALIGN_CENTRE)
-  self.syvyysArvo.Wrap(-1)
-  self.syvyysArvo.SetFont(wx.Font(20,wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL,wx.FONTWEIGHT_NORMAL,False,wx.EmptyString))
-  gSizer2.Add(self.syvyysArvo,0,wx.ALL|wx.EXPAND,5)
-  self.voimaArvo=wx.StaticText(self,wx.ID_ANY,u"10",wx.DefaultPosition,wx.DefaultSize,wx.ALIGN_CENTRE)
-  self.voimaArvo.Wrap(-1)
-  self.voimaArvo.SetFont(wx.Font(20,wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL,wx.FONTWEIGHT_NORMAL,False,wx.EmptyString))
-  gSizer2.Add(self.voimaArvo,0,wx.ALL|wx.EXPAND,5)
-  self.puolikArvo=wx.StaticText(self,wx.ID_ANY,u"13",wx.DefaultPosition,wx.DefaultSize,wx.ALIGN_CENTRE)
-  self.puolikArvo.Wrap(-1)
-  self.puolikArvo.SetFont(wx.Font(20,wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL,wx.FONTWEIGHT_NORMAL,False,wx.EmptyString))
-  gSizer2.Add(self.puolikArvo,0,wx.ALL|wx.EXPAND,5)
-  self.maaArvo=wx.StaticText(self,wx.ID_ANY,u"SaSi",wx.DefaultPosition,wx.DefaultSize,wx.ALIGN_CENTRE)
-  self.maaArvo.Wrap(-1)
-  self.maaArvo.SetFont(wx.Font(20,wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL,wx.FONTWEIGHT_NORMAL,False,wx.EmptyString))
-  gSizer2.Add(self.maaArvo,0,wx.ALL|wx.EXPAND,5)
-  self.iskuArvo=wx.StaticText(self,wx.ID_ANY,u"OFF",wx.DefaultPosition,wx.DefaultSize,wx.ALIGN_CENTRE)
-  self.iskuArvo.Wrap(-1)
-  self.iskuArvo.SetFont(wx.Font(20,wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL,wx.FONTWEIGHT_NORMAL,False,wx.EmptyString))
-  gSizer2.Add(self.iskuArvo,0,wx.ALL|wx.EXPAND,5)
-  bSizer7.Add(gSizer2,0,wx.EXPAND,5)
-  bSizer1.Add(bSizer7,1,wx.ALL|wx.EXPAND,5)
-  self.SetSizer(bSizer1)
-  self.Layout()
-  self.Centre(wx.BOTH)
- def __del__(self):
-  pass
-	
+import os
+import wx.lib.scrolledpanel as scrolled
+import bar_animation as ba
+import communication
+import guioperations
+import threading
+import serial
+
+
+'''
+from communication import threading
+import guioperations as gui
+com = Communication("com3", 9600)
+gui = Guioperations()
+threadin aloitus 
+t1 = threading.Thread(target=com.readValues()
+t1.start()
+'''
+
+class windowClass(wx.Frame):
+    def __init__(self, *args, **kwargs):
+        super(windowClass, self).__init__(*args, size=wx.Size(600, 960))
+
+        self.Centre()
+        self.basicGUI()
+        self.data = TiedonKasittely()
+        self.ba = ba
+        self.com = communication
+        self.gui = guioperations
+        self.listener = self.com.Communication("com3", 9600)
+        t1 = threading.Thread(target=self.com.Communication.readValues(self.listener))
+        t1.start()
+        self.timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.update, self.timer)
+
+    def basicGUI(self):
+
+        panel = wx.Panel(self, wx.ID_ANY)
+        self.SetTitle('Vatjus 3000')
+        font1 = self.GetFont()
+        font2 = self.GetFont()
+        font3 = self.GetFont()
+        font1.SetPointSize(15)
+        font2.SetPointSize(25)
+        font3.SetPointSize(35)
+
+        # nappuloiden alustus
+
+        # tiedosto
+        # avaa hankkeen listalta
+        self.tiedostobutton = wx.Button(panel, label="Tiedosto", pos=(5, 10), size=(110, 110))
+        self.tiedostobutton.SetFont(font1)
+        self.tiedostobutton.Bind(wx.EVT_BUTTON, self.tiedostonavaus)
+
+        # piste
+        # avaa pisteen hankkeen sisältä
+        self.pistebutton = wx.Button(panel, label="Piste", pos=(120, 10), size=(110, 110))
+        self.pistebutton.SetFont(font1)
+        self.pistebutton.Bind(wx.EVT_BUTTON, self.pisteenavaus)
+
+        # ohjelma
+        # valitsee kairausohjelman
+        self.ohjelmabutton = wx.Button(panel, label="Ohjelma", pos=(235, 10), size=(110, 110))
+        self.ohjelmabutton.SetFont(font1)
+        self.ohjelmabutton.Bind(wx.EVT_BUTTON, self.valitseohjelma)
+
+        # hallinta
+        # hallitaan valtakuntaa
+        self.hallintabutton = wx.Button(panel, label="Hallinta", pos=(350, 10), size=(110, 110))
+        self.hallintabutton.SetFont(font1)
+        self.hallintabutton.Bind(wx.EVT_BUTTON, self.hallintamenu)
+
+        # maalaji
+        # käyttäjä asettaa maalajin listalta
+        self.maalajibutton = wx.Button(panel, label="Maalaji", pos=(465, 10), size=(110, 110))
+        self.maalajibutton.SetFont(font1)
+        self.maalajibutton.Bind(wx.EVT_BUTTON, self.valitsemaalaji)
+
+        # piirto
+        # käyttäjä voi valita piirtonäkymän
+        self.graphbutton = wx.Button(panel, label="Piirto", pos=(10, 215), size=(200, 100))
+        self.graphbutton.SetFont(font1)
+        self.graphbutton.Bind(wx.EVT_BUTTON, self.graafinpiirto)
+
+        # hae
+        # communications listenerin mockup
+        self.loadbutton = wx.Button(panel, label="Hae", pos=(220, 215), size=(50, 50))
+        self.loadbutton.SetFont(font1)
+        self.loadbutton.Bind(wx.EVT_BUTTON, self.lataapiste)
+
+        # alusta
+        # tyhjentää paneelin ja asettaa arvot alkuarvoiksi
+        self.alustabutton = wx.Button(panel, label="Alusta", pos=(220, 265), size=(75, 50))
+        self.alustabutton.SetFont(font1)
+        self.alustabutton.Bind(wx.EVT_BUTTON, self.alustatiedot)
+
+        # alkusyvyys
+        # käyttäjä voi valita alkusyvyyden, joka lisätään listenerin syvyys arvoon
+        self.alkusyvyysbutton = wx.Button(panel, label="a-syv", pos=(300, 215), size=(100,100))
+        self.alkusyvyysbutton.SetFont(font1)
+        self.alkusyvyysbutton.Bind(wx.EVT_BUTTON, self.asetaalkusyvyys)
+
+        # tietotekstien alustus
+        self.tiedostoteksti = wx.StaticText(panel, -1, "Tiedosto: ", pos=(10, 120))
+        self.tiedostoteksti.SetFont(font2)
+
+        # tiedostonimiteksti näyttää valitun hankkeen nimen
+        self.tiedostonnimiteksti = wx.StaticText(panel, -1, ">tiedoston nimi<", pos=(220, 120))
+        self.tiedostonnimiteksti.SetFont(font2)
+
+        self.pisteteksti = wx.StaticText(panel, -1, "Piste: ", pos=(10, 165))
+        self.pisteteksti.SetFont(font2)
+
+        # pistenimiteksti näyttää valitusta hankkeesta valitun pisteen
+        self.pistenimiteksti = wx.StaticText(panel, -1, ">pisteen nimi<", pos=(150, 165))
+        self.pistenimiteksti.SetFont(font2)
+
+        # alatekstien alustus
+        self.alkusyvyysteksti = wx.StaticText(panel, -1, "A-syv", pos=(5, 315))
+        self.alkusyvyysteksti.SetFont(font1)
+
+        # alkusyvyysarvoteksti päivittyy käyttäjän valinnan mukaan
+        self.alkusyvyysarvoteksti = wx.StaticText(panel, -1, "><", pos=(5, 345))
+        self.alkusyvyysarvoteksti.SetFont(font2)
+
+
+        self.syvyysteksti = wx.StaticText(panel, -1, "Syvyys", pos=(70, 315))
+        self.syvyysteksti.SetFont(font1)
+
+        # syvyysarvoteksti päivittyy alkusyvyys + listeneriltä tuleva syvyys
+        self.syvyysarvoteksti = wx.StaticText(panel, -1, "><", pos=(75, 345))
+        self.syvyysarvoteksti.SetFont(font2)
+
+        self.voimateksti = wx.StaticText(panel, -1, "Voima", pos=(150, 315))
+        self.voimateksti.SetFont(font1)
+
+        # voima-arvoteksti päivittyy listeneriltä tulevan voiman mukaan
+        self.voimaarvoteksti = wx.StaticText(panel, -1, "><", pos=(160, 345))
+        self.voimaarvoteksti.SetFont(font2)
+
+        self.puolikierroksetteksti = wx.StaticText(panel, -1, "P-kierr", pos=(230, 315))
+        self.puolikierroksetteksti.SetFont(font1)
+
+        # puolikierroksetarvoteksti päivittyy listeneriltä tulevan voiman mukaan
+        self.puolikierroksetarvoteksti = wx.StaticText(panel, -1, "><", pos=(240, 345))
+        self.puolikierroksetarvoteksti.SetFont(font2)
+
+
+        self.nopeusteksti = wx.StaticText(panel, -1, "Nopeus", pos=(310, 315))
+        self.nopeusteksti.SetFont(font1)
+
+        # nopeusarvoteksti päivittyy listeneriltä tulevan voiman mukaan
+        self.nopeusarvoteksti = wx.StaticText(panel, -1, "><", pos=(325, 345))
+        self.nopeusarvoteksti.SetFont(font2)
+
+        self.maalajiteksti = wx.StaticText(panel, -1, "Maalaji", pos=(410, 315))
+        self.maalajiteksti.SetFont(font1)
+
+        # maalajiarvoteksti päivittyy käyttäjän valitessa maalaji
+        self.maalajiarvoteksti = wx.StaticText(panel, -1, "SaSi", pos=(390, 345))
+        self.maalajiarvoteksti.SetFont(font2)
+
+        self.iskuteksti = wx.StaticText(panel, -1, "Isku", pos=(515, 315))
+        self.iskuteksti.SetFont(font1)
+
+        # iskuarvoteksti päivittyy käyttäjän valitessa isku
+        self.iskuarvoteksti = wx.StaticText(panel, -1, "OFF", pos=(515, 345))
+        self.iskuarvoteksti.SetFont(font2)
+
+        # kirjoituspaneelin ja tekstielementtien alustus
+        # addspacer paddaa paneelin ylälaidan arvotekstien alapuolelle
+        self.scrolled_panel = scrolled.ScrolledPanel(panel, -1, style=wx.SUNKEN_BORDER)
+        self.spSizer = wx.BoxSizer(wx.VERTICAL)
+        self.scrolled_panel.SetSizer(self.spSizer)
+        panelSizer = wx.BoxSizer(wx.VERTICAL)
+        panelSizer.AddSpacer(400)
+        panelSizer.Add(self.scrolled_panel, 1, wx.EXPAND)
+        panel.SetSizer(panelSizer)
+
+    def tiedostonavaus(self, event):
+        if self.tiedostonnimiteksti.GetLabel() != ">tiedoston nimi<":
+            os.chdir("..")
+            self.tiedosto = TiedonKasittely.iavaatiedosto(self)
+            self.tiedostonnimiteksti.SetLabelText(self.tiedosto)
+            self.pistenimiteksti.SetLabelText(">pisteen nimi<")
+            self.syvyysarvoteksti.SetLabelText("><")
+            self.voimaarvoteksti.SetLabelText("><")
+            self.puolikierroksetarvoteksti.SetLabelText("><")
+            self.nopeusarvoteksti.SetLabelText("><")
+            os.chdir(os.path.join(os.path.abspath(os.path.curdir), windowClass.tiedostonnimiteksti))
+        else:
+            self.tiedosto = TiedonKasittely.iavaatiedosto(data)
+            windowClass.tiedostonnimiteksti = self.tiedosto
+            self.tiedostonnimiteksti.SetLabelText(self.tiedosto)
+            self.pistenimiteksti.SetLabelText(">pisteen nimi<")
+            os.chdir(os.path.join(os.path.abspath(os.path.curdir), windowClass.tiedostonnimiteksti))
+
+    def pisteenavaus(self, event):
+        if self.tiedostonnimiteksti == ">tiedoston nimi<":
+            warning = wx.MessageDialog(None, "Valitse ensin tiedosto", "Varoitus", wx.OK | wx.ICON_INFORMATION)
+            warning.ShowModal()
+            warning.Destroy()
+        else:
+            self.piste = TiedonKasittely.iavaapiste(self)
+            windowClass.pistenimiteksti = self.piste
+            parsittu = os.path.splitext(self.piste)[0]
+            self.pistenimiteksti.SetLabelText(parsittu)
+
+    # kysyy käyttäjältä alkusyvyyttä, joka tallennetaan
+    # windowclassin.data luokkaan
+    def asetaalkusyvyys(self, event):
+        alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys:',"alkusyvyys","",
+                style=wx.OK)
+        alkusyvyys.ShowModal()
+        windowClass.alkusyvyysarvoteksti = self.alkusyvyysarvoteksti
+        windowClass.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
+        self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
+        alkusyvyys.Destroy()
+
+    def lataapiste(self, event):
+        if self.pistenimiteksti == ">pisteen nimi<":
+            warning = wx.MessageDialog(None, "Valitse ensin piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
+            warning.ShowModal()
+            warning.Destroy()
+        else:
+            self.piste = self.pistenimiteksti.GetLabel()
+            TiedonKasittely.iluetiedot(self.data)
+            windowClass.update(self, wx.Timer)
+
+    # kutsuu päivityksiä arvoteksteille ja paneelille
+    def update(self, event):
+        # print(self.listener)
+        windowClass.updatepiste(self, self.data)
+        windowClass.updatetextpanel(self, self.data)
+        print("update")
+
+    # päivittää tekstipaneelin yläpuolella olevat arvotekstit com-listenerin tietojen mukaan
+    def updatepiste(self, data):
+        self.data.iluetiedot()
+        self.voimaarvoteksti.SetLabelText(str(data.voima))
+        self.puolikierroksetarvoteksti.SetLabelText(str(data.puolikierrokset))
+        self.nopeusarvoteksti.SetLabelText(str(data.nopeus))
+        if self.data.alkusyvyys != 0:
+            self.syvyysarvoteksti.SetLabelText(str(data.syvyys+data.alkusyvyys))
+        else:
+            self.syvyysarvoteksti.SetLabelText(str(data.syvyys))
+
+    # kirjoittaa tekstipaneelille uuden elementin data-luokan tiedoista
+    def updatetextpanel(self, data):
+        self.scrolled_panel.ScrollLines(10)
+        self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
+        self.scrolled_panel.Layout()
+        self.scrolled_panel.Refresh()
+        line = "syvyys: {} voima: {} puolikierrokset: {} nopeus: {}".format(data.haesyvyys(),
+                                                                            data.haevoima(),
+                                                                            data.haepuolikierrokset(),
+                                                                            data.haenopeus())
+        new_text = wx.StaticText(self.scrolled_panel, -1, line, size=(550, 30))
+        font = new_text.GetFont()
+        font.SetPointSize(15)
+        new_text.SetFont(font)
+        self.spSizer.Add(new_text)
+        self.scrolled_panel.ScrollLines(10)
+        self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
+        self.scrolled_panel.Layout()
+        self.scrolled_panel.Refresh()
+
+    # alustaa arvotekstit ja rullaa tekstipaneelin tyhjäksi
+    def alustatiedot(self, event):
+        self.tiedostonnimiteksti.SetLabelText(">tiedoston nimi<")
+        self.pistenimiteksti.SetLabelText(">pisteen nimi<")
+        self.alkusyvyysarvoteksti.SetLabelText("><")
+        self.syvyysarvoteksti.SetLabelText("><")
+        self.voimaarvoteksti.SetLabelText("><")
+        self.puolikierroksetarvoteksti.SetLabelText("><")
+        self.nopeusarvoteksti.SetLabelText("><")
+        self.maalajiarvoteksti.SetLabelText("SaSi")
+        self.data = TiedonKasittely()
+        self.scrolled_panel.ScrollLines(150)
+        self.scrolled_panel.Layout()
+        self.scrolled_panel.Refresh()
+        for i in range(20):
+            line = ""
+            new_text = wx.StaticText(self.scrolled_panel, -1, line, size=(550, 30))
+            self.spSizer.Add(new_text)
+            self.scrolled_panel.ScrollLines(10)
+            self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
+            self.scrolled_panel.Layout()
+            self.scrolled_panel.Refresh()
+        new_text = wx.StaticText(self.scrolled_panel, -1, "----------------", size=(550, 30))
+        font = new_text.GetFont()
+        font.SetPointSize(15)
+        new_text.SetFont(font)
+        self.spSizer.Add(new_text)
+        new_text = wx.StaticText(self.scrolled_panel, -1, "Tiedot tyhjennetty", size=(550, 40))
+        font = new_text.GetFont()
+        font.SetPointSize(25)
+        new_text.SetFont(font)
+        self.spSizer.Add(new_text)
+        new_text = wx.StaticText(self.scrolled_panel, -1, "----------------", size=(550, 30))
+        font = new_text.GetFont()
+        font.SetPointSize(15)
+        new_text.SetFont(font)
+        self.spSizer.Add(new_text)
+        self.scrolled_panel.ScrollLines(250)
+        self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
+        self.scrolled_panel.Layout()
+        self.scrolled_panel.Refresh()
+        self.ba.plt.clf()
+
+    def graafinpiirto(self, event):
+
+        # if ba.fig == None:
+        #     graafi.show()
+        ba.main(self.data)
+
+
+        print("lululu noob noob")
+
+    def valitseohjelma(self, event):
+        print("Ohjelman valinta")
+
+    def hallintamenu(self, event):
+        print("hallitsijat hallitsee")
+
+    # käyttäjä valitsee listalta maalajin, joka tallennetaan data-luokkaan
+    def valitsemaalaji(self, event):
+        valinta = self.data.ivalitsemaalaji()
+        print("tägättiin maalaji {} syvyydelle {}".format(valinta, self.data.haesyvyys()))
+        self.maalajiarvoteksti.SetLabelText(valinta)
+
+# Tiedonkasittely luokka
+# tämä tallentaa käyttäjän ja communicationin syöttämän datan ja syöttää sen windowclass luokalle
+class TiedonKasittely(object):
+    def __init__(self, maalaji="SaSi", alkusyvyys=0, syvyys=0, voima=0, puolikierrokset=0, nopeus=0, figure=None):
+        super(TiedonKasittely, self).__init__()
+
+        self.maalaji = maalaji
+        self.alkusyvyys = alkusyvyys
+        self.syvyys = syvyys
+        self.voima = voima
+        self.puolikierrokset = puolikierrokset
+        self.nopeus = nopeus
+        self.figure = figure
+
+    def asetaalkusyvyys(self, alkusyvyys):
+        self.alkusyvyys = alkusyvyys
+    def asetasyvyys(self, syvyys):
+        self.syvyys = syvyys
+    def asetavoima(self, voima):
+        self.voima = voima
+    def asetapuolikierrokset(self, pkierr):
+        self.puolikierrokset = pkierr
+    def asetanopeus(self, nopeus):
+        self.nopeus = nopeus
+    def asetamaalaji(self, maalaji):
+        self.maalaji = maalaji
+    def asetafigure(self, figure):
+        self.figure = figure
+
+    def haesyvyys(self):
+        kokonaisyvyys = self.alkusyvyys+self.syvyys
+        return kokonaisyvyys
+    def haevoima(self):
+        return self.voima
+    def haepuolikierrokset(self):
+        return self.puolikierrokset
+    def haenopeus(self):
+        return self.nopeus
+    def haealkusyvyys(self):
+        return self.alkusyvyys
+    def haemaalaji(self):
+        return self.maalaji
+    def haefigure(self):
+        return self.figure
+
+
+    def iavaatiedosto(self):
+        z = [nimi for nimi in alusta_tiedot.tiedostot]
+        tiedostonvalinta = wx.SingleChoiceDialog(None, "Valitse tiedosto", "Tiedostot", z, wx.CHOICEDLG_STYLE)
+        if tiedostonvalinta.ShowModal() == wx.ID_OK:
+            self.tiedosto = tiedostonvalinta.GetStringSelection()
+            tiedostonvalinta.Destroy()
+            return self.tiedosto
+
+    def iavaapiste(self):
+        x = [nimi for nimi in os.listdir(os.curdir)]
+        pistevalinta = wx.SingleChoiceDialog(None, "Valitse piste", "Pisteet", x, wx.CHOICEDLG_STYLE)
+        if pistevalinta.ShowModal() == wx.ID_OK:
+            self.piste = pistevalinta.GetStringSelection()
+            pistevalinta.Destroy()
+            return self.piste
+
+    # valitaan luokalle maalaji listalta
+    def ivalitsemaalaji(self):
+        maavalinta = wx.SingleChoiceDialog(None, "Valitse maalaji", "", ['SaSi', 'Bedrock', 'Parquet'],
+                                           wx.CHOICEDLG_STYLE)
+        if maavalinta.ShowModal() == wx.ID_OK:
+            TiedonKasittely.maalaji = maavalinta.GetStringSelection()
+            TiedonKasittely.asetamaalaji(self, maavalinta)
+            maavalinta.Destroy()
+            return maavalinta.GetStringSelection()
+
+    # luetaan tiedot tekstitiedostosta, mockup communication listenistä
+    def iluetiedot(self):
+        with open("data0.txt", 'r') as textfile:
+            for line in textfile:
+                if len(line) > 1:
+                    # line = line.rpartition("#MIT:")[2]
+                    lineparts = line.replace('\n', '').split('\t')
+                    TiedonKasittely.iparsitiedot(self, lineparts)
+                    # self.syvyys = line_s
+                    # self.voima = line_v
+                    # self.puolikierrokset = line_pk
+                    # self.nopeus = line_n
+            textfile.close()
+
+    # parsitaan data merkittävään muotoon
+    def iparsitiedot(self, line):
+        line_sanoma = line[0].rpartition(":")[0]
+        syvyys = int(line[0].rpartition(":")[2])
+        TiedonKasittely.asetasyvyys(self, syvyys)
+        voima = int(line[1])
+        TiedonKasittely.asetavoima(self, voima)
+        puolikierrokset = int(line[2])
+        TiedonKasittely.asetapuolikierrokset(self, puolikierrokset)
+        nopeus = int(line[3])
+        TiedonKasittely.asetanopeus(self, nopeus)
+        print("sanoma:{} syvyys:{} voima:{} pk:{} nopeus:{}".format(line_sanoma,
+                                                                    self.haesyvyys(),
+                                                                    self.haevoima(),
+                                                                    self.haepuolikierrokset(),
+                                                                    self.haenopeus()))
+        # if line_sanoma =="TAL":
+        # if line_sanoma == "MIT":
+
+class OtherFrame(wx.Frame):
+    """"""
+
+    # ----------------------------------------------------------------------
+    def __init__(self):
+        """Constructor"""
+        wx.Frame.__init__(self, None, wx.ID_ANY, "Piirto", size=(500,500))
+        panel = wx.Panel(self)
+
+
+def main():
+    app = wx.App()
+    frame = windowClass(None)
+    frame.Show(True)
+    app.MainLoop()
+
+if __name__ == '__main__':
+    main()
+
+
+#update arvot ja piirros yhdeltä riviltä
 
