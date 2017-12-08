@@ -1,0 +1,54 @@
+﻿,Sr  SORA		'Sorat:
+,hSr HIENO SORA		'- hieno sora
+,keSr KESKIR.SOR	'- keskirakeinen sora
+,kaSr KARKEA SOR	'- karkea sora
+,hkSr HIEKK. SOR	'- hiekkainen sora
+,huSr HUMUK. SOR	'- humuksinen sora
+
+,Hk HIEKKA		'Hiekat:
+,hHk HIENO HIEK.	'- hieno hiekka
+,keHk KESKIR.HKA	'- keskirakeinen hiekka
+,kaHk KARKEA HKA	'-karkea hiekka
+,srHk SOR.HIEKKA	'- sorainen hiekka
+,siHk SILT.HIEKK	'- silttinen hiekka
+,huHk HUM.HIEKKA	'- humuksinen hiekka
+
+,Mr MOREENI		'Moreenit
+,SrMr SORAMOR. 		'- soramoreeni
+,hkSrMr H.SORMOR	'- hiekkainen soramoreeni
+,HkMr HIEK.MOR.		'- hiekkamoreeni
+,siHkMr SiHKAMOR	'- silttinen hiekkamoreeni
+,srHkMr SoHKAMOR	'- sorainen hiekkamoreeni
+,huHkMr HuHKAMOR	'- humuksinen hiekkamoreeni
+,SiMr SILT.MOR.		'- silttimoreeni
+,hkSiMr HkSIL.MOR	'- hiekkainen silttimoreeni
+,huSiMr HuSIL.MOR	'- humuksinen silttimoreeni
+
+,Si SILTTI		'Siltit:
+,hSi HIENO SILT.	'- hieno siltti
+,keSi KESKIR.SIL	'- keskirakeinen siltti
+,kaSi KARK.SILT.	'- karkea siltti
+,hkSi HIEK.SILT.	'- hiekkainen siltti
+,saSi SAVIN.SILT.	'- savinen siltti
+,ljSi SAVIN.SILT.	'- liejuinen siltti
+
+,Sa SAVI         	'Savet:
+,laSa LAIHA SAVI	'- laiha savi
+,liSa LIHAV.SAVI	'- lihava savi
+,ljSa LIJUI.SAVI	'- liejuinen savi
+
+,Lj LIEJU		'Liejut:
+
+,Tv TURVE       	'Turpeet:
+
+,Mu MULTA
+,Hm HUMUSMAA
+
+,Ta TÄYTEMAA		'Muut 
+,Ki KIVI
+,Lo LOHKARE
+,Po LAPIPOR.LOHK
+,Ka KALLIO
+,Vesi VESI
+,Ma TUNTEMATON
+,Ei PIIRRETÄ
