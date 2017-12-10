@@ -12,10 +12,11 @@ import wx
 import os
 import wx.lib.scrolledpanel as scrolled
 import bar_animation as ba
-import communication
-import guioperations
-import threading
-import serial
+import re
+#import communication
+#import guioperations
+#import threading
+#import serial
 
 
 '''
@@ -36,11 +37,11 @@ class windowClass(wx.Frame):
         self.basicGUI()
         self.data = TiedonKasittely()
         self.ba = ba
-        self.com = communication
-        self.gui = guioperations
-        self.listener = self.com.Communication("com3", 9600)
-        t1 = threading.Thread(target=self.com.Communication.readValues(self.listener))
-        t1.start()
+        #self.com = communication
+        #self.gui = guioperations
+        #self.listener = self.com.Communication("com3", 9600)
+        #t1 = threading.Thread(target=self.com.Communication.readValues(self.listener))
+        #t1.start()
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.update, self.timer)
 
@@ -126,6 +127,13 @@ class windowClass(wx.Frame):
         self.pistenimiteksti = wx.StaticText(panel, -1, ">pisteen nimi<", pos=(150, 165))
         self.pistenimiteksti.SetFont(font2)
 
+        # ohjelmanimiteksti näyttää valitusta ohjelmanappulasta käytössäolevan ohjelman
+        self.ohjelmateksti = wx.StaticText(panel, -1, "Ohjelma:", pos=(410, 215))
+        self.ohjelmateksti.SetFont(font1)
+
+        self.ohjelmaarvoteksti = wx.StaticText(panel, -1, "><", pos=(500, 215))
+        self.ohjelmaarvoteksti.SetFont(font1)
+
         # alatekstien alustus
         self.alkusyvyysteksti = wx.StaticText(panel, -1, "A-syv", pos=(5, 315))
         self.alkusyvyysteksti.SetFont(font1)
@@ -161,10 +169,10 @@ class windowClass(wx.Frame):
         self.nopeusteksti.SetFont(font1)
 
         # nopeusarvoteksti päivittyy listeneriltä tulevan voiman mukaan
-        self.nopeusarvoteksti = wx.StaticText(panel, -1, "><", pos=(325, 345))
+        self.nopeusarvoteksti = wx.StaticText(panel, -1, "><", pos=(315, 345))
         self.nopeusarvoteksti.SetFont(font2)
 
-        self.maalajiteksti = wx.StaticText(panel, -1, "Maalaji", pos=(410, 315))
+        self.maalajiteksti = wx.StaticText(panel, -1, "Maalaji", pos=(390, 315))
         self.maalajiteksti.SetFont(font1)
 
         # maalajiarvoteksti päivittyy käyttäjän valitessa maalaji
@@ -286,6 +294,7 @@ class windowClass(wx.Frame):
         self.puolikierroksetarvoteksti.SetLabelText("><")
         self.nopeusarvoteksti.SetLabelText("><")
         self.maalajiarvoteksti.SetLabelText("SaSi")
+        self.ohjelmaarvoteksti.SetLabelText("><")
         self.data = TiedonKasittely()
         self.scrolled_panel.ScrollLines(150)
         self.scrolled_panel.Layout()
@@ -324,21 +333,26 @@ class windowClass(wx.Frame):
         # if ba.fig == None:
         #     graafi.show()
         ba.main(self.data)
-
-
         print("lululu noob noob")
 
     def valitseohjelma(self, event):
-        print("Ohjelman valinta")
+        ohjelma = self.data.ivalitseohjelma()
+        self.ohjelmaarvoteksti.SetLabelText(ohjelma)
 
     def hallintamenu(self, event):
         print("hallitsijat hallitsee")
 
     # käyttäjä valitsee listalta maalajin, joka tallennetaan data-luokkaan
     def valitsemaalaji(self, event):
-        valinta = self.data.ivalitsemaalaji()
-        print("tägättiin maalaji {} syvyydelle {}".format(valinta, self.data.haesyvyys()))
-        self.maalajiarvoteksti.SetLabelText(valinta)
+        self.data.iluemaalajit()
+        print("tägättiin maalaji{} syvyydelle {}".format(self.data.haemaalaji(), self.data.haesyvyys()))
+        tagi = self.data.haemaalaji()
+        with open("maalajit.txt", "r") as textfile:
+            for line in textfile:
+                if len(line) > 1:
+                    lineparts = line.replace("\n", "").strip("\t")
+                    if lineparts.__contains__(self.data.haemaalaji()):
+                        self.maalajiarvoteksti.SetLabelText(lineparts.rsplit(' ')[0].replace(',',""))
 
 # Tiedonkasittely luokka
 # tämä tallentaa käyttäjän ja communicationin syöttämän datan ja syöttää sen windowclass luokalle
@@ -402,15 +416,76 @@ class TiedonKasittely(object):
             pistevalinta.Destroy()
             return self.piste
 
+    # valitaan ohjelma ohjelma-napista
+    # tiedot luetaan tutkimustavat-tiedostosta
+    #
+    def ivalitseohjelma(self):
+        z = []
+        with open("tutkimustavat.txt", "r", encoding="utf-8") as textfile:
+            for line in textfile:
+                if len(line) > 1:
+                    z.append(line.rsplit(" ")[1])
+        textfile.close()
+        ohjelmavalinta = wx.SingleChoiceDialog(None, "Valitse piste", "Pisteet", z, wx.CHOICEDLG_STYLE)
+        if ohjelmavalinta.ShowModal() == wx.ID_OK:
+            ohjelmavalinta = ohjelmavalinta.GetStringSelection()
+            with open("tutkimustavat.txt", "r") as textfile:
+                for line in textfile:
+                    if line.__contains__(ohjelmavalinta):
+                        textfile.close()
+                        if line[:2].__contains__("ï"):
+                            return line[3:5]
+                        else:
+                            return line[:2]
+
     # valitaan luokalle maalaji listalta
-    def ivalitsemaalaji(self):
-        maavalinta = wx.SingleChoiceDialog(None, "Valitse maalaji", "", ['SaSi', 'Bedrock', 'Parquet'],
+    # maalajit kakkosikkunaan valitaan tekstitiedostosta ensimmäisen ikkunan
+    # valinnan kolmen ensimmäisen kirjaimen mukaan.
+    def ivalitsemaalaji(self, lista):
+        maalista = []
+        temp_lista = []
+        maalaji = wx.SingleChoiceDialog(None, "Valitse maalaji", "Maalaji", lista,
                                            wx.CHOICEDLG_STYLE)
-        if maavalinta.ShowModal() == wx.ID_OK:
-            TiedonKasittely.maalaji = maavalinta.GetStringSelection()
-            TiedonKasittely.asetamaalaji(self, maavalinta)
-            maavalinta.Destroy()
-            return maavalinta.GetStringSelection()
+        if maalaji.ShowModal() == wx.ID_OK:
+            maalaji = maalaji.GetStringSelection()
+            if maalaji == "Liejut":
+                self.asetamaalaji("Lieju")
+                return None
+            elif maalaji == "Turpeet":
+                turvelaji = wx.SingleChoiceDialog(None, "Valitse turvelaji", "Turpeet", ['turve', 'multa', 'humusmaa'])
+                if turvelaji.ShowModal() == wx.ID_OK:
+                    turvelaji = turvelaji.GetStringSelection()
+                    self.asetamaalaji(turvelaji)
+                    return None
+            elif maalaji == "Muut":
+                maalaji = wx.SingleChoiceDialog(None, "Valitse maalaji", "Muut maat", ['TÄYTEMAA', 'KIVI', 'LOHKARE',
+                                                                                       'LAPIPOR.LOHK', 'KALLIO', 'VESI',
+                                                                                       'TUNTEMATON', 'EI PIIRRETÄ'])
+                if maalaji.ShowModal() == wx.ID_OK:
+                    maalaji = maalaji.GetStringSelection()
+                    self.asetamaalaji(maalaji)
+                    return None
+            else:
+                maalaji = maalaji.lower()
+                parseri_maski = maalaji[:3]
+                with open("maalajit.txt", "r") as textfile:
+                    for line in textfile:
+                        if len(line) > 1:
+                            lineparts = line.replace("\n", "").split("\t")
+                            for line in lineparts:
+                                if line.__contains__(parseri_maski):
+                                    temp_lista.append(line)
+                textfile.close()
+                for alkio in temp_lista:
+                    parsittu = re.sub('[^a-zA-Z0-9 \n\.]', '', alkio)
+                    maalista.append(parsittu)
+                maatyyppi = wx.SingleChoiceDialog(None, "Valitse maatyyppi", "{}".format(maalaji),
+                                                  maalista, wx.CHOICEDLG_STYLE)
+                if maatyyppi.ShowModal() == wx.ID_OK:
+                    maatyyppi = maatyyppi.GetStringSelection()
+                    self.asetamaalaji(maatyyppi)
+                    return None
+
 
     # luetaan tiedot tekstitiedostosta, mockup communication listenistä
     def iluetiedot(self):
@@ -425,6 +500,22 @@ class TiedonKasittely(object):
                     # self.puolikierrokset = line_pk
                     # self.nopeus = line_n
             textfile.close()
+
+    def iluemaalajit(self):
+        lajit = []
+        temp_list = []
+        with open("maalajit.txt", "r") as textfile:
+            for line in textfile:
+                if len(line) > 1:
+                    lineparts = line.replace('\n', '').split('\t')
+                    for line in lineparts:
+                        if line.__contains__(":"):
+                            temp_list.append(line)
+            for alkio in temp_list:
+                parsittu = re.sub('[^a-zA-Z0-9 \n\.]', '', alkio)
+                lajit.append(parsittu)
+        textfile.close()
+        self.ivalitsemaalaji(lajit)
 
     # parsitaan data merkittävään muotoon
     def iparsitiedot(self, line):
@@ -443,7 +534,9 @@ class TiedonKasittely(object):
                                                                     self.haepuolikierrokset(),
                                                                     self.haenopeus()))
         # if line_sanoma =="TAL":
+            #lätä takasin
         # if line_sanoma == "MIT":
+            #printtaa
 
 class OtherFrame(wx.Frame):
     """"""
@@ -465,5 +558,7 @@ if __name__ == '__main__':
     main()
 
 
-#update arvot ja piirros yhdeltä riviltä
+#tiedontallennukset saving.py palautaTalpolku tallennuspolku, avaustiedosto jne
+
+# #PATH	C:\Users\GEOXX <- käyttökansio
 

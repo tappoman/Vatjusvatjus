@@ -40,11 +40,10 @@
 ,Lj LIEJU		'Liejut:
 
 ,Tv TURVE       	'Turpeet:
-
 ,Mu MULTA
 ,Hm HUMUSMAA
 
-,Ta TÄYTEMAA		'Muut 
+,Ta TÄYTEMAA		'Muut: 
 ,Ki KIVI
 ,Lo LOHKARE
 ,Po LAPIPOR.LOHK
