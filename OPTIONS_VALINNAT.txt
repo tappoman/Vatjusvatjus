@@ -7,43 +7,43 @@ Luokka
 			tiedosto.txt (sijainti)
 			
 Saving:
-	asetaParams()
-		port: (String) COM1-COM10 (dropdown tms.)
-		baud: (float) syöte: 9600 (void mennä dropdown kans, perusnopeudet tähän)
-		polku: (String) syöte: "esim C:/Users/blaablaablaa" Tämä on tallennettavan TAL-datan ja MIT-datan polku!!
-			USECONTROL.ini (juuri)
+aseta parametrit:	asetaParams()
+			port: (String) COM1-COM10 (dropdown tms.)
+			baud: (float) syöte: 9600 (void mennä dropdown kans, perusnopeudet tähän)
+			polku: (String) syöte: "esim C:/Users/blaablaablaa" Tämä on tallennettavan TAL-datan ja MIT-datan polku!!
+				USECONTROL.ini (juuri)
 			
-	asetaHWcontrol()
-		LOGGING: (float) syöte
-		PULS_CM: (float) syöte 
-		PULS_PK: (float) syöte
-			HWCONTROL.ini (juuri)
+aseta hwcontrol:	asetaHWcontrol()
+			LOGGING: (float) syöte
+			PULS_CM: (float) syöte 
+			PULS_PK: (float) syöte
+				HWCONTROL.ini (juuri)
 			
-	asetaAloitustiedot()
-		FO: (String) syöte
-		KJ: (String) syöte 
-		OM: (String) syöte
-		ML: (String) syöte
-		ORG: (String syöte
-			ALOITUSTIEDOT.ini (juuri)
+aseta aloitustiedot:	asetaAloitustiedot()
+			FO: (String) syöte
+			KJ: (String) syöte 
+			OM: (String) syöte
+			ML: (String) syöte
+			ORG: (String syöte
+				ALOITUSTIEDOT.ini (juuri)
 
-	asetaPistetiedot()
-		TY: (String) syöte
-		PK: (String) syöte
-		LA: (String) syöte
-			PISTETIEDOT.ini (juuri)
+aseta pistetiedot:	asetaPistetiedot()
+			TY: (String) syöte
+			PK: (String) syöte
+			LA: (String) syöte
+				PISTETIEDOT.ini (juuri)
 
-	asetaTutkimustiedot()
-		TT: (String) syöte
-		TX: (String) syöte
-		XY: (String) syöte
-		LN: (String) syöte
-			TUTKIMUSTIEDOT.ini (juuri)
+aseta tutkimustiedot:	asetaTutkimustiedot()
+			TT: (String) syöte
+			TX: (String) syöte
+			XY: (String) syöte
+			LN: (String) syöte
+				TUTKIMUSTIEDOT.ini (juuri)
 			
-	tallennaTAL()
-		hanke: (String) haetaan USECONTROL.ini filusta
-		polku: (String) haetaan USECONTROL.ini filusta
-		TAL: (tallennettava rivi = #TAL)
+aseta tallennustiedot:	tallennaTAL()
+			hanke: (String) haetaan USECONTROL.ini filusta
+			polku: (String) haetaan USECONTROL.ini filusta
+			TAL: (tallennettava rivi = #TAL)
 		
 		
 eli yllä olevilla metodeilla tallennettaan filuun kun jotain muutetaan asetusikkunassa
@@ -57,13 +57,3 @@ config.read('haluttu.ini')
 
 #kaikki on DEFAULT sektiossa omissa filuissaan
 config['DEFAULT']['port'] --> antaa portin filusta jne.
-		
-
-	
-		
-		
-		
-		
-	
-	
-
