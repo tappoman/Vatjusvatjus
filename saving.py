@@ -1,6 +1,4 @@
-﻿#TODO
-#Hoida tallennus loppuun
-
+﻿
 """Tämä luokka vastaa tiedostonkäsittelystä.
 sisältää metodit
 kks-parametrien tallennukseen,
@@ -10,17 +8,6 @@ kalibrointitiedot,
 kielivalinnat ,
 tallennuspolku,
 kommunikaation hallinta(portti, baudi) ..."""
-
-
-#Eli Kansio_1 --> Hankkeen nimi:
-#Tiedoston nimi --> Piste
-#Headeri --> Työnumero, Tutkimustapa, sijainti (E, N, syvyys). Päivämäärä, kalibrointiarvot
-#    --> perään TAL:
-
-#Maalaji (lisätään myös syvyyteen X kun maalaji muuttuu)
-
-#Tiedosto_2 (asetukset): Portti, baudi, polku,
-
 
 
 import sys
@@ -43,7 +30,7 @@ class Saving (object):
     def tallennaMIT(self, MIT):
         self.tiedosto = "MIT_temp.txt"
         self.fullpath = os.path.join(self.tal_polku, self.tiedosto)
-        file = open(self.fullpath, "a")
+        file = open(self.fullpath, "a", encoding="utf-8")
         file.write(MIT + "\n")
 
     #asettaa polun tallennettavalle datalle ja kommunikaation liittyville parametreille (baud, port)
@@ -184,6 +171,7 @@ class Saving (object):
         file.write(TAL + "\n")
 
 
+<<<<<<< HEAD
 
 # sa = Saving()
 # sa.asetaParams("COM3", "9500", "c:/tmp/", "hanke1.txt")
@@ -195,6 +183,19 @@ class Saving (object):
 # sa.koostaHankeheader()
 # sa.koostaPisteheader()
 # sa.koostaTutkimusheader()
+=======
+'''
+sa = Saving()
+sa.asetaParams("COM3", "9500", "c:/tmp/", "hanke1.txt")
+sa.asetaHWcontrol()
+sa.asetaHanketiedot()
+sa.asetaPistetiedot("12344", "0 MK", "GM6364")
+sa.asetaTutkimustiedot("PA", "KALIBBLAA", "LALLAA")
+
+sa.koostaHankeheader()
+sa.koostaPisteheader()
+sa.koostaTutkimusheader()'''
+>>>>>>> 62f9fa469acbad216647d1547ec6065a98bb748f
 
 
 #config = configparser.ConfigParser()
