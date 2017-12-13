@@ -30,7 +30,7 @@ class Saving (object):
     def tallennaMIT(self, MIT):
         self.tiedosto = "MIT_temp.txt"
         self.fullpath = os.path.join(self.tal_polku, self.tiedosto)
-        file = open(self.fullpath, "a")
+        file = open(self.fullpath, "a", encoding="utf-8")
         file.write(MIT + "\n")
 
     #asettaa polun tallennettavalle datalle ja kommunikaation liittyville parametreille (baud, port)
