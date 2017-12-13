@@ -15,8 +15,8 @@ import bar_animation as ba
 import re
 import configparser
 import shutil
+import saving
 
-# import saving
 # import communication
 # import guioperations
 # import threading
@@ -631,37 +631,90 @@ class TiedonKasittely(object):
             muokattava = valinta.GetStringSelection()
             valinta.Destroy()
             if muokattava == "HANKETIEDOT":
-                self.config.read("HANKETIEDOT.ini")
-                uusifo = wx.TextEntryDialog(None, "FO", "{} hanketiedot".format(self.hanke),
-                                            self.config["DEFAULT"]["fo"])
-                if uusifo.ShowModal() == wx.ID_OK:
-                    uusifo = uusifo.GetValue()
+                self.ihankeheader()
+            if muokattava == "PISTETIEDOT":
+                self.ipisteheader()
+            if muokattava == "TUTKIMUSTIEDOT":
+                self.itutkimusheader()
 
-                uusikj = wx.TextEntryDialog(None, "KJ", "{} hanketiedot".format(self.hanke),
-                                            self.config["DEFAULT"]["KJ"])
-                if uusikj.ShowModal() == wx.ID_OK:
-                    uusikj = uusikj.GetValue()
+    def ihankeheader(self):
+        self.config.read("HANKETIEDOT.ini")
+        uusifo = wx.TextEntryDialog(None, "FO", "{} hanketiedot".format(self.hanke),
+                                    self.config["DEFAULT"]["fo"])
+        if uusifo.ShowModal() == wx.ID_OK:
+            uusifo = uusifo.GetValue()
 
-                uusiom = wx.TextEntryDialog(None, "OM", "{} hanketiedot".format(self.hanke),
-                                            self.config["DEFAULT"]["OM"])
-                if uusiom.ShowModal() == wx.ID_OK:
-                    uusiom = uusiom.GetValue()
+        uusikj = wx.TextEntryDialog(None, "KJ", "{} hanketiedot".format(self.hanke),
+                                    self.config["DEFAULT"]["KJ"])
+        if uusikj.ShowModal() == wx.ID_OK:
+            uusikj = uusikj.GetValue()
 
-                uusiml = wx.TextEntryDialog(None, "ML", "{} hanketiedot".format(self.hanke),
-                                            self.config["DEFAULT"]["ML"])
-                if uusiml.ShowModal() == wx.ID_OK:
-                    uusiml = uusiml.GetValue()
+        uusiom = wx.TextEntryDialog(None, "OM", "{} hanketiedot".format(self.hanke),
+                                    self.config["DEFAULT"]["OM"])
+        if uusiom.ShowModal() == wx.ID_OK:
+            uusiom = uusiom.GetValue()
 
-                uusiorg = wx.TextEntryDialog(None, "ORG", "{} hanketiedot".format(self.hanke),
-                                            self.config["DEFAULT"]["ORG"])
-                if uusiorg.ShowModal() == wx.ID_OK:
-                    uusiorg = uusiorg.GetValue()
+        uusiml = wx.TextEntryDialog(None, "ML", "{} hanketiedot".format(self.hanke),
+                                    self.config["DEFAULT"]["ML"])
+        if uusiml.ShowModal() == wx.ID_OK:
+            uusiml = uusiml.GetValue()
 
+        uusiorg = wx.TextEntryDialog(None, "ORG", "{} hanketiedot".format(self.hanke),
+                                     self.config["DEFAULT"]["ORG"])
+        if uusiorg.ShowModal() == wx.ID_OK:
+            uusiorg = uusiorg.GetValue()
+
+        sa = saving.Saving()
+        sa.asetaHanketiedot(uusifo, uusikj, uusiml, uusiom, uusiorg)
+
+
+    def ipisteheader(self):
+        self.config.read("PISTETIEDOT.ini")
+        uusity = wx.TextEntryDialog(None, "TY", "{} pisteen {} tiedot".format(self.hanke, self.piste),
+                                    self.config["DEFAULT"]["TY"])
+        if uusity.ShowModal() == wx.ID_OK:
+            uusity = uusity.GetValue()
+
+        uusipk = wx.TextEntryDialog(None, "PK",  "{} pisteen {} tiedot".format(self.hanke, self.piste),
+                                    self.config["DEFAULT"]["PK"])
+        if uusipk.ShowModal() == wx.ID_OK:
+            uusipk = uusipk.GetValue()
+
+        uusila = wx.TextEntryDialog(None, "LA",  "{} pisteen {} tiedot".format(self.hanke, self.piste),
+                                    self.config["DEFAULT"]["LA"])
+        if uusila.ShowModal() == wx.ID_OK:
+            uusila = uusila.GetValue()
+
+
+
+    def itutkimusheader(self):
+        self.config.read("TUTKIMUSTIEDOT.ini")
+        uusitt = wx.TextEntryDialog(None, "TT", "{} pisteen {} tutkimustiedot".format(self.hanke, self.piste),
+                                    self.config["DEFAULT"]["TT"])
+        if uusitt.ShowModal() == wx.ID_OK:
+            uusitt = uusitt.GetValue()
+
+        uusitx = wx.TextEntryDialog(None, "TX", "{} pisteen {} tutkimustiedot".format(self.hanke, self.piste),
+                                    self.config["DEFAULT"]["TX"])
+        if uusitx.ShowModal() == wx.ID_OK:
+            uusitx = uusitx.GetValue()
+
+        uusixy = wx.TextEntryDialog(None, "XY", "{} pisteen {} tutkimustiedot".format(self.hanke, self.piste),
+                                    self.config["DEFAULT"]["XY"])
+        if uusixy.ShowModal() == wx.ID_OK:
+            uusixy = uusixy.GetValue()
+
+        uusiln = wx.TextEntryDialog(None, "LN", "{} pisteen {} tutkimustiedot".format(self.hanke, self.piste),
+                                        self.config["DEFAULT"]["LN"])
+        if uusiln.ShowModal() == wx.ID_OK:
+            uusiln = uusiln.GetValue()
+
+            # koosta uusi pisteheader
+            print(uusitt)
             with open("{}.txt".format(self.piste), 'r', encoding="utf-8") as textfile:
                 for line in textfile:
                     if len(line) > 1:
                         print(line)
-        return None
 
     def iluotempconfig(self):
         os.chdir(self.root)

@@ -86,7 +86,7 @@ class Saving (object):
 
 
     #Aina tiedoston alkuun metodilla koostaHankeheader(), määritellään ylläpidosta
-    def asetaHanketiedot(self, FO="2.3", KJ="KKJ-N60", OM="TILAAJA", ML="GEO", ORG="GEOPOJAT"):
+    def asetaHanketiedot(self, FO, KJ, OM, ML, ORG):
         self._config["DEFAULT"] = {"FO": FO,
                                    "KJ": KJ,
                                    "OM": OM,
@@ -185,16 +185,16 @@ class Saving (object):
 
 
 
-sa = Saving()
-sa.asetaParams("COM3", "9500", "c:/tmp/", "hanke1.txt")
-sa.asetaHWcontrol()
-sa.asetaHanketiedot()
-sa.asetaPistetiedot("12344", "0 MK", "GM6364")
-sa.asetaTutkimustiedot("PA", "KALIBBLAA", "LALLAA")
-
-sa.koostaHankeheader()
-sa.koostaPisteheader()
-sa.koostaTutkimusheader()
+# sa = Saving()
+# sa.asetaParams("COM3", "9500", "c:/tmp/", "hanke1.txt")
+# sa.asetaHWcontrol()
+# sa.asetaHanketiedot()
+# sa.asetaPistetiedot("12344", "0 MK", "GM6364")
+# sa.asetaTutkimustiedot("PA", "KALIBBLAA", "LALLAA")
+#
+# sa.koostaHankeheader()
+# sa.koostaPisteheader()
+# sa.koostaTutkimusheader()
 
 
 #config = configparser.ConfigParser()
