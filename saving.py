@@ -1,6 +1,4 @@
-﻿#TODO
-#Hoida tallennus loppuun
-
+﻿
 """Tämä luokka vastaa tiedostonkäsittelystä.
 sisältää metodit
 kks-parametrien tallennukseen,
@@ -10,17 +8,6 @@ kalibrointitiedot,
 kielivalinnat ,
 tallennuspolku,
 kommunikaation hallinta(portti, baudi) ..."""
-
-
-#Eli Kansio_1 --> Hankkeen nimi:
-#Tiedoston nimi --> Piste
-#Headeri --> Työnumero, Tutkimustapa, sijainti (E, N, syvyys). Päivämäärä, kalibrointiarvot
-#    --> perään TAL:
-
-#Maalaji (lisätään myös syvyyteen X kun maalaji muuttuu)
-
-#Tiedosto_2 (asetukset): Portti, baudi, polku,
-
 
 
 import sys
@@ -184,7 +171,7 @@ class Saving (object):
         file.write(TAL + "\n")
 
 
-
+'''
 sa = Saving()
 sa.asetaParams("COM3", "9500", "c:/tmp/", "hanke1.txt")
 sa.asetaHWcontrol()
@@ -194,7 +181,7 @@ sa.asetaTutkimustiedot("PA", "KALIBBLAA", "LALLAA")
 
 sa.koostaHankeheader()
 sa.koostaPisteheader()
-sa.koostaTutkimusheader()
+sa.koostaTutkimusheader()'''
 
 
 #config = configparser.ConfigParser()
