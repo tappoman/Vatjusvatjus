@@ -349,7 +349,9 @@ class windowClass(wx.Frame):
                 self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
                 self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
                 alkusyvyys.Destroy()
-                print("lähetetään kkssälle tieto AL syvyydellä {} on {}".format(alkusyvyys.GetValue(), kairausvalinta))
+                print("lähetetään kkssälle: työnumero(hanke?), {}, {}, pvm(timestä?)".format(kairausvalinta)
+                      , self.data.piste)
+
 
     def lopetakairaus(self, event):
         os.chdir(self.data.root)
@@ -387,18 +389,17 @@ class windowClass(wx.Frame):
             warning.Destroy()
         else:
             self.piste = self.pistenimiteksti.GetLabel()
-            self.data.ikuuntele()
             self.update()
 
     # kutsuu päivityksiä arvoteksteille ja paneelille
     def update(self):
         # print(self.listener)
+        self.data.ikuuntele()
         self.updatepiste(self.data)
         self.updatetextpanel(self.data)
 
     # päivittää tekstipaneelin yläpuolella olevat arvotekstit com-listenerin tietojen mukaan
     def updatepiste(self, data):
-        self.data.ikuuntele()
         self.voimaarvoteksti.SetLabelText(str(data.voima))
         self.puolikierroksetarvoteksti.SetLabelText(str(data.puolikierrokset))
         self.nopeusarvoteksti.SetLabelText(str(data.nopeus))
@@ -644,14 +645,13 @@ class TiedonKasittely(object):
 
     # luetaan tiedot tekstitiedostosta, mockup communication listenistä
     def ikuuntele(self):
+        z = []
         with open("data0.txt", 'r', encoding="utf-8") as textfile:
             for line in textfile:
                 if len(line) > 1:
                     lineparts = line.replace('\n', '').split('\t')
-                    if lineparts.__contains__("#"):
+                    if lineparts[0][:4]==("#MIT"):
                         self.iparsitiedot(lineparts)
-            textfile.close()
-        return None
 
     def iparsiheader(self):
         headlista = []
@@ -683,6 +683,7 @@ class TiedonKasittely(object):
 
     # parsitaan data merkittävään muotoon
     def iparsitiedot(self, line):
+        print(line)
         line_sanoma = line[0].rpartition(":")[0]
         syvyys = int(line[0].rpartition(":")[2])
         self.asetasyvyys(syvyys)
@@ -696,7 +697,6 @@ class TiedonKasittely(object):
             #lätä takasin
         # if line_sanoma == "MIT":
             #printtaa
-        return None
 
     def ihallinta(self):
         self.iluotempconfig()
