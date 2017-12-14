@@ -76,13 +76,13 @@ class windowClass(wx.Frame):
 
         # ohjelma
         # valitsee kairausohjelman
-        self.ohjelmabutton = wx.Button(panel, label="Ohjelma", pos=(235, 10), size=(110, 110))
+        self.ohjelmabutton = wx.Button(panel, label="Tutkimus-\ntapa", pos=(235, 10), size=(110, 110))
         self.ohjelmabutton.SetFont(font1)
         self.ohjelmabutton.Bind(wx.EVT_BUTTON, self.valitseohjelma)
 
         # hallinta
         # hallitaan valtakuntaa
-        self.hallintabutton = wx.Button(panel, label="Hallinta", pos=(350, 10), size=(110, 110))
+        self.hallintabutton = wx.Button(panel, label="Tietojen\nhallinta", pos=(350, 10), size=(110, 110))
         self.hallintabutton.SetFont(font1)
         self.hallintabutton.Bind(wx.EVT_BUTTON, self.hallintamenu)
 
@@ -92,103 +92,129 @@ class windowClass(wx.Frame):
         self.maalajibutton.SetFont(font1)
         self.maalajibutton.Bind(wx.EVT_BUTTON, self.valitsemaalaji)
 
-        # piirto
-        # käyttäjä voi valita piirtonäkymän
-        self.graphbutton = wx.Button(panel, label="Piirto", pos=(10, 215), size=(200, 100))
-        self.graphbutton.SetFont(font1)
-        self.graphbutton.Bind(wx.EVT_BUTTON, self.graafinpiirto)
-
         # hae
         # communications listenerin mockup
-        self.loadbutton = wx.Button(panel, label="Hae", pos=(220, 215), size=(50, 50))
+        self.loadbutton = wx.Button(panel, label="Hae", pos=(465, 120), size=(50, 50))
         self.loadbutton.SetFont(font1)
         self.loadbutton.Bind(wx.EVT_BUTTON, self.lataapiste)
 
         # alusta
         # tyhjentää paneelin ja asettaa arvot alkuarvoiksi
-        self.alustabutton = wx.Button(panel, label="Alusta", pos=(220, 265), size=(75, 50))
+        self.alustabutton = wx.Button(panel, label="Alusta", pos=(520, 120), size=(65, 50))
         self.alustabutton.SetFont(font1)
         self.alustabutton.Bind(wx.EVT_BUTTON, self.alustatiedot)
 
-        # alkusyvyys
-        # käyttäjä voi valita alkusyvyyden, joka lisätään listenerin syvyys arvoon
-        self.alkusyvyysbutton = wx.Button(panel, label="a-syv", pos=(300, 215), size=(100,100))
-        self.alkusyvyysbutton.SetFont(font1)
-        self.alkusyvyysbutton.Bind(wx.EVT_BUTTON, self.asetaalkusyvyys)
+        # piirto
+        # käyttäjä voi valita piirtonäkymän
+        self.graphbutton = wx.Button(panel, label="Piirto", pos=(10, 215), size=(100, 100))
+        self.graphbutton.SetFont(font1)
+        self.graphbutton.Bind(wx.EVT_BUTTON, self.graafinpiirto)
+
+        # alkukairaus
+        # käyttäjä valitsee kairaustyypin ja alkusyvyyden, joka lähetetään kkssälle
+        self.alkukairausbutton = wx.Button(panel, label="Alku\nkairaus", pos=(120, 215), size=(100,100))
+        self.alkukairausbutton.SetFont(font1)
+        self.alkukairausbutton.Bind(wx.EVT_BUTTON, self.aloitaalkukairaus)
+
+        # kairauksen lopetus
+        # käyttäjä valitsee lopetussyyn
+        # tiedot kkssälle
+        self.lopetusbutton = wx.Button(panel, label="Lopeta", pos=(400, 215), size=(100,100))
+        self.lopetusbutton.SetFont(font1)
+        self.lopetusbutton.Bind(wx.EVT_BUTTON, self.lopetakairaus)
+
+        # tankobutton
+        # heilutellaan sitä tankoa
+        # disco
+        self.tankobutton = wx.Button(panel, label="Tanko", pos=(500, 215), size=(50,50))
+        self.tankobutton.SetFont(font1)
+        self.tankobutton.Bind(wx.EVT_BUTTON, self.tanko)
 
         # tietotekstien alustus
         self.hanketeksti = wx.StaticText(panel, -1, "Hanke: ", pos=(10, 120))
         self.hanketeksti.SetFont(font2)
 
         # tiedostonimiteksti näyttää valitun hankkeen nimen
-        self.hankenimiteksti = wx.StaticText(panel, -1, ">hankkeen nimi<", pos=(220, 120))
+        self.hankenimiteksti = wx.StaticText(panel, -1, ">hankkeen nimi<", pos=(120, 120))
         self.hankenimiteksti.SetFont(font2)
 
         self.pisteteksti = wx.StaticText(panel, -1, "Piste: ", pos=(10, 165))
         self.pisteteksti.SetFont(font2)
 
         # pistenimiteksti näyttää valitusta hankkeesta valitun pisteen
-        self.pistenimiteksti = wx.StaticText(panel, -1, ">pisteen nimi<", pos=(150, 165))
+        self.pistenimiteksti = wx.StaticText(panel, -1, ">pisteen nimi<", pos=(100, 165))
         self.pistenimiteksti.SetFont(font2)
 
         # ohjelmanimiteksti näyttää valitusta ohjelmanappulasta käytössäolevan ohjelman
-        self.ohjelmateksti = wx.StaticText(panel, -1, "Ohjelma:", pos=(410, 215))
+        self.ohjelmateksti = wx.StaticText(panel, -1, "Ohjelma:", pos=(230, 210))
         self.ohjelmateksti.SetFont(font1)
 
-        self.ohjelmaarvoteksti = wx.StaticText(panel, -1, "><", pos=(500, 215))
-        self.ohjelmaarvoteksti.SetFont(font1)
+        self.ohjelmaarvoteksti = wx.StaticText(panel, -1, "><", pos=(315, 200))
+        self.ohjelmaarvoteksti.SetFont(font2)
 
-        # alatekstien alustus
-        self.alkusyvyysteksti = wx.StaticText(panel, -1, "A-syv", pos=(5, 315))
+        # alkukairausteksti päivittyy käyttäjän valinnan mukaan
+        self.alkukairausteksti = wx.StaticText(panel, -1, "AL:", pos=(230, 245))
+        self.alkukairausteksti.SetFont(font1)
+
+        self.alkukairausarvoteksti = wx.StaticText(panel, -1, "><", pos=(260, 235))
+        self.alkukairausarvoteksti.SetFont(font2)
+
+        self.alkusyvyysteksti = wx.StaticText(panel, -1, "A-syv:", pos=(230, 280))
         self.alkusyvyysteksti.SetFont(font1)
 
-        # alkusyvyysarvoteksti päivittyy käyttäjän valinnan mukaan
-        self.alkusyvyysarvoteksti = wx.StaticText(panel, -1, "><", pos=(5, 345))
+        self.alkusyvyysarvoteksti = wx.StaticText(panel, -1, "><", pos=(295, 270))
         self.alkusyvyysarvoteksti.SetFont(font2)
 
-
-        self.syvyysteksti = wx.StaticText(panel, -1, "Syvyys", pos=(70, 315))
+        # alatekstien alustus
+        self.syvyysteksti = wx.StaticText(panel, -1, "Syvyys", pos=(10, 315))
         self.syvyysteksti.SetFont(font1)
 
         # syvyysarvoteksti päivittyy alkusyvyys + listeneriltä tuleva syvyys
-        self.syvyysarvoteksti = wx.StaticText(panel, -1, "><", pos=(75, 345))
+        self.syvyysarvoteksti = wx.StaticText(panel, -1, "><", pos=(15, 345))
         self.syvyysarvoteksti.SetFont(font2)
 
-        self.voimateksti = wx.StaticText(panel, -1, "Voima", pos=(150, 315))
+        self.voimateksti = wx.StaticText(panel, -1, "Voima", pos=(85, 315))
         self.voimateksti.SetFont(font1)
 
         # voima-arvoteksti päivittyy listeneriltä tulevan voiman mukaan
-        self.voimaarvoteksti = wx.StaticText(panel, -1, "><", pos=(160, 345))
+        self.voimaarvoteksti = wx.StaticText(panel, -1, "><", pos=(95, 345))
         self.voimaarvoteksti.SetFont(font2)
 
-        self.puolikierroksetteksti = wx.StaticText(panel, -1, "P-kierr", pos=(230, 315))
+        self.puolikierroksetteksti = wx.StaticText(panel, -1, "P-kierr", pos=(165, 315))
         self.puolikierroksetteksti.SetFont(font1)
 
         # puolikierroksetarvoteksti päivittyy listeneriltä tulevan voiman mukaan
-        self.puolikierroksetarvoteksti = wx.StaticText(panel, -1, "><", pos=(240, 345))
+        self.puolikierroksetarvoteksti = wx.StaticText(panel, -1, "><", pos=(170, 345))
         self.puolikierroksetarvoteksti.SetFont(font2)
 
 
-        self.nopeusteksti = wx.StaticText(panel, -1, "Nopeus", pos=(310, 315))
+        self.nopeusteksti = wx.StaticText(panel, -1, "Nopeus", pos=(235, 315))
         self.nopeusteksti.SetFont(font1)
 
         # nopeusarvoteksti päivittyy listeneriltä tulevan voiman mukaan
-        self.nopeusarvoteksti = wx.StaticText(panel, -1, "><", pos=(315, 345))
+        self.nopeusarvoteksti = wx.StaticText(panel, -1, "><", pos=(240, 345))
         self.nopeusarvoteksti.SetFont(font2)
 
-        self.maalajiteksti = wx.StaticText(panel, -1, "Maalaji", pos=(390, 315))
+        self.maalajiteksti = wx.StaticText(panel, -1, "Maalaji", pos=(315, 315))
         self.maalajiteksti.SetFont(font1)
 
         # maalajiarvoteksti päivittyy käyttäjän valitessa maalaji
-        self.maalajiarvoteksti = wx.StaticText(panel, -1, "><", pos=(390, 345))
+        self.maalajiarvoteksti = wx.StaticText(panel, -1, "><", pos=(320, 345))
         self.maalajiarvoteksti.SetFont(font2)
 
-        self.iskuteksti = wx.StaticText(panel, -1, "Isku", pos=(515, 315))
+        self.iskuteksti = wx.StaticText(panel, -1, "Isku", pos=(400, 315))
         self.iskuteksti.SetFont(font1)
 
         # iskuarvoteksti päivittyy käyttäjän valitessa isku
-        self.iskuarvoteksti = wx.StaticText(panel, -1, "OFF", pos=(515, 345))
+        self.iskuarvoteksti = wx.StaticText(panel, -1, "OFF", pos=(390, 345))
         self.iskuarvoteksti.SetFont(font2)
+
+        self.tankoteksti = wx.StaticText(panel, -1, "Tanko", pos=(465, 315))
+        self.tankoteksti.SetFont(font1)
+
+        # iskuarvoteksti päivittyy käyttäjän valitessa isku
+        self.tankoarvolaatikko = wx.Panel(panel, pos=(465, 345), size=(50,50))
+        self.tankoarvolaatikko.SetBackgroundColour('red')
 
         # kirjoituspaneelin ja tekstielementtien alustus
         # addspacer paddaa paneelin ylälaidan arvotekstien alapuolelle
@@ -298,13 +324,61 @@ class windowClass(wx.Frame):
 
     # kysyy käyttäjältä alkusyvyyttä, joka tallennetaan
     # windowclassin.data luokkaan
-    def asetaalkusyvyys(self, event):
-        alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys',"Alkusyvyys","",
-                style=wx.OK)
-        alkusyvyys.ShowModal()
-        self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
-        self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
-        alkusyvyys.Destroy()
+    def aloitaalkukairaus(self, event):
+        os.chdir(self.data.root)
+        z = []
+        with open("alkukairaus.txt", "r") as textfile:
+            for line in textfile:
+                if len(line) > 1:
+                    z.append(line.rsplit(" ")[1].strip("\n"))
+        textfile.close()
+        kairausvalinta = wx.SingleChoiceDialog(None, "Valitse alkukairaustapa", "Alkukairaus", z, wx.CHOICEDLG_STYLE)
+        if kairausvalinta.ShowModal() == wx.ID_OK:
+            kairausvalinta = kairausvalinta.GetStringSelection()
+            if kairausvalinta == "OHITETAAN":
+                print("lähetä tieto kks alkukairaus ohitetaan")
+            else:
+                with open("alkukairaus.txt", "r") as textfile:
+                    for line in textfile:
+                        if line.__contains__(kairausvalinta):
+                            self.alkukairausarvoteksti.SetLabelText(line[1:3])
+                alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys',"Alkusyvyys","",
+                                                style=wx.OK)
+                alkusyvyys.Centre()
+                alkusyvyys.ShowModal()
+                self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
+                self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
+                alkusyvyys.Destroy()
+                print("lähetetään kkssälle tieto AL syvyydellä {} on {}".format(alkusyvyys.GetValue(), kairausvalinta))
+
+    def lopetakairaus(self, event):
+        os.chdir(self.data.root)
+        z = []
+        with open("kairausloppu.txt", "r") as textfile:
+            for line in textfile:
+                if len(line) > 1:
+                    z.append(line.rsplit(" ")[1].strip("\n"))
+                    # z.append(line)
+        textfile.close()
+        kairausvalinta = wx.SingleChoiceDialog(None, "Valitse lopetussyy", "Kairauksen lopetus", z, wx.CHOICEDLG_STYLE)
+        if kairausvalinta.ShowModal() == wx.ID_OK:
+            kairausvalinta = kairausvalinta.GetStringSelection()
+            # with open("kairausloppu.txt", "r") as textfile:
+            #     for line in textfile:
+            #         if line.__contains__(kairausvalinta):
+            #             print(line[1:3])
+            print("lähetetään kkssälle tieto kairaus lopetettiin syvyydellä {} syystä {}"
+                  .format(self.data.haesyvyys(), kairausvalinta))
+
+    def tanko(self, event):
+        if self.tankoarvolaatikko.GetBackgroundColour() == 'red':
+            self.tankoarvolaatikko.SetBackgroundColour('green')
+            self.tankoarvolaatikko.Refresh()
+        elif self.tankoarvolaatikko.GetBackgroundColour() == 'green':
+            self.tankoarvolaatikko.SetBackgroundColour('red')
+            self.tankoarvolaatikko.Refresh()
+        return None
+
 
     def lataapiste(self, event):
         if self.pistenimiteksti.GetLabel() == ">pisteen nimi<":
@@ -511,9 +585,10 @@ class TiedonKasittely(object):
                 if len(line) > 1:
                     z.append(line.rsplit(" ")[1])
         textfile.close()
-        ohjelmavalinta = wx.SingleChoiceDialog(None, "Valitse piste", "Pisteet", z, wx.CHOICEDLG_STYLE)
+        ohjelmavalinta = wx.SingleChoiceDialog(None, "Valitse ohjelma", "Ohjelmat", z, wx.CHOICEDLG_STYLE)
         if ohjelmavalinta.ShowModal() == wx.ID_OK:
             ohjelmavalinta = ohjelmavalinta.GetStringSelection()
+            print("lähetetään kkssälle tieto tt syvyydellä {} on {}".format(self.haesyvyys(), ohjelmavalinta))
             with open("tutkimustavat.txt", "r", encoding="utf-8-sig") as textfile:
                 for line in textfile:
                     if line.__contains__(ohjelmavalinta):
@@ -667,7 +742,6 @@ class TiedonKasittely(object):
         sa = saving.Saving()
         sa.asetaHanketiedot(uusifo, uusikj, uusiml, uusiom, uusiorg)
 
-
     def ipisteheader(self):
         self.config.read("PISTETIEDOT.ini")
         uusity = wx.TextEntryDialog(None, "TY", "{} pisteen {} tiedot".format(self.hanke, self.piste),
@@ -685,7 +759,8 @@ class TiedonKasittely(object):
         if uusila.ShowModal() == wx.ID_OK:
             uusila = uusila.GetValue()
 
-
+        sa = saving.Saving()
+        sa.asetaPistetiedot(uusity, uusipk, uusila)
 
     def itutkimusheader(self):
         self.config.read("TUTKIMUSTIEDOT.ini")
@@ -709,12 +784,8 @@ class TiedonKasittely(object):
         if uusiln.ShowModal() == wx.ID_OK:
             uusiln = uusiln.GetValue()
 
-            # koosta uusi pisteheader
-            print(uusitt)
-            with open("{}.txt".format(self.piste), 'r', encoding="utf-8") as textfile:
-                for line in textfile:
-                    if len(line) > 1:
-                        print(line)
+        sa = saving.Saving()
+        sa.asetaTutkimustiedot(uusitt, uusitx, uusixy, uusiln)
 
     def iluotempconfig(self):
         os.chdir(self.root)
