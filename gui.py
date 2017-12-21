@@ -99,9 +99,9 @@ class windowClass(wx.Frame):
 
         # alusta
         # tyhjentää paneelin ja asettaa arvot alkuarvoiksi
-        self.alustabutton = wx.Button(panel, label="Alusta", pos=(520, 120), size=(65, 50))
+        self.alustabutton = wx.Button(panel, label="kks", pos=(520, 120), size=(65, 50))
         self.alustabutton.SetFont(font1)
-        self.alustabutton.Bind(wx.EVT_BUTTON, self.alustatiedot)
+        self.alustabutton.Bind(wx.EVT_BUTTON, self.komennakks)
 
         # piirto
         # käyttäjä voi valita piirtonäkymän
@@ -145,10 +145,10 @@ class windowClass(wx.Frame):
         self.pistenimiteksti.SetFont(font2)
 
         # ohjelmanimiteksti näyttää valitusta ohjelmanappulasta käytössäolevan ohjelman
-        self.ohjelmateksti = wx.StaticText(panel, -1, "Ohjelma:", pos=(230, 210))
+        self.ohjelmateksti = wx.StaticText(panel, -1, "TT:", pos=(230, 210))
         self.ohjelmateksti.SetFont(font1)
 
-        self.ohjelmaarvoteksti = wx.StaticText(panel, -1, "><", pos=(315, 200))
+        self.ohjelmaarvoteksti = wx.StaticText(panel, -1, "><", pos=(260, 200))
         self.ohjelmaarvoteksti.SetFont(font2)
 
         # alkukairausteksti päivittyy käyttäjän valinnan mukaan
@@ -239,6 +239,9 @@ class windowClass(wx.Frame):
             self.data.iavaahanke()
             self.hankenimiteksti.SetLabelText(self.data.hanke)
 
+    # jos ei luoda uutta pistettä, niin jatketaan vanhasta
+    # avataan tekstifile, joka luetaan kunnes viimeinen pistenimi-tunnistin tulee
+    # ja tämän perään jatketaan datan kirjoittamista
     def pisteenavaus(self, event):
         if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
             warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
@@ -249,63 +252,99 @@ class windowClass(wx.Frame):
                                            wx.YES_NO)
             uusivastaus = uusikysymys.ShowModal()
             uusikysymys.Destroy()
-            if uusivastaus == wx.ID_NO:
-                return None
-            else:
+            if uusivastaus == wx.ID_YES:
                 self.data.iluopiste(self.data.hanke)
                 self.pistenimiteksti.SetLabelText(self.data.piste)
+                self.pistetiedotpaneelille()
+            else:
+                self.pistetiedotpaneelille()
+                os.chdir("GEOXX")
+                print(self.hankenimiteksti.GetLabel())
+                pisteet = []
+                with open("{}.txt".format(self.hankenimiteksti.GetLabel())) as textfile:
+                    for line in textfile:
+                        if line.__contains__("PISTENIMI"):
+                            linepart = line.replace("PISTENIMI: ", "").strip("\n")
+                            pisteet.append(linepart)
+                    self.pistenimiteksti.SetLabel(pisteet[len(pisteet)-1])
+                textfile.close()
+                os.chdir(self.data.root)
 
     # kysyy käyttäjältä alkusyvyyttä, joka tallennetaan
     # windowclassin.data luokkaan
     def aloitaalkukairaus(self, event):
-        os.chdir(self.data.root)
-        z = []
-        with open("alkukairaus.txt", "r") as textfile:
-            for line in textfile:
-                if len(line) > 1:
-                    z.append(line.rsplit(" ")[1].strip("\n"))
-        textfile.close()
-        kairausvalinta = wx.SingleChoiceDialog(None, "Valitse alkukairaustapa", "Alkukairaus", z, wx.CHOICEDLG_STYLE)
-        if kairausvalinta.ShowModal() == wx.ID_OK:
-            kairausvalinta = kairausvalinta.GetStringSelection()
-            if kairausvalinta == "OHITETAAN":
-                print("lähetä tieto kks alkukairaus ohitetaan")
-            else:
-                with open("alkukairaus.txt", "r") as textfile:
-                    for line in textfile:
-                        if line.__contains__(kairausvalinta):
-                            self.alkukairausarvoteksti.SetLabelText(line[1:3])
-                alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys',"Alkusyvyys","",
-                                                style=wx.OK)
-                alkusyvyys.Centre()
-                alkusyvyys.ShowModal()
-                self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
-                self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
-                alkusyvyys.Destroy()
-                print("lähetetään kkssälle: työnumero, kairausvalinta, piste, pvm(timestä?)")
-                # print("lähetetään kkssälle: työnumero(hanke?), {}, {}, pvm(timestä?)".format(kairausvalinta)
-                #       , self.data.piste)
+        if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
+            warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
+            warning.ShowModal()
+            warning.Destroy()
+        else:
+
+            os.chdir(self.data.root)
+            z = []
+            with open("alkukairaus.txt", "r") as textfile:
+                for line in textfile:
+                    if len(line) > 1:
+                        z.append(line.rsplit(" ")[1].strip("\n"))
+            textfile.close()
+            kairausvalinta = wx.SingleChoiceDialog(None, "Valitse alkukairaustapa", "Alkukairaus", z, wx.CHOICEDLG_STYLE)
+            if kairausvalinta.ShowModal() == wx.ID_OK:
+                kairausvalinta = kairausvalinta.GetStringSelection()
+                if kairausvalinta == "OHITETAAN":
+                    print("lähetä tieto kks alkukairaus ohitetaan")
+                    os.chdir("GEOXX")
+                    with open("{}.txt".format(self.data.hanke), 'a') as textfile:
+                        textfile.write("\n" + "alkukairaus ohitetaan")
+                        textfile.close()
+                    os.chdir(self.data.root)
+                else:
+                    with open("alkukairaus.txt", "r") as textfile:
+                        for line in textfile:
+                            if line.__contains__(kairausvalinta):
+                                self.alkukairausarvoteksti.SetLabelText(line[1:3])
+                    alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys',"Alkusyvyys","",
+                                                    style=wx.OK)
+                    alkusyvyys.Centre()
+                    alkusyvyys.ShowModal()
+                    self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
+                    self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
+                    alkusyvyys.Destroy()
+                    os.chdir("GEOXX")
+                    with open("{}.txt".format(self.data.hanke), 'a') as textfile:
+                        textfile.write("\n" + "alkukairaus: {} syvyydellä {}".format(self.data.syvyys, kairausvalinta))
+                        textfile.close()
+                    os.chdir(self.data.root)
+                    print("lähetetään kkssälle: työnumero, kairausvalinta, piste, pvm(timestä?)")
+                    self.linepanelille("Alkukairaus {} syvyydellä {}".format(kairausvalinta, alkusyvyys.GetValue()))
+                    # print("lähetetään kkssälle: työnumero(hanke?), {}, {}, pvm(timestä?)".format(kairausvalinta)
+                    #       , self.data.piste)
 
     def lopetakairaus(self, event):
-        os.chdir(self.data.root)
-        z = []
-        with open("kairausloppu.txt", "r") as textfile:
-            for line in textfile:
-                if len(line) > 1:
-                    z.append(line.rsplit(" ")[1].strip("\n"))
-        textfile.close()
-        kairausvalinta = wx.SingleChoiceDialog(None, "Valitse lopetussyy", "Kairauksen lopetus", z, wx.CHOICEDLG_STYLE)
-        if kairausvalinta.ShowModal() == wx.ID_OK:
-            kairausvalinta = kairausvalinta.GetStringSelection()
-            print("lähetetään kkssälle tieto kairaus lopetettiin syvyydellä {} syystä {}"
-                  .format(self.data.haesyvyys(), kairausvalinta))
-            os.chdir("GEOXX")
-            with open("{}.txt".format(self.data.hanke), 'a') as textfile:
-                textfile.write("lopetus: {} syvyydellä {}".format(self.data.syvyys, kairausvalinta))
-                textfile.close()
-            os.chdir(self.data.root)
+        if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
+            warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
+            warning.ShowModal()
+            warning.Destroy()
         else:
-            return None
+
+            os.chdir(self.data.root)
+            z = []
+            with open("kairausloppu.txt", "r") as textfile:
+                for line in textfile:
+                    if len(line) > 1:
+                        z.append(line.rsplit(" ")[1].strip("\n"))
+            textfile.close()
+            kairausvalinta = wx.SingleChoiceDialog(None, "Valitse lopetussyy", "Kairauksen lopetus", z, wx.CHOICEDLG_STYLE)
+            if kairausvalinta.ShowModal() == wx.ID_OK:
+                kairausvalinta = kairausvalinta.GetStringSelection()
+                print("lähetetään kkssälle tieto kairaus lopetettiin syvyydellä {} syystä {}"
+                      .format(self.data.haesyvyys(), kairausvalinta))
+                os.chdir("GEOXX")
+                with open("{}.txt".format(self.data.hanke), 'a') as textfile:
+                    textfile.write("\n" + "lopetus: {} syvyydellä {}".format(self.data.syvyys, kairausvalinta))
+                    textfile.close()
+                os.chdir(self.data.root)
+                self.linepanelille("Kairaus lopetettiin {} syvyydellä {}".format(kairausvalinta, self.data.haesyvyys()))
+            else:
+                return None
 
     def tanko(self, event):
         if self.tankoarvolaatikko.GetBackgroundColour() == 'red':
@@ -321,6 +360,10 @@ class windowClass(wx.Frame):
             warning = wx.MessageDialog(None, "Valitse ensin piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             warning.ShowModal()
             warning.Destroy()
+        elif self.ohjelmaarvoteksti.GetLabel() == "><":
+            warning = wx.MessageDialog(None, "Valitse tutkimustapa", "Varoitus", wx.OK | wx.ICON_INFORMATION)
+            warning.ShowModal()
+            warning.Destroy()
         else:
             self.piste = self.pistenimiteksti.GetLabel()
             self.update()
@@ -329,11 +372,35 @@ class windowClass(wx.Frame):
     def update(self):
         # print(self.listener)
         self.data.ikuuntele()
-        self.updatepiste(self.data)
-        self.updatetextpanel(self.data)
+        self.updatepistearvot(self.data)
+        self.listenerupdate(self.data)
+
+    def pistetiedotpaneelille(self):
+        os.chdir("GEOXX")
+        print(self.hankenimiteksti.GetLabel())
+        with open("{}.txt".format(self.hankenimiteksti.GetLabel())) as textfile:
+            for line in textfile:
+                self.linepanelille(line)
+        textfile.close()
+        os.chdir(self.data.root)
+
+    def linepanelille(self, line):
+        self.scrolled_panel.ScrollLines(10)
+        self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
+        self.scrolled_panel.Layout()
+        self.scrolled_panel.Refresh()
+        new_text = wx.StaticText(self.scrolled_panel, -1, line, size=(550, 30))
+        font = new_text.GetFont()
+        font.SetPointSize(15)
+        new_text.SetFont(font)
+        self.spSizer.Add(new_text)
+        self.scrolled_panel.ScrollLines(10)
+        self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
+        self.scrolled_panel.Layout()
+        self.scrolled_panel.Refresh()
 
     # päivittää tekstipaneelin yläpuolella olevat arvotekstit com-listenerin tietojen mukaan
-    def updatepiste(self, data):
+    def updatepistearvot(self, data):
         self.voimaarvoteksti.SetLabelText(str(data.voima))
         self.puolikierroksetarvoteksti.SetLabelText(str(data.puolikierrokset))
         self.nopeusarvoteksti.SetLabelText(str(data.nopeus))
@@ -343,7 +410,7 @@ class windowClass(wx.Frame):
             self.syvyysarvoteksti.SetLabelText(str(data.syvyys))
 
     # kirjoittaa tekstipaneelille uuden elementin data-luokan tiedoista
-    def updatetextpanel(self, data):
+    def listenerupdate(self, data):
         self.scrolled_panel.ScrollLines(10)
         self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
         self.scrolled_panel.Layout()
@@ -363,48 +430,13 @@ class windowClass(wx.Frame):
         self.scrolled_panel.Refresh()
 
     # alustaa arvotekstit ja rullaa tekstipaneelin tyhjäksi
-    def alustatiedot(self, event):
-        self.hankenimiteksti.SetLabelText(">tiedoston nimi<")
-        self.pistenimiteksti.SetLabelText(">pisteen nimi<")
-        self.alkusyvyysarvoteksti.SetLabelText("><")
-        self.syvyysarvoteksti.SetLabelText("><")
-        self.voimaarvoteksti.SetLabelText("><")
-        self.puolikierroksetarvoteksti.SetLabelText("><")
-        self.nopeusarvoteksti.SetLabelText("><")
-        self.maalajiarvoteksti.SetLabelText("><")
-        self.ohjelmaarvoteksti.SetLabelText("><")
-        self.data = TiedonKasittely()
-        self.scrolled_panel.ScrollLines(150)
-        self.scrolled_panel.Layout()
-        self.scrolled_panel.Refresh()
-        for i in range(20):
-            line = ""
-            new_text = wx.StaticText(self.scrolled_panel, -1, line, size=(550, 30))
-            self.spSizer.Add(new_text)
-            self.scrolled_panel.ScrollLines(10)
-            self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
-            self.scrolled_panel.Layout()
-            self.scrolled_panel.Refresh()
-        new_text = wx.StaticText(self.scrolled_panel, -1, "----------------", size=(550, 30))
-        font = new_text.GetFont()
-        font.SetPointSize(15)
-        new_text.SetFont(font)
-        self.spSizer.Add(new_text)
-        new_text = wx.StaticText(self.scrolled_panel, -1, "Tiedot tyhjennetty", size=(550, 40))
-        font = new_text.GetFont()
-        font.SetPointSize(25)
-        new_text.SetFont(font)
-        self.spSizer.Add(new_text)
-        new_text = wx.StaticText(self.scrolled_panel, -1, "----------------", size=(550, 30))
-        font = new_text.GetFont()
-        font.SetPointSize(15)
-        new_text.SetFont(font)
-        self.spSizer.Add(new_text)
-        self.scrolled_panel.ScrollLines(250)
-        self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
-        self.scrolled_panel.Layout()
-        self.scrolled_panel.Refresh()
-        self.ba.plt.clf()
+    def komennakks(self, event):
+        komento = wx.TextEntryDialog(None, "KKS Komento", "Kirjoita komento",
+                                    "STATE")
+        if komento.ShowModal() == wx.ID_OK:
+            print("tottele saatana")
+        else:
+            return None
 
     def graafinpiirto(self, event):
         # if ba.fig == None:
@@ -413,8 +445,14 @@ class windowClass(wx.Frame):
         print("lululu noob noob")
 
     def valitseohjelma(self, event):
-        ohjelma = self.data.ivalitseohjelma()
-        self.ohjelmaarvoteksti.SetLabelText(ohjelma)
+        if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
+            varoitus = wx.MessageDialog(None, "Valitse ensin hanke ja piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
+            varoitus.ShowModal()
+            varoitus.Destroy()
+        else:
+            ohjelma = self.data.ivalitseohjelma()
+            self.ohjelmaarvoteksti.SetLabelText(ohjelma)
+            self.linepanelille("TT {} syvyydellä {}".format(ohjelma, self.data.haesyvyys()))
 
     def hallintamenu(self, event):
         if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
@@ -429,23 +467,50 @@ class windowClass(wx.Frame):
 
     # käyttäjä valitsee listalta maalajin, joka tallennetaan data-luokkaan
     def valitsemaalaji(self, event):
-        self.data.iluemaalajit()
-        print("tägättiin maalaji{} syvyydelle {}".format(self.data.haemaalaji(), self.data.haesyvyys()))
-        tagi = self.data.haemaalaji()
-        os.chdir(self.data.root)
-        with open("maalajit.txt", "r", encoding="utf-8") as textfile:
-            for line in textfile:
-                if len(line) > 1:
-                    lineparts = line.replace("\n", "").strip("\t")
-                    if lineparts.__contains__("-{}".format(tagi)):
-                        lyhenne = lineparts.rsplit(' ')[0].replace(',', "")
-                        self.maalajiarvoteksti.SetLabelText(lyhenne)
+        if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
+            warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
+            warning.ShowModal()
+            warning.Destroy()
+        else:
+            self.data.iluemaalajit()
+            print("tägättiin maalaji {} syvyydelle {}".format(self.data.haemaalaji(), self.data.haesyvyys()))
+            tagi = self.data.haemaalaji()
+            os.chdir(self.data.root)
 
-        textfile.close()
+            if tagi == "Lieju":
+                self.maalajiarvoteksti.SetLabelText("Lj")
+                os.chdir("GEOXX")
+                with open("{}.txt".format(self.data.hanke), 'a') as hanketextfile:
+                    hanketextfile.write(
+                        "\n" + "{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(), self.data.syvyys))
+                    os.chdir(self.data.root)
+                    hanketextfile.close()
+            else:
+                if tagi == "turve":
+                     tagi = tagi.upper()
+                if tagi == "multa":
+                    tagi = tagi.upper()
+                if tagi == "humusmaa":
+                    tagi = tagi.upper()
+                print(tagi)
+                with open("maalajit.txt", "r", encoding="utf-8") as maatextfile:
+                    for line in maatextfile:
+                        if len(line) > 1:
+                            lineparts = line.replace("\n", "").strip("\t")
+                            if lineparts.__contains__("{}".format(tagi)):
+                                lyhenne = lineparts.rsplit(' ')[0].replace(',', "")
+                                self.maalajiarvoteksti.SetLabelText(lyhenne)
+                os.chdir("GEOXX")
+                with open("{}.txt".format(self.data.hanke), 'a') as hanketextfile:
+                    hanketextfile.write("\n" + "{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(), self.data.syvyys))
+                    os.chdir(self.data.root)
+                    maatextfile.close()
+                    hanketextfile.close()
 
-# tietojenkäsittely luokka
-# tämä tallentaa käyttäjän ja communicationin syöttämän datan ja syöttää sen eteenpäin windowclass luokalle
-# ja tallennettaviin tietoihin
+
+#tietojenkäsittely luokka
+#tallentaa käyttäjän ja communicationin syöttämän datan ja syöttää sen eteenpäin windowclass luokalle
+#ja tallennettaviin tietoihin
 class TiedonKasittely(object):
     def __init__(self, hanke = None, piste=None, maalaji="", alkusyvyys=0, syvyys=0, voima=0,
                  puolikierrokset=0, nopeus=0, figure=None, ROOT_DIR = os.path.dirname(os.path.abspath(__file__))):
@@ -536,11 +601,11 @@ class TiedonKasittely(object):
                     file = open("{}.txt".format(hankenimi), 'a')
                     self.hanke = hankenimi
                     self.config.read("HANKETIEDOT.ini")
-                    file.write(self.config["DEFAULT"]["fo"])
-                    file.write("\n"+self.config["DEFAULT"]["kj"])
-                    file.write("\n"+self.config["DEFAULT"]["om"])
-                    file.write("\n"+self.config["DEFAULT"]["ml"])
-                    file.write("\n"+self.config["DEFAULT"]["org"])
+                    file.write("fo = " + self.config["DEFAULT"]["fo"])
+                    file.write("\nkj = "+self.config["DEFAULT"]["kj"])
+                    file.write("\nom = "+self.config["DEFAULT"]["om"])
+                    file.write("\nml = "+self.config["DEFAULT"]["ml"])
+                    file.write("\norg = "+self.config["DEFAULT"]["org"])
                     file.close()
                     self.ituhoatempconfig()
                     os.chdir(self.root)
@@ -550,11 +615,9 @@ class TiedonKasittely(object):
         else:
             os.chdir(self.root)
             hankenimi.Destroy()
-            print("hanketta ei luotu")
             return None
 
     # luodaan piste käyttäjän antamalla nimellä
-    # estetään ylikirjoitus try-exceptillä
     def iluopiste(self, hanke):
         pistenimi = wx.TextEntryDialog(None, "Anna hankkeen {} uudelle pisteelle nimi".format(hanke),
                                        "Uuden pisteen luonti hankkeelle {}".format(hanke))
@@ -569,14 +632,14 @@ class TiedonKasittely(object):
                 file = open("{}.txt".format(hanke), "a", encoding="utf-8")
                 self.config.read("PISTETIEDOT.ini")
                 file.write("\n" + "PISTENIMI: {}".format(nimi))
-                file.write("\n" + self.config["DEFAULT"]["ty"])
-                file.write("\n" + self.config["DEFAULT"]["pk"])
-                file.write("\n" + self.config["DEFAULT"]["la"])
+                file.write("\nty = " + self.config["DEFAULT"]["ty"])
+                file.write("\npk = " + self.config["DEFAULT"]["pk"])
+                file.write("\nla = " + self.config["DEFAULT"]["la"])
                 self.config.read("TUTKIMUSTIEDOT.ini")
-                file.write("\n" + self.config["DEFAULT"]["tt"])
-                file.write("\n" + self.config["DEFAULT"]["tx"])
-                file.write("\n" + self.config["DEFAULT"]["xy"])
-                file.write("\n" + self.config["DEFAULT"]["ln"] + "\n")
+                file.write("\ntt = " + self.config["DEFAULT"]["tt"])
+                file.write("\ntx = " + self.config["DEFAULT"]["tx"])
+                file.write("\nxy = " + self.config["DEFAULT"]["xy"])
+                file.write("\nln = " + self.config["DEFAULT"]["ln"] + "\n")
                 file.close()
                 self.ituhoatempconfig()
                 os.chdir(self.root)
@@ -623,7 +686,7 @@ class TiedonKasittely(object):
             maalaji = maalaji.GetStringSelection()
             if maalaji == "Liejut":
                 self.asetamaalaji("Lieju")
-                return None
+                return maalaji
             elif maalaji == "Turpeet":
                 turvelaji = wx.SingleChoiceDialog(None, "Valitse turvelaji", "Turpeet", ['turve', 'multa', 'humusmaa'])
                 if turvelaji.ShowModal() == wx.ID_OK:
@@ -636,11 +699,6 @@ class TiedonKasittely(object):
                                                                                        'TUNTEMATON', 'EI PIIRRETÄ'])
                 if maalaji.ShowModal() == wx.ID_OK:
                     maalaji = maalaji.GetStringSelection()
-                    os.chdir("GEOXX")
-                    textfile = open("{}.txt".format(self.hanke), 'a')
-                    textfile.write("{} syvyydellä {}".format(maalaji, self.syvyys))
-                    textfile.close()
-                    os.chdir(self.root)
                     self.asetamaalaji(maalaji)
                     return None
             else:
@@ -661,13 +719,10 @@ class TiedonKasittely(object):
                                                   maalista, wx.CHOICEDLG_STYLE)
                 if maatyyppi.ShowModal() == wx.ID_OK:
                     maatyyppi = maatyyppi.GetStringSelection()
-                    os.chdir("GEOXX")
-                    textfile = open("{}.txt".format(self.hanke), 'a')
-                    textfile.write("{} syvyydellä {}".format(maalaji, self.syvyys))
-                    textfile.close()
-                    os.chdir(self.root)
                     self.asetamaalaji(maatyyppi)
                     return None
+        else:
+            return None
 
     # luetaan tiedot tekstitiedostosta, mockup communication listenistä
     def ikuuntele(self):
@@ -737,6 +792,9 @@ class TiedonKasittely(object):
                 self.ipisteheader()
             if muokattava == "TUTKIMUSTIEDOT":
                 self.itutkimusheader()
+        else:
+            self.ituhoatempconfig()
+            return None
 
     def ihankeheader(self):
         self.config.read("HANKETIEDOT.ini")
