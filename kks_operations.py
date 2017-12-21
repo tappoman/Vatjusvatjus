@@ -16,9 +16,9 @@ import time
 import queue
 
 """luodaan communication olio com ja avataan yhteys sovittimelle"""
-com = Communication("COM3", 9600)
+com = Communication()
 
-class Guioperations (object):
+class Kksoperations (object):
 
     def __init__(self):
 
@@ -45,6 +45,9 @@ class Guioperations (object):
     def lueThread(self):
         t1 = threading.Thread(target=com.readValues)
         t1.start()
+
+    def annaKasky(self, command):
+        com.setCommand()
 
 
 #KKS-YLEISKASKYT
@@ -159,7 +162,6 @@ class Guioperations (object):
     def aloitaAlkukairaus(self):
         """aloittaa alkukairauksen, palauttaa #alkukairaus
         SIIRTYY ALKUKAIRAUSTILAAN -->
-        TÄYTYY ALOITTAA KUUNTELU GUI:N PUOLELTA guioperations.kuunteleAlkukairausta() --> POLLAUSVÄLI 1S.
         PARSITAAN MYÖS #NOSKU #NOSTO"""
         com.setCommand('ALKUK:1')
 
@@ -176,8 +178,8 @@ class Guioperations (object):
     Nosto asetettu KKS:ssa.			< - - - - - -    #NOSTO
     Nosto kuitattu KKS:ssa.			< - - - - - -    #NOSKU"""
 
-    def kuunteleAlkukairausta(self):
-        com.readValues()
+#    def kuunteleAlkukairausta(self):
+#        com.readValues()
 
     def asetaAlkusyvyys(self, syvyys):
         com.setCommand("ALKUSYV:", syvyys)
@@ -195,12 +197,12 @@ class Guioperations (object):
         com.setCommand("SYVYYS:", syvyys, ":")
         #return "#1"
 
-    def aloitaMittaustila(self):
+    def aloitaKairaus(self):
         """aloittaa mittauksen --> SIIRTYY MITTAUSTILAAN (MITTAUSTILA-2???)"""
         com.setCommand("START")
 
     def lopetaKairaus(self):
-        """lopettaa kairauksen ja palaa alkutilaan Palauttaa END:123 15 vajaan patkan arvot (mitvit???) ja"""
+        """lopettaa kairauksen ja palaa alkutilaan Palauttaa END:123 15 vajaan patkan arvot"""
         com.setCommand("END")
        # return "#END:123"
 
@@ -239,19 +241,18 @@ Jatkuu kairaustilana.
 
 #TESTINGZONE
 
-"""
-gui = Guioperations()
+'''
+kks = Kksoperations()
 
-gui.pysaytaKairaus()
-gui.aloitaAlkutila()
-gui.tiedusteleAika()
-gui.aloitaAlkukairaus()
-gui.lopetaAlkukairaus()
-gui.aloitaMittaustila()
+kks.pysaytaKairaus()
+kks.aloitaAlkutila()
+kks.tiedusteleAika()
+kks.aloitaAlkukairaus()
+kks.lopetaAlkukairaus()
+kks.aloitaKairaus()
 
 time.sleep(15)
-gui.pysaytaKairaus()
-gui.aloitaAlkutila()
-com.closeConnection()
-
-"""
+kks.pysaytaKairaus()
+kks.aloitaAlkutila()
+kks.closeConnection()
+'''

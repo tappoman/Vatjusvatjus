@@ -11,17 +11,24 @@ import serial
 import os
 import time
 from saving import *
+import configparser
 
 sa = Saving()
 
 
 class Communication (object):
 
-    def __init__(self, port="", baudrate=""):
-        self.port = port
-        self.baudrate = baudrate
+    def __init__(self):
+
+        self._config = configparser.ConfigParser()
+        self._config.read("USECONTROL.ini")
+        self.port = self._config["DEFAULT"]["port"]
+        self.baudrate = int(self._config["DEFAULT"]["baud"])
+        self.hands = self._config["DEFAULT"]["hands"]
+        self.stopbits = int(self._config["DEFAULT"]["stopbits"])
+        self.bytesize = int(self._config["DEFAULT"]["bytesize"])
         try:
-            self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, bytesize=8, parity='N', stopbits=1, timeout=2)
+            self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, bytesize=self.bytesize, parity=self.hands, stopbits=self.stopbits, timeout=2)
         except (FileNotFoundError, serial.serialutil.SerialException):
             print("Serial Connection Problem")
             closeConnection()

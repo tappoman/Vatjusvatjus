@@ -1,4 +1,7 @@
-﻿
+﻿#TODO
+#Hoida tallennus loppuun
+#alkukairauksen ja lopetussyyn tallennus?
+
 """Tämä luokka vastaa tiedostonkäsittelystä.
 sisältää metodit
 kks-parametrien tallennukseen,
@@ -10,6 +13,17 @@ tallennuspolku,
 kommunikaation hallinta(portti, baudi) ..."""
 
 
+#Eli Kansio_1 --> Hankkeen nimi:
+#Tiedoston nimi --> Piste
+#Headeri --> Työnumero, Tutkimustapa, sijainti (E, N, syvyys). Päivämäärä, kalibrointiarvot
+#    --> perään TAL:
+
+#Maalaji (lisätään myös syvyyteen X kun maalaji muuttuu)
+
+#Tiedosto_2 (asetukset): Portti, baudi, polku,
+
+
+
 import sys
 import time
 import os.path
@@ -17,21 +31,21 @@ import configparser
 
 class Saving (object):
 
-    def __init__ (self, tal_polku="", port="", baud="" ):
-        self.tal_polku = tal_polku
+    def __init__ (self):
         self.asetus_polku = os.path.dirname(os.path.abspath(__file__))
-        self.port = port
-        self.baud = baud
-        self.TAL_fullpath = ""
         self._config = configparser.ConfigParser()
 
 
     #Määrittää tallenustiedoston kaikelle kks-laitteelta tulevalle datalle ja tallettaa sen
     def tallennaMIT(self, MIT):
+        self._config.read("USECONTROL.ini")
+        self.tal_polku = self._config["DEFAULT"]["polku"]
+        if not os.path.exists(self.tal_polku):
+            os.mkdir(self.tal_polku)
         self.tiedosto = "MIT_temp.txt"
         self.fullpath = os.path.join(self.tal_polku, self.tiedosto)
-        file = open(self.fullpath, "a", encoding="utf-8")
-        file.write(MIT + "\n")
+        file = open(self.fullpath, "w")
+        file.write(MIT)
 
     #asettaa polun tallennettavalle datalle ja kommunikaation liittyville parametreille (baud, port)
     #ottaa polun vastaan muododssa 'C:/POLKU/'
@@ -72,24 +86,53 @@ class Saving (object):
         # VASARA		N299	K1.945	P25.01.2018	'AN6  -- " --	SGF tarve myöhemmin'''
 
 
-    #Aina tiedoston alkuun metodilla koostaHankeheader(), määritellään ylläpidosta
-    def asetaHanketiedot(self, FO, KJ, OM, ML, ORG):
+    #Aina tiedoston alkuun, määritellään ylläpidosta
+    def asetaAloitustiedot(self, FO="2.3", KJ="KKJ-N60", OM="TILAAJA", ML="GEO", ORG="GEOPOJAT"):
+        '''self.fo = FO
+        self.kj = KJ
+        self.om = OM
+        self.ml = ML
+        self.org = ORG'''
+
         self._config["DEFAULT"] = {"FO": FO,
                                    "KJ": KJ,
                                    "OM": OM,
                                    "ML": ML,
                                    "ORG": ORG}
-        with open ("HANKETIEDOT.ini", "w") as cfgfile:
+        with open ("ALOITUSTIEDOT.ini", "w") as cfgfile:
             self._config.write(cfgfile)
 
+#lisää nämä
+            '''Pisteen yleistiedot. Tiedosto voi sisältää useita pisteitä kairattuna
+            eri menetelmillä. Kunkin pisteen alkuun tarjotaan tallennettavaksi
+            tiedot ylläpidosta. Muuttuvat kentät päivitetään ylläpitoon.
+            Näitä voidaan myös tarkastella/muuttaa omana ikkunana.
+            Kentät ovat:
+            # TYÖNUMERO	12345678
+            # TYÖNIMI	POHJANTIE
+            # LAITTEET	GM65-sn13256		'monitoimikaira
+            # KAIRAAJA	S LAAKKONEN
+            	TY  123456             HAILA				'työnumero     työnimi
+	PK  0      MK						'pöytäkirja   0    kairaaja
+	LA  GM75GT						'laitteet
+            '''
 
-    #pistekohtaiset tiedot, aina uuden pisteen alkuun SAMASSA TIEDOSTOSSA = HANKKEESSA
+
+    #pistekohtaiset tiedot, aina uuden pisteen alkuun
     def asetaPistetiedot(self, TY, PK, LA):
         self._config["DEFAULT"] = {"TY": TY,
                                    "PK": PK,
                                    "LA": LA}
         with open ("PISTETIEDOT.ini", "w") as cfgfile:
             self._config.write(cfgfile)
+
+        '''self.ty = TY
+        self.pk = PK
+        self.la = LA
+        self.tiedosto = "PISTETIEDOT.txt"
+        self.fullpath = os.path.join(self.asetus_polku, self.tiedosto)
+        file = open(self.fullpath, "w")
+        file.write("TY \t" + self.ty + "\n" + "PK \t" + self.pk + "\n" + "LA \t" + self.la + "\n")'''
 
 
     def asetaTutkimustiedot(self, TT, TX, XY, LN="-\t" + "-\t"):
@@ -100,9 +143,20 @@ class Saving (object):
         with open ("TUTKIMUSTIEDOT.ini", "w") as cfgfile:
             self._config.write(cfgfile)
 
+        '''self.tt = TT
+        self.tx = TX
+        self.xy = XY
+        self.ln = LN
 
-        #METODIT JOTKA KOOSTAVAT VARSINAISEN TEKLATIEDOSTON
-        # ottaa vastaan hankenimen = tallennustiedoston nimi, tallennuspolun (USECONTROL tiedosto), sekä tallenettavan TAL rivin ja kirjoittaa näm polunn tiedostoon
+        self.tiedosto = "TUTKIMUSTIEDOT.txt"
+        self.fullpath = os.path.join(self.asetus_polku, self.tiedosto)
+        file = open(self.fullpath, "w")
+        file.write("TT \t" + self.tt + "\n" "TX \t" + self.tx + "\n" + "XY \t" + self.xy + "\n" + "LN \t" + self.ln + "\n")'''
+
+
+
+    #METODIT JOTKA KOOSTAVAT VARSINAISEN TEKLATIEDOSTON
+    # ottaa vastaan hankenimen = tallennustiedoston nimi, tallennuspolun (USECONTROL tiedosto), sekä tallenettavan TAL rivin ja kirjoittaa näm polunn tiedostoon
 
     def koostaHankeheader(self):
         self._config.read("USECONTROL.ini")
@@ -113,7 +167,7 @@ class Saving (object):
         file = open(self.fullpath, "w")
 
         #TIEDOSTOKOHTAISET
-        self._config.read("HANKETIEDOT.ini")
+        self._config.read("ALOITUSTIEDOT.ini")
         file.write("FO\t" + self._config["DEFAULT"]["fo"] + "\n" +
                     "KJ\t" + self._config["DEFAULT"]["kj"] + "\n" +
                     "OM\t" + self._config["DEFAULT"]["om"] + "\n" +
@@ -151,51 +205,60 @@ class Saving (object):
                     "XY\t" + self._config["DEFAULT"]["xy"] + "\n" +
                     "LN\t" + self._config["DEFAULT"]["ln"] + "\n")
 
-    def tallennaSYV(self, SYV):
+    def tallennaSYV(self, hanke, SYV):
         self._config.read("USECONTROL.ini")
         self.tal_polku = self._config["DEFAULT"]["polku"]
-        self.hanke = self._config["DEFAULT"]["hanke"]
+        #self.hanke = self._config["DEFAULT"]["hanke"]
 
         self.fullpath = os.path.join(self.tal_polku, self.hanke)
         file = open(self.fullpath, "a")
         file.write(SYV + "\n")
 
 
-    def tallennaTAL(self, TAL):
+    def tallennaTAL(self, hanke, TAL):
         self._config.read("USECONTROL.ini")
         self.tal_polku = self._config["DEFAULT"]["polku"]
-        self.hanke = self._config["DEFAULT"]["hanke"]
-
+        self.hanke = hanke
         self.fullpath = os.path.join(self.tal_polku, self.hanke)
         file = open(self.fullpath, "a")
         file.write(TAL + "\n")
 
+    #lisaa maalajin datarivin peraan vaihdettaessa
+    def tallennaMaalaji(self, hanke, maalaji):
+        self._config.read("USECONTROL.ini")
+        self.tal_polku = self._config["DEFAULT"]["polku"]
+        self.hanke = hanke
+        self.fullpath = os.path.join(self.tal_polku, self.hanke)
+        file = open(self.fullpath, "a")
+        file.write(maalaji + "\n")
 
-<<<<<<< HEAD
 
-# sa = Saving()
-# sa.asetaParams("COM3", "9500", "c:/tmp/", "hanke1.txt")
-# sa.asetaHWcontrol()
-# sa.asetaHanketiedot()
-# sa.asetaPistetiedot("12344", "0 MK", "GM6364")
-# sa.asetaTutkimustiedot("PA", "KALIBBLAA", "LALLAA")
-#
-# sa.koostaHankeheader()
-# sa.koostaPisteheader()
-# sa.koostaTutkimusheader()
-=======
-'''
-sa = Saving()
-sa.asetaParams("COM3", "9500", "c:/tmp/", "hanke1.txt")
-sa.asetaHWcontrol()
-sa.asetaHanketiedot()
-sa.asetaPistetiedot("12344", "0 MK", "GM6364")
-sa.asetaTutkimustiedot("PA", "KALIBBLAA", "LALLAA")
 
-sa.koostaHankeheader()
-sa.koostaPisteheader()
-sa.koostaTutkimusheader()'''
->>>>>>> 62f9fa469acbad216647d1547ec6065a98bb748f
+        # sisältää "kiinteät" yksittäisestä mittauksesta riippumattomat asetukset esim. com
+        # Tätä ei tarvita, asetukset tulevat ohjelmistokansioon!!!.
+        '''def asetaAsetuspolku(self, polku):
+            self.asetus_polku = polku
+            if not os.path.exists(self.asetus_polku):
+                os.makedirs(self.asetus_polku)'''
+
+        # sisältää "kiinteät" yksittäisestä mittauksesta riippumattomat asetukset esim. com
+        '''def asetaMITpolku(self, polku):
+            self.asetus_polku = polku
+            if not os.path.exists(self.asetus_polku):
+                os.makedirs(self.asetus_polku)'''
+
+        #def tallennaParametrit (self, params):
+
+#sa = Saving()
+#sa.asetaParams("COM3", "9500", "c:/tmp/", "hanke1.txt")
+#sa.asetaHWcontrol()
+#sa.asetaAloitustiedot()
+#sa.asetaPistetiedot("12344", "0 MK", "GM6364")
+#sa.asetaTutkimustiedot("PA", "KALIBBLAA", "LALLAA")
+
+#sa.koostaHankeheader()
+#sa.koostaPisteheader()
+#sa.koostaTutkimusheader()
 
 
 #config = configparser.ConfigParser()
