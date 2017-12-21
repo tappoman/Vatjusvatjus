@@ -22,7 +22,6 @@ import saving
 # import threading
 # import serial
 
-
 '''
 from communication import threading
 import guioperations as gui
@@ -202,18 +201,18 @@ class windowClass(wx.Frame):
         self.maalajiarvoteksti = wx.StaticText(panel, -1, "><", pos=(320, 345))
         self.maalajiarvoteksti.SetFont(font2)
 
-        self.iskuteksti = wx.StaticText(panel, -1, "Isku", pos=(400, 315))
+        self.iskuteksti = wx.StaticText(panel, -1, "Isku", pos=(455, 315))
         self.iskuteksti.SetFont(font1)
 
         # iskuarvoteksti päivittyy käyttäjän valitessa isku
-        self.iskuarvoteksti = wx.StaticText(panel, -1, "OFF", pos=(390, 345))
+        self.iskuarvoteksti = wx.StaticText(panel, -1, "OFF", pos=(445, 345))
         self.iskuarvoteksti.SetFont(font2)
 
-        self.tankoteksti = wx.StaticText(panel, -1, "Tanko", pos=(465, 315))
+        self.tankoteksti = wx.StaticText(panel, -1, "Tanko", pos=(515, 315))
         self.tankoteksti.SetFont(font1)
 
         # iskuarvoteksti päivittyy käyttäjän valitessa isku
-        self.tankoarvolaatikko = wx.Panel(panel, pos=(465, 345), size=(50,50))
+        self.tankoarvolaatikko = wx.Panel(panel, pos=(515, 345), size=(50,50))
         self.tankoarvolaatikko.SetBackgroundColour('red')
 
         # kirjoituspaneelin ja tekstielementtien alustus
@@ -227,47 +226,18 @@ class windowClass(wx.Frame):
         panel.SetSizer(panelSizer)
 
     def hankkeenavaus(self, event):
-        uusikysymys = wx.MessageDialog(None, "Luodaanko uusi hanke?","Hanke", wx.YES_NO)
-        uusivastaus = uusikysymys.ShowModal()
-        uusikysymys.Destroy()
-        if uusivastaus == wx.ID_NO:
-            if self.hankenimiteksti.GetLabel() != ">hankkeen nimi<":
-                os.chdir(self.data.root)
-                self.hanke = self.data.iavaahanke()
-                self.hankenimiteksti.SetLabelText(self.data.hanke)
-                self.pistenimiteksti.SetLabelText(">pisteen nimi<")
-                self.syvyysarvoteksti.SetLabelText("><")
-                self.voimaarvoteksti.SetLabelText("><")
-                self.puolikierroksetarvoteksti.SetLabelText("><")
-                self.nopeusarvoteksti.SetLabelText("><")
-                os.chdir(os.path.join(os.path.abspath(os.path.curdir), self.data.hanke))
-            else:
-                self.hanke = self.data.iavaahanke()
-                self.hankenimiteksti.SetLabelText(self.hanke)
-                self.pistenimiteksti.SetLabelText(">pisteen nimi<")
-                os.chdir(os.path.join(os.path.abspath(os.path.curdir), self.data.hanke))
-        else:
-            self.luohanke()
 
-    # luodaan hanke käyttäjän antamalla nimellä
-    # estetään ylikirjoitus try-exceptillä
-    def luohanke(self):
-        os.chdir(self.data.root)
-        hankenimi = wx.TextEntryDialog(None, "Anna uudelle hankkeelle nimi", "Uuden hankkeen luonti")
-        if hankenimi.ShowModal() == wx.ID_OK:
-            hankenimi = hankenimi.GetValue()
-            varmistus = wx.MessageDialog(None, "Luodaan hanke {}".format(hankenimi), "Luodaan..", wx.YES_NO)
-            luo = varmistus.ShowModal()
-            if luo == wx.ID_YES and os.curdir==".":
-                try:
-                    os.mkdir(hankenimi)
-                    self.hankenimiteksti.SetLabelText(hankenimi)
-                    os.chdir(hankenimi)
-                    self.luopiste(hankenimi)
-                except FileExistsError:
-                    warning = wx.MessageDialog(None, "Hanke {} on jo olemassa".format(hankenimi), "Varoitus", wx.OK | wx.ICON_INFORMATION)
-                    warning.ShowModal()
-                    warning.Destroy()
+        if self.hankenimiteksti.GetLabel() != ">hankkeen nimi<":
+            self.data.iavaahanke()
+            self.hankenimiteksti.SetLabelText(self.data.hanke)
+            self.pistenimiteksti.SetLabelText(">pisteen nimi<")
+            self.syvyysarvoteksti.SetLabelText("><")
+            self.voimaarvoteksti.SetLabelText("><")
+            self.puolikierroksetarvoteksti.SetLabelText("><")
+            self.nopeusarvoteksti.SetLabelText("><")
+        else:
+            self.data.iavaahanke()
+            self.hankenimiteksti.SetLabelText(self.data.hanke)
 
     def pisteenavaus(self, event):
         if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
@@ -275,52 +245,15 @@ class windowClass(wx.Frame):
             warning.ShowModal()
             warning.Destroy()
         else:
-
-            uusikysymys = wx.MessageDialog(None, "Luodaanko uusi piste hankkeelle {}?".format(self.hanke), "Piste",
+            uusikysymys = wx.MessageDialog(None, "Luodaanko uusi piste hankkeelle {}?".format(self.data.hanke), "Piste",
                                            wx.YES_NO)
             uusivastaus = uusikysymys.ShowModal()
             uusikysymys.Destroy()
             if uusivastaus == wx.ID_NO:
-                piste, header = self.data.iavaapiste()
-                parsittu = os.path.splitext(piste)[0]
-                for i in header:
-                    self.scrolled_panel.ScrollLines(1)
-                    self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
-                    self.scrolled_panel.Layout()
-                    self.scrolled_panel.Refresh()
-                    new_text = wx.StaticText(self.scrolled_panel, -1, i, size=(550, 30))
-                    font = new_text.GetFont()
-                    font.SetPointSize(15)
-                    new_text.SetFont(font)
-                    self.spSizer.Add(new_text)
-                self.pistenimiteksti.SetLabelText(parsittu)
+                return None
             else:
-                self.luopiste(self.hanke)
-
-    # luodaan piste käyttäjän antamalla nimellä
-    # estetään ylikirjoitus try-exceptillä
-    def luopiste(self, hanke):
-        print(os.getcwd())
-        print("luodaan pistettä hankkeeseen {}".format(hanke))
-        pistenimi = wx.TextEntryDialog(None, "Anna hankkeen {} uudelle pisteelle nimi".format(hanke),
-                                       "Uuden pisteen luonti hankkeelle {}".format(hanke))
-        if pistenimi.ShowModal() == wx.ID_OK:
-            pistenimi = pistenimi.GetValue()
-            varmistus = wx.MessageDialog(None, "Luodaan piste {} hankkeelle {}".format(pistenimi, hanke)
-                                         , "Luodaan..", wx.YES_NO)
-            luo = varmistus.ShowModal()
-            if luo == wx.ID_YES and os.curdir == ".":
-                try:
-                    file = open("{}.txt".format(pistenimi), "r")
-                    file.close()
-                    warning = wx.MessageDialog(None, "Piste {} on jo olemassa".format(pistenimi), "Varoitus",
-                                               wx.OK | wx.ICON_INFORMATION)
-                    warning.ShowModal()
-                    warning.Destroy()
-                except FileNotFoundError:
-                    file = open("{}.txt".format(pistenimi), "w", encoding="utf-8")
-                    file.close()
-                    self.pistenimiteksti.SetLabelText(pistenimi)
+                self.data.iluopiste(self.data.hanke)
+                self.pistenimiteksti.SetLabelText(self.data.piste)
 
     # kysyy käyttäjältä alkusyvyyttä, joka tallennetaan
     # windowclassin.data luokkaan
@@ -349,9 +282,9 @@ class windowClass(wx.Frame):
                 self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
                 self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
                 alkusyvyys.Destroy()
-                print("lähetetään kkssälle: työnumero(hanke?), {}, {}, pvm(timestä?)".format(kairausvalinta)
-                      , self.data.piste)
-
+                print("lähetetään kkssälle: työnumero, kairausvalinta, piste, pvm(timestä?)")
+                # print("lähetetään kkssälle: työnumero(hanke?), {}, {}, pvm(timestä?)".format(kairausvalinta)
+                #       , self.data.piste)
 
     def lopetakairaus(self, event):
         os.chdir(self.data.root)
@@ -360,17 +293,19 @@ class windowClass(wx.Frame):
             for line in textfile:
                 if len(line) > 1:
                     z.append(line.rsplit(" ")[1].strip("\n"))
-                    # z.append(line)
         textfile.close()
         kairausvalinta = wx.SingleChoiceDialog(None, "Valitse lopetussyy", "Kairauksen lopetus", z, wx.CHOICEDLG_STYLE)
         if kairausvalinta.ShowModal() == wx.ID_OK:
             kairausvalinta = kairausvalinta.GetStringSelection()
-            # with open("kairausloppu.txt", "r") as textfile:
-            #     for line in textfile:
-            #         if line.__contains__(kairausvalinta):
-            #             print(line[1:3])
             print("lähetetään kkssälle tieto kairaus lopetettiin syvyydellä {} syystä {}"
                   .format(self.data.haesyvyys(), kairausvalinta))
+            os.chdir("GEOXX")
+            with open("{}.txt".format(self.data.hanke), 'a') as textfile:
+                textfile.write("lopetus: {} syvyydellä {}".format(self.data.syvyys, kairausvalinta))
+                textfile.close()
+            os.chdir(self.data.root)
+        else:
+            return None
 
     def tanko(self, event):
         if self.tankoarvolaatikko.GetBackgroundColour() == 'red':
@@ -380,7 +315,6 @@ class windowClass(wx.Frame):
             self.tankoarvolaatikko.SetBackgroundColour('red')
             self.tankoarvolaatikko.Refresh()
         return None
-
 
     def lataapiste(self, event):
         if self.pistenimiteksti.GetLabel() == ">pisteen nimi<":
@@ -518,6 +452,7 @@ class TiedonKasittely(object):
         super(TiedonKasittely, self).__init__()
 
         self.hanke = hanke
+        self.piste = piste
         self.maalaji = maalaji
         self.alkusyvyys = alkusyvyys
         self.syvyys = syvyys
@@ -560,21 +495,97 @@ class TiedonKasittely(object):
         return self.figure
 
     def iavaahanke(self):
-        z = [nimi for nimi in next(os.walk('.'))[1] if not nimi.endswith("_")]
+        os.chdir("GEOXX")
+        z = [nimi.replace(".txt","") for nimi in os.listdir(os.curdir) if nimi.endswith(".txt")]
+        z.append("LUO UUSI HANKE")
         tiedostonvalinta = wx.SingleChoiceDialog(None, "Valitse hanke", "Hankkeet", z, wx.CHOICEDLG_STYLE)
-        if tiedostonvalinta.ShowModal() == wx.ID_OK:
-            self.hanke = tiedostonvalinta.GetStringSelection()
-            tiedostonvalinta.Destroy()
-            return self.hanke
 
-    def iavaapiste(self):
-        x = [nimi.replace(".txt","") for nimi in os.listdir(os.curdir) if nimi.endswith(".txt")]
-        pistevalinta = wx.SingleChoiceDialog(None, "Valitse piste", "Pisteet", x, wx.CHOICEDLG_STYLE)
-        if pistevalinta.ShowModal() == wx.ID_OK:
-            self.piste = pistevalinta.GetStringSelection()
-            pistevalinta.Destroy()
-            pisteheader = self.iparsiheader()
-            return self.piste, pisteheader
+        if tiedostonvalinta.ShowModal() == wx.ID_OK:
+            if tiedostonvalinta.GetStringSelection() == "LUO UUSI HANKE":
+                self.iluohanke()
+                os.chdir(self.root)
+                return None
+            else:
+                self.hanke = tiedostonvalinta.GetStringSelection()
+                tiedostonvalinta.Destroy()
+                os.chdir(self.root)
+        else:
+            os.chdir(self.root)
+            return None
+
+    # luodaan hanke käyttäjän antamalla nimellä
+    # erikoismerkit parsittu pois
+    # estetään ylikirjoitus try-exceptillä
+    def iluohanke(self):
+        hankenimi = wx.TextEntryDialog(None, "Anna uudelle hankkeelle nimi", "Uuden hankkeen luonti")
+        if hankenimi.ShowModal() == wx.ID_OK:
+            hankenimi = hankenimi.GetValue()
+            hankenimi = ''.join(e for e in hankenimi if e.isalnum())
+            varmistus = wx.MessageDialog(None, "Luodaan hanke {}".format(hankenimi), "Luodaan..", wx.YES_NO)
+            luo = varmistus.ShowModal()
+            if luo == wx.ID_YES:
+                z = [hanke.replace(".txt", "") for hanke in os.listdir(os.curdir)]
+                if z.__contains__(hankenimi):
+                    warning = wx.MessageDialog(None, "Hanke {} on jo olemassa".format(hankenimi), "Varoitus",
+                                               wx.OK | wx.ICON_INFORMATION)
+                    warning.ShowModal()
+                    warning.Destroy()
+                    os.chdir(self.root)
+                else:
+                    self.iluotempconfig()
+                    file = open("{}.txt".format(hankenimi), 'a')
+                    self.hanke = hankenimi
+                    self.config.read("HANKETIEDOT.ini")
+                    file.write(self.config["DEFAULT"]["fo"])
+                    file.write("\n"+self.config["DEFAULT"]["kj"])
+                    file.write("\n"+self.config["DEFAULT"]["om"])
+                    file.write("\n"+self.config["DEFAULT"]["ml"])
+                    file.write("\n"+self.config["DEFAULT"]["org"])
+                    file.close()
+                    self.ituhoatempconfig()
+                    os.chdir(self.root)
+            else:
+                os.chdir(self.root)
+                return None
+        else:
+            os.chdir(self.root)
+            hankenimi.Destroy()
+            print("hanketta ei luotu")
+            return None
+
+    # luodaan piste käyttäjän antamalla nimellä
+    # estetään ylikirjoitus try-exceptillä
+    def iluopiste(self, hanke):
+        pistenimi = wx.TextEntryDialog(None, "Anna hankkeen {} uudelle pisteelle nimi".format(hanke),
+                                       "Uuden pisteen luonti hankkeelle {}".format(hanke))
+        if pistenimi.ShowModal() == wx.ID_OK:
+            nimi = pistenimi.GetValue()
+            varmistus = wx.MessageDialog(None, "Luodaan piste {} hankkeelle {}".format(nimi, hanke)
+                                         , "Luodaan..", wx.YES_NO)
+            luo = varmistus.ShowModal()
+            if luo == wx.ID_YES:
+                self.piste = nimi
+                self.iluotempconfig()
+                file = open("{}.txt".format(hanke), "a", encoding="utf-8")
+                self.config.read("PISTETIEDOT.ini")
+                file.write("\n" + "PISTENIMI: {}".format(nimi))
+                file.write("\n" + self.config["DEFAULT"]["ty"])
+                file.write("\n" + self.config["DEFAULT"]["pk"])
+                file.write("\n" + self.config["DEFAULT"]["la"])
+                self.config.read("TUTKIMUSTIEDOT.ini")
+                file.write("\n" + self.config["DEFAULT"]["tt"])
+                file.write("\n" + self.config["DEFAULT"]["tx"])
+                file.write("\n" + self.config["DEFAULT"]["xy"])
+                file.write("\n" + self.config["DEFAULT"]["ln"] + "\n")
+                file.close()
+                self.ituhoatempconfig()
+                os.chdir(self.root)
+            else:
+                os.chdir(self.root)
+                return None
+        else:
+            os.chdir(self.root)
+            return None
 
     # valitaan ohjelma ohjelma-napista
     # tiedot luetaan tutkimustavat-tiedostosta
@@ -590,6 +601,11 @@ class TiedonKasittely(object):
         if ohjelmavalinta.ShowModal() == wx.ID_OK:
             ohjelmavalinta = ohjelmavalinta.GetStringSelection()
             print("lähetetään kkssälle tieto tt syvyydellä {} on {}".format(self.haesyvyys(), ohjelmavalinta))
+            os.chdir("GEOXX")
+            with open("{}.txt".format(self.hanke), 'a') as textfile:
+                textfile.write("{} syvyydellä {}".format(self.syvyys, ohjelmavalinta))
+                textfile.close()
+            os.chdir(self.root)
             with open("tutkimustavat.txt", "r", encoding="utf-8-sig") as textfile:
                 for line in textfile:
                     if line.__contains__(ohjelmavalinta):
@@ -620,6 +636,11 @@ class TiedonKasittely(object):
                                                                                        'TUNTEMATON', 'EI PIIRRETÄ'])
                 if maalaji.ShowModal() == wx.ID_OK:
                     maalaji = maalaji.GetStringSelection()
+                    os.chdir("GEOXX")
+                    textfile = open("{}.txt".format(self.hanke), 'a')
+                    textfile.write("{} syvyydellä {}".format(maalaji, self.syvyys))
+                    textfile.close()
+                    os.chdir(self.root)
                     self.asetamaalaji(maalaji)
                     return None
             else:
@@ -640,6 +661,11 @@ class TiedonKasittely(object):
                                                   maalista, wx.CHOICEDLG_STYLE)
                 if maatyyppi.ShowModal() == wx.ID_OK:
                     maatyyppi = maatyyppi.GetStringSelection()
+                    os.chdir("GEOXX")
+                    textfile = open("{}.txt".format(self.hanke), 'a')
+                    textfile.write("{} syvyydellä {}".format(maalaji, self.syvyys))
+                    textfile.close()
+                    os.chdir(self.root)
                     self.asetamaalaji(maatyyppi)
                     return None
 
@@ -789,13 +815,18 @@ class TiedonKasittely(object):
 
     def iluotempconfig(self):
         os.chdir(self.root)
-        shutil.copy('HANKETIEDOT.ini', '{}'.format(self.hanke))
-        shutil.copy('PISTETIEDOT.ini', '{}'.format(self.hanke))
-        shutil.copy('TUTKIMUSTIEDOT.ini', '{}'.format(self.hanke))
-        os.chdir(self.hanke)
-        print("temp tiedostot luotu hankkeelle {}".format(self.hanke))
+        shutil.copy('HANKETIEDOT.ini', 'GEOXX')
+        shutil.copy('PISTETIEDOT.ini', 'GEOXX')
+        shutil.copy('TUTKIMUSTIEDOT.ini', 'GEOXX')
+        os.chdir("GEOXX")
         return None
 
+    def ituhoatempconfig(self):
+        os.remove('HANKETIEDOT.ini')
+        os.remove('PISTETIEDOT.ini')
+        os.remove('TUTKIMUSTIEDOT.ini')
+
+# saisko tästä graafille uuden ikkunan jotenkin hienosti
 class OtherFrame(wx.Frame):
     """"""
 
