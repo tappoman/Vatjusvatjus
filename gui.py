@@ -262,7 +262,8 @@ class windowClass(wx.Frame):
                 self.pistetiedotpaneelille()
             else:
                 self.pistetiedotpaneelille()
-                os.chdir("GEOXX")
+                self.config.read("USECONTROL.ini")
+                os.chdir(self.config["DEFAULT"]["polku"])
                 print(self.hankenimiteksti.GetLabel())
                 pisteet = []
                 with open("{}.txt".format(self.hankenimiteksti.GetLabel())) as textfile:
@@ -295,7 +296,8 @@ class windowClass(wx.Frame):
                 kairausvalinta = kairausvalinta.GetStringSelection()
                 if kairausvalinta == "OHITETAAN":
                     print("lähetä tieto kks alkukairaus ohitetaan")
-                    os.chdir("GEOXX")
+                    self.config.read("USECONTROL.ini")
+                    os.chdir(self.config["DEFAULT"]["polku"])
                     with open("{}.txt".format(self.data.hanke), 'a') as textfile:
                         textfile.write("\n" + "alkukairaus ohitetaan")
                         textfile.close()
@@ -312,7 +314,8 @@ class windowClass(wx.Frame):
                     self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
                     self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
                     alkusyvyys.Destroy()
-                    os.chdir("GEOXX")
+                    self.config.read("USECONTROL.ini")
+                    os.chdir(self.config["DEFAULT"]["polku"])
                     with open("{}.txt".format(self.data.hanke), 'a') as textfile:
                         textfile.write("\n" + "alkukairaus: {} syvyydellä {}".format(self.data.syvyys, kairausvalinta))
                         textfile.close()
@@ -341,7 +344,8 @@ class windowClass(wx.Frame):
                 kairausvalinta = kairausvalinta.GetStringSelection()
                 print("lähetetään kkssälle tieto kairaus lopetettiin syvyydellä {} syystä {}"
                       .format(self.data.haesyvyys(), kairausvalinta))
-                os.chdir("GEOXX")
+                self.config.read("USECONTROL.ini")
+                os.chdir(self.config["DEFAULT"]["polku"])
                 with open("{}.txt".format(self.data.hanke), 'a') as textfile:
                     textfile.write("\n" + "lopetus: {} syvyydellä {}".format(self.data.syvyys, kairausvalinta))
                     textfile.close()
@@ -381,7 +385,8 @@ class windowClass(wx.Frame):
         self.listenerupdate(self.data)
 
     def pistetiedotpaneelille(self):
-        os.chdir("GEOXX")
+        self.config.read("USECONTROL.ini")
+        os.chdir(self.config["DEFAULT"]["polku"])
         print(self.hankenimiteksti.GetLabel())
         with open("{}.txt".format(self.hankenimiteksti.GetLabel())) as textfile:
             for line in textfile:
@@ -488,7 +493,8 @@ class windowClass(wx.Frame):
 
             if tagi == "Lieju":
                 self.maalajiarvoteksti.SetLabelText("Lj")
-                os.chdir("GEOXX")
+                self.config.read("USECONTROL.ini")
+                os.chdir(self.config["DEFAULT"]["polku"])
                 with open("{}.txt".format(self.data.hanke), 'a') as hanketextfile:
                     hanketextfile.write(
                         "\n" + "{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(), self.data.syvyys))
@@ -509,7 +515,8 @@ class windowClass(wx.Frame):
                             if lineparts.__contains__("{}".format(tagi)):
                                 lyhenne = lineparts.rsplit(' ')[0].replace(',', "")
                                 self.maalajiarvoteksti.SetLabelText(lyhenne)
-                os.chdir("GEOXX")
+                self.config.read("USECONTROL.ini")
+                os.chdir(self.config["DEFAULT"]["polku"])
                 with open("{}.txt".format(self.data.hanke), 'a') as hanketextfile:
                     hanketextfile.write("\n" + "{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(), self.data.syvyys))
                     os.chdir(self.data.root)
@@ -541,7 +548,7 @@ class TiedonKasittely(object):
         self.root = ROOT_DIR
         self.config = configparser.ConfigParser()
 
-        # self.kks = Kksoperations()
+        self.kks = Kksoperations()
 
 
 
@@ -578,7 +585,8 @@ class TiedonKasittely(object):
         return self.figure
 
     def iavaahanke(self):
-        os.chdir("GEOXX")
+        self.config.read("USECONTROL.ini")
+        os.chdir(self.config["DEFAULT"]["polku"])
         z = [nimi.replace(".txt","") for nimi in os.listdir(os.curdir) if nimi.endswith(".txt")]
         z.append("LUO UUSI HANKE")
         tiedostonvalinta = wx.SingleChoiceDialog(None, "Valitse hanke", "Hankkeet", z, wx.CHOICEDLG_STYLE)
@@ -682,7 +690,8 @@ class TiedonKasittely(object):
         if ohjelmavalinta.ShowModal() == wx.ID_OK:
             ohjelmavalinta = ohjelmavalinta.GetStringSelection()
             print("lähetetään kkssälle tieto tt syvyydellä {} on {}".format(self.haesyvyys(), ohjelmavalinta))
-            os.chdir("GEOXX")
+            self.config.read("USECONTROL.ini")
+            os.chdir(self.config["DEFAULT"]["polku"])
             with open("{}.txt".format(self.hanke), 'a') as textfile:
                 textfile.write("{} syvyydellä {}".format(self.syvyys, ohjelmavalinta))
                 textfile.close()
@@ -948,7 +957,8 @@ class TiedonKasittely(object):
         shutil.copy('HANKETIEDOT.ini', 'GEOXX')
         shutil.copy('PISTETIEDOT.ini', 'GEOXX')
         shutil.copy('TUTKIMUSTIEDOT.ini', 'GEOXX')
-        os.chdir("GEOXX")
+        self.config.read("USECONTROL.ini")
+        os.chdir(self.config["DEFAULT"]["polku"])
         return None
 
     def ituhoatempconfig(self):
