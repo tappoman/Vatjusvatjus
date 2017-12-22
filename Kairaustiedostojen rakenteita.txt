@@ -1,0 +1,257 @@
+	VATJUS-MICRO OY				Kairaustiedostojen rakenteita
+								2.12.2017 /lva
+	---------------------------------------------------------------------------
+
+   KAIRAUSJÄRJESTELMÄN TIEDOSTOT
+
+
+	Tiedostot ovat ASCII -tekstitiedostoja, joissa yhdellä rivillä on yksi asia
+	päättyen rivinvaihtomerkkeihin <crlf>. 
+	Tiedostossa on rivin alussa tunnistekenttä, jonka perusteella etsivä
+	ohjelma löytää hakemansa. Rivin sisältöosat erotetaan tabulaattorilla.
+	Kairaustiedostossa erottimina ovat välimerkit.
+	Ohjaustiedostot voivat sisältää kommentteja rivin alussa tai rivin lopussa.
+	Kommentin merkki on yläpilkku (').
+	Pienehköt ohjaustiedostot (..cntrol) voidaan koota tarvittaessa myös
+	yhdeksi tiedostoksi.
+
+	Ohjaustiedostot sijaitsevat ohjelmistokansiossa. Purkutiedoston kansio
+	määritetään polulla.
+	Esityksissä käytetään selkeänisoa fonttia.
+
+
+   USECONTROL.TXT
+	'päivitys: xx.xx.2018 /nimi
+
+	'Kommunikoinnin asetukset	
+	#BAUD   9600		'siirtonopeus
+	#CHAR   D8,S1,PN	'merkin rakenne
+	#HANDS  N		'kättely, N=ei
+	#PORT   1		'siirtoportti
+
+
+	'Tallennuksen asetukset
+	#PATH	C:\Users\GEOXX\hanke15.txt	'tietojen tallennuskansio
+
+	'Tallennettavan tiedostoon aloitustiedot. Esiintyvät vain kerran.
+	'Näitä voidaan tarkastella/muuttaa omassa ikkunassa.
+	#FO     2.3				'INFRA-2.3/SGF myöhemmin.	
+	#KJ     KKJ-N60				'koordinaattijärjestelmä
+	#OM     TILAAJA				'kairaustietojen saaja
+	#ML	GEO				'maalajit GEO/xx mukaisesti
+	#OR	GEOpojat			'tutkimusorganisaatio
+
+	'Pisteen yleistiedot. Tiedosto voi sisältää useita pisteitä kairattuna
+	'eri menetelmillä. Kunkin pisteen alkuun tarjotaan tallennettavaksi
+	'tiedot ylläpidosta. Muuttuvat kentät päivitetään ylläpitoon.
+	'Näitä voidaan myös tarkastella/muuttaa omana ikkunana.
+	'Kentät ovat:
+	#TYÖNUMERO	12345678
+	#TYÖNIMI	POHJANTIE
+	#LAITTEET	GM65-sn13256		'monitoimikaira
+	#KAIRAAJA	S LAAKKONEN
+
+
+   HWCONTROL.TXT
+
+	'Näitä tarkastellaan/muutetaan omassa ikkunassa.
+ 	'Muuttuvat kentät päivitetään ylläpitoon ja KK-sovittimelle.
+	' Laitteiston asetukset:
+	#LOGGING	20	'Tallennusväli yleisesti 20. Kuitenkin menetelmäkohtaisesti
+				'PH-puristus: 4 cm, CPTU-kairaus: 2 cm. Sovitin huolehtii
+				'näistä mittausväleistä. Tässä ei tarpeellinen.
+	#PULS/CM	45.55	'Syvyyden pulssivakio/cm 0.nn -- nnn.nn.
+	#PULS/PK	30	'Pulssimäärä puolikierrosta kohden.
+
+	'AN -mittauskanavien asetukset:
+	#PK-VOIMA	N256	K0.255	P25.01.2018	'AN2 nollaus, kerroin, kalibrointipäiväys
+	#PH-VOIMA	N344	K1.245	P25.01.2018	'AN1  -- " --
+	#PH-VÄÄNTÖ	N299	K1.945	P25.01.2018	'AN3  -- " --
+	#VESI-VI	N299	K1.945	P25.01.2018	'AN4  -- " --	SGF tarve myöhemmin
+	#VESI-PA	N299	K1.945	P25.01.2018	'AN5  -- " --	SGF tarve myöhemmin
+	#VASARA		N299	K1.945	P25.01.2018	'AN6  -- " --	SGF tarve myöhemmin
+
+
+   SELECTIONS.TXT
+
+	'Tiedosto sisältää luettelovalinnat:
+	'	- tutkimustavat
+	'	- alkukairaustavat
+	'	- maalajit
+	'	- päättymisen syyt
+	'Valintarivi sisältää koodiosan ja selkotekstin. Valitusta vain koodi tallennetaan.
+
+
+								   TEKSTIT.TXT
+
+									Tiedosto sisältää sovelluksen tekstiluettelon. Kukin teksti haetaan avaimen avulla
+									käyttöön. Kutakin teksti voi olla samalla rivillä useina kenttinä eri kieliä varten.
+									Kielen sarakevalinta valitaan järjestelmäasetuksen KIELI: -valinnassa.
+
+									#KIELI:	2
+									'avain	1. kieli	2. kieli	3. kieli
+									#CCCC	VALITSE		SELECT		..
+
+
+												PISTEET.TXT
+												Kairattavien pisteiden luettelo, josta saadaan valitun pisteen olennaiset
+												tiedot suoraan kenttiinsä. Tietorakenne on ns. GT -formaatti.  Ei vielä.
+
+
+
+   KAIRAUKSEN TOIMINTA-ASKELEET:
+
+	- monitoroidaan tarvittaessa menetelmän mittauskanavia.
+	  Kalibroidaan tarvittaessa, ei vielä kuvausta.
+
+	- käynnistetään piste:
+		- oletuksena annetaan edellisen tiedoston nimi
+			- kuitataan sisään tai annetaan uusi.
+	- kopioidaan alkuun alkutiedot, jos alkaa uusi tiedosto.
+	- kopioidaan vain kairauksen yleistiedot.
+
+	- valitaan tutkimustapa.
+	- kopioidaan TT:n kalibrointiarvot mukaan.
+	- annetaan koordinaattipohjat (9...) täydennettäväksi 
+	  Annetaan pistenumero.
+
+	- valitaan alkukairaustapa luettelosta.
+	****- alkukairaustilaan siirryttäessä lähetetään alussa sovittimelle ****
+		TYÖNUMERO, TUTK.TAPA, PISTE, PVM 
+			-->     def asetaHanke(self, tyonumero, hanke):
+					def asetaPiste(self, piste): --> muotoa :ss..s: 
+					def asetaTapa(self, tapa):
+					
+					*def asetaPaiva(self, paiva):
+					*def asetaAika(self, aika):
+					
+				
+	- toteutetaan alkukairaus ja tallennetaan sen mukainen alkusyvyys (AL)
+			-->     def aloitaAlkukairaus(self):
+			-->		def asetaAlkusyvyys(self, syvyys):
+			
+	
+	- siirrytään odotustilaan
+			-->		def aloitaOdotustila(self):
+			
+			
+	- siirrytään kairaustilaan
+			-->    def aloitaKairaus(self):
+			
+				- saadaan mittaussanomia ja tallennussanomia.
+				- saadaan nosto- ja sen kuittaussanomia, tila näytetään. ***TEKSTI ISOLLA PUNAISELLA***
+					<-- #NOSTO, #NOSKU
+				
+				- ****saadaan painikesanomia:***
+					- maalajivalintaa. 
+					Kairauksen aikana annettu maalaji tallennetaan, kun seuraava syvyysrivi tallennetaan. 
+					<-- Maalaji
+					--> (saving) def tallennaMaalaji(self, hanke, maalaji)
+					
+				- porauksessa kellotuksen ohjausta ON/OFF.
+					SEKUNTIASKELLUS #TIMER:n
+					
+					
+				- pur/heijarissa menetelmän vaihto (P/H)
+					<-- ***EI MITÄÄN HAJUA***
+					--> ***EI MITÄÄN HAJUA***
+					
+				- painokairauksessa LYÖNTI -tilan ohjaukset.
+					<-- ***EI MITÄÄN HAJUA***
+					--> ***EI MITÄÄN HAJUA***
+					
+				- kairauksen pysäytys odotustilaan ja jatkaminen.
+					<-- MIT-ODOTUS
+					--> def aloitaKairaus(self): (jatkaa kairausta)
+						
+		
+		- kairaustilan esitys:
+			- toimintatila, nostovalo.
+			- alareunassa koko ajan numeerisesti perustietoa
+			  esim.:  S123  P100  PK25  R30/min (syvyys voima puolik. kiertonop.)
+			  
+			- muutoin taulukkoesitys / kuvaajaesitys.
+
+	- kairauksen lopetus ja lopetussyyn valinta luettelosta.
+		<-- "#END:123 15"
+		-->  def lopetaKairaus(self):
+		
+		
+	- selaus pisteittäin editointia ja piirtoa varten.
+			--> ??? TEKLATIEDOSTON AVAUS JA SELAUS --> EDITOINTI VIELÄ TEHTÄVÄ
+			--> ??? MITÄ EDITOIDAAN 
+			--> VHM VAPAA HUOMAUTUS	'kairauksen edetessä annettava huomautus menee
+								' syvyyskohtansa perään seuraavalle riville.
+	- Maalajit
+			--> Myös jälkikäteen 
+
+
+	- vapaan huomautuksen lisäys teklatiedostoon
+			--> ??? reaaliajassa lennosta vaiko avatun tiedoston editointin vaiheessa
+
+	- Maalajit
+			--> 
+
+   TALLENNUSTIEDOSTON RAKENNE-ESIMERKKI
+
+	'Tiedostokohtaiset vain kerran. Kopioidaan ylläpidosta.
+	'Kunkin rivin tunnus alkaa rivin alusta.
+	FO  2.3							'formaatti versio
+	KJ   XXXXX						'koordinaattijärjestelmä
+	OM  TILAAJA						'työn omistaja
+	ML  GEO							'maalajiluettelo GEO -mukaisesti
+	OR  GEO-LABS						'kairaava organisaatio
+
+	'pistekohtaiset kunkin pisteen alkuun ylläpidosta.
+	TY  123456             HAILA				'työnumero     työnimi
+	PK  0      MK						'pöytäkirja   0    kairaaja
+	LA  GM75GT						'laitteet
+
+	'tutkimuskohtaiset
+	TT  PA - 0						'tutkimustapa - 0
+	TX  KALIB.ARVOT PKV:18.03.2015   263_0.337		'vapaa tekstikenttä, jossa kalibrointitiedot
+	XY  -999999      -999999      -999999     23042015  2	'x-koordi  y-koordi  z-korkeus  pvm  pistenumero.
+								'Koordinaatit annetaan, jos tiedetään, muutoin ysit.
+	LN  -       - 						'linjatiedot: LINJA  PAALU  SIVULLE  näiden käyttö
+								'on vähäistä. Tallennetaan pelkät viivat.
+
+	'mittaustiedot sisennettynä blankoilla
+	AL  00.00      						'alkusyvyys nn.nn m. 
+	    00.20  100   7      					syvyys  voima  puolikierros (maalaji huom) PA:ssa.
+	    00.40  100   2     Sr					syvyys  voima  puolikierros  maalajilyhenne				   
+	    00.60  100   4        
+	    00.80   75   0
+	HM VAPAA HUOMAUTUS					'kairauksen edetessä annettava huomautus menee
+								' syvyyskohtansa perään seuraavalle riville.
+	    01.00   50   0        
+	    01.20  100   1        
+	    01.40  100   1        
+	    01.60  100   13       
+	    01.80  100   34       
+	    02.00  100   85       
+	    02.20  100   18
+		. . .
+            15.91  100   102    
+            16.05    0   -5 					'kovassa maassa kokeillaan kerroksen lävistystä
+								'lyönneillä. On oma työtilansa, jonka käskytys
+								'vielä puuttuu. Tämä vain painokairauksessa.
+								'Lynöti aiheuttaa piirrossa epäjatkuvuuskohdan.
+        -1  MS							'Kairauksen päätös (-1): MS määräsyvyys.
+
+
+	'Seuraava piste tallentuu samaan tiedostoon ellei  tiedostoa vaihdeta. Välissä
+	'saa olla pari tyhjää riviä.
+	'Menetelmä voi vaihtua ja rivirakenne sen mukana. Sovitin huolehtii rivirakenteesta.
+	TY  123456             HAILA
+	PK  0      MK	
+	LA  GM75GT
+
+	'tutkimuskohtaiset
+	TT  PA - 0
+	TX  KALIB.ARVOT PKV:18.03.2015   263_0.337
+	XY  -999999      -999999      -999999     23042015  35
+	LN  -       - 	
+
+
+
+	
