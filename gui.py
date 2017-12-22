@@ -44,7 +44,9 @@ class windowClass(wx.Frame):
     def onClose(self):
 #        self.kks.closeConnection()
         self.data.kks.closeConnection()
-        self.Close()
+        #self.Close()
+        #self.Destroy()
+
 
     def basicGUI(self):
 
@@ -61,6 +63,7 @@ class windowClass(wx.Frame):
         #Framen sulkemisnappi
         closeBtn = wx.Button(panel, label="Close")
         closeBtn.Bind(wx.EVT_BUTTON, self.onClose)
+        self.Bind(wx.EVT_WINDOW_DESTROY, self.suljelistener)
 
         # hanke
         # avaa hankkeen listalta
@@ -434,8 +437,9 @@ class windowClass(wx.Frame):
     def komennakks(self, event):
         komento = wx.TextEntryDialog(None, "KKS Komento", "Kirjoita komento")
         if komento.ShowModal() == wx.ID_OK:
-            print(komento.GetValue)
-            self.data.kks.annaKasky(str(komento.GetValue))
+            komento = str(komento.GetValue())
+            print(komento)
+            self.data.kks.annaKasky(komento)
             #print("tottele saatana")
             #self.data.kks.aloitaKairaus()
 
@@ -512,8 +516,9 @@ class windowClass(wx.Frame):
                     hanketextfile.close()
 
     def suljelistener(self, event):
-        if wx.CloseEvent():
+            event.Skip()
             self.onClose()
+            #wx.EVT_WINDOW_DESTROY
 
 #tietojenkäsittely luokka
 #tallentaa käyttäjän ja communicationin syöttämän datan ja syöttää sen eteenpäin windowclass luokalle
@@ -967,6 +972,8 @@ def main():
     frame = windowClass(None)
     frame.Show(True)
     app.MainLoop()
+
+
     #ti = TiedonKasittely()
     #ti.ikuuntele()
 
@@ -976,6 +983,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 #tiedontallennukset saving.py palautaTalpolku tallennuspolku, avaustiedosto jne
 

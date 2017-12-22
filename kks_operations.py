@@ -41,8 +41,10 @@ class Kksoperations (object):
         print(results)
 
     def closeConnection(self):
+        print("suletaan")
         self.com.closeConnection()
-
+        #self.com.Destroy()
+        #self.t1.Destroy()
 
     def lueThread(self):
         t1 = threading.Thread(target=self.com.readValues)
