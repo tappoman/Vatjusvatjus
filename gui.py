@@ -35,7 +35,7 @@ class windowClass(wx.Frame):
         self.data = TiedonKasittely()
         self.ba = ba
         self.timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self.update, self.timer)
+        self.Bind(wx.EVT_TIMER, self.data.ikuuntele, self.timer)
 
         self.sa = Saving()
         #self.com = Communication()
@@ -371,11 +371,12 @@ class windowClass(wx.Frame):
         else:
             self.piste = self.pistenimiteksti.GetLabel()
             self.update()
+            self.timer.Start(500)
 
     # kutsuu päivityksiä arvoteksteille ja paneelille
     def update(self):
         # print(self.listener)
-        self.data.ikuuntele()
+        # self.data.ikuuntele()
         self.updatepistearvot(self.data)
         self.listenerupdate(self.data)
 
@@ -540,7 +541,7 @@ class TiedonKasittely(object):
         self.root = ROOT_DIR
         self.config = configparser.ConfigParser()
 
-        self.kks = Kksoperations()
+        # self.kks = Kksoperations()
 
 
 
@@ -742,7 +743,7 @@ class TiedonKasittely(object):
             return None
 
     # luetaan tiedot tekstitiedostosta, mockup communication listenistä
-    def ikuuntele(self):
+    def ikuuntele(self, event):
         z = []
         #with open("data0.txt", 'r', encoding="utf-8") as textfile:
         self.config.read("USECONTROL.ini")
