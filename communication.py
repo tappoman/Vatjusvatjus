@@ -59,7 +59,7 @@ class Communication (object):
                 self.ser.flushOutput()
                 self.value = self.ser.readline().decode()
                 if self.value:
-                    print(self.value)
+                    #print(self.value)
                     sa.tallennaMIT(self.value)
                 #time.sleep(0.5)
 
