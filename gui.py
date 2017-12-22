@@ -549,7 +549,7 @@ class TiedonKasittely(object):
         self.root = ROOT_DIR
         self.config = configparser.ConfigParser()
 
-        # self.kks = Kksoperations()
+        self.kks = Kksoperations()
 
 
 
@@ -767,6 +767,7 @@ class TiedonKasittely(object):
 
                     #MITTAUS- JA TALLENNUSSANOMAT KKS:LTA
                     if lineparts[0][:4] == "#MIT":
+                        print("MITTIA PUKKAA")
                         self.iparsitiedot(lineparts)
 
                     if lineparts[0][:4] == "#TAL":
@@ -848,13 +849,24 @@ class TiedonKasittely(object):
     def iparsitiedot(self, line):
         print(line)
         line_sanoma = line[0].rpartition(":")[0]
-        syvyys = int(line[0].rpartition(":")[2])
+
+        #syvyys = int(line[0].rpartition(":")[2])
+        syvyys = line[0].rpartition(":")[2]
+        print(syvyys)
         self.asetasyvyys(syvyys)
-        voima = int(line[1])
+
+        #voima = int(line[1])
+        voima = line[1]
+        print(voima)
         self.asetavoima(voima)
-        puolikierrokset = int(line[2])
+
+        #puolikierrokset = int(line[2])
+        puolikierrokset = line[2]
         self.asetapuolikierrokset(puolikierrokset)
-        nopeus = int(line[3])
+        print(puolikierrokset)
+        #nopeus = int(line[3])
+        nopeus = line[3]
+        print(nopeus)
         self.asetanopeus(nopeus)
         # if line_sanoma =="TAL":
             #lätä takasin
@@ -955,11 +967,9 @@ class TiedonKasittely(object):
 
     def iluotempconfig(self):
         os.chdir(self.root)
-        self.config.read("USECONTROL.ini")
-        polku = self.config["DEFAULT"]["polku"]
-        shutil.copy('HANKETIEDOT.ini', polku)
-        shutil.copy('PISTETIEDOT.ini', polku)
-        shutil.copy('TUTKIMUSTIEDOT.ini', polku)
+        shutil.copy('HANKETIEDOT.ini', 'GEOXX')
+        shutil.copy('PISTETIEDOT.ini', 'GEOXX')
+        shutil.copy('TUTKIMUSTIEDOT.ini', 'GEOXX')
         self.config.read("USECONTROL.ini")
         os.chdir(self.config["DEFAULT"]["polku"])
         return None
@@ -985,6 +995,7 @@ def main():
     frame = windowClass(None)
     frame.Show(True)
     app.MainLoop()
+
 
     #ti = TiedonKasittely()
     #ti.ikuuntele()
