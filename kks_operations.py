@@ -16,7 +16,8 @@ import time
 import queue
 
 """luodaan communication olio com ja avataan yhteys sovittimelle"""
-com = Communication()
+
+
 
 class Kksoperations (object):
 
@@ -25,82 +26,83 @@ class Kksoperations (object):
         """Thread for KKS-reader
         # lck = threading.Lock()
         #que = queue.Queue()
-        t1 = threading.Thread(target=com.readValues)
-        #t1 = threading.Thread(target=com.readValues)
-        #t1 = threading.Thread(target=lambda q, arg1: q.put(com.readValues(arg1)), args=(que, "t"))
+        t1 = threading.Thread(target=self.com.readValues)
+        #t1 = threading.Thread(target=self.com.readValues)
+        #t1 = threading.Thread(target=lambda q, arg1: q.put(self.com.readValues(arg1)), args=(que, "t"))
         #t1.start()
         #result = que.get()
         #print(result)"""
 
-        t1 = threading.Thread(target=com.readValues)
-        t1.start()
+        self.com = Communication()
+        self.t1 = threading.Thread(target=self.com.readValues)
+        self.t1.start()
 
     def tulostaStream(self):
-        print (results)
+        print(results)
 
     def closeConnection(self):
-        com.closeConnection()
+        self.com.closeConnection()
 
 
     def lueThread(self):
-        t1 = threading.Thread(target=com.readValues)
+        t1 = threading.Thread(target=self.com.readValues)
         t1.start()
 
     def annaKasky(self, command):
-        com.setCommand()
+        self.com.setCommand()
 
 
 #KKS-YLEISKASKYT
 
     def asetaViive(self):
         """Aseta viive 1-99 ms, jonka jälkeen vasta tablet (=SOVITIN???)= lähettää vastauksensa. Palauttaa #1"""
-        com.setCommand("DELAY")
+        self.com.setCommand("DELAY")
         #return "#DELAY"
 
     def tiedusteleTila(self):
         """Tiedustelee ja palauttaa tilan"""
-        com.setCommand("STATE")
+        self.com.setCommand("STATE")
         #return "#STATE"
 
     def tiedusteleAika(self):
         """Tiedustelee ja palauttaa kalenterin ja ajan muodossa #RTC:pp.kk.vvvv-tt.mm.ss """
-        com.setCommand("RTC:?")
+        self.com.setCommand("RTC:?")
         #return "#RTC:pp.kk.vvvv-tt.mm.ss """"
 
     def asetaAika(self, aika):
         """"asettaa ajan muodossa hh:mm:sss ja palauttaa 1"""
-        com.setCommand("RTC:T:", aika)
+        self.com.setCommand("RTC:T:", aika)
         #return "#1"
 
     def asetaPaiva(self, paiva):
         """asettaa paivan muodossa pp.kk.vvvv ja palauttaa 1"""
-        com.setCommand("RTC:D", paiva)
+        self.com.setCommand("RTC:D", paiva)
         #return "#1"
 
     # def tallennaPaiva(self):
     # #RTC:M 		PVM � tallennus KKS:ssa	"""
-    # return com.setCommand("RTC:M")
+    # return self.com.setCommand("RTC:M")
 
 
     """HW-ASETUS / KYSELY"""
     def asetaSyvyydenVakio(self, pulssivakio):
     #palauttaa #1
-        com.setCommand("SYV-PV:", pulssivakio, ":")
+        self.com.setCommand("SYV-PV:", pulssivakio, ":")
         #return "#1"
 
     def asetaPuolikierrostenVakio(self, pulssivakio):
         #palautta #1
-        com.setCommand("PK-PV:", pulssivakio, ":")
+        self.com.setCommand("PK-PV:", pulssivakio, ":")
         #return "#1"
 
     def kysyHwVakiot(self):
         # palauttaa syvyyden(SYV-PV) ja puolikierrosten (PK-PV) vakiot
-        com.setCommand("?PULVA")
+        self.com.setCommand("?PULVA")
         #return "#PV:nnn.n-nn"
 
     def kysyAkkujenJannite(self):
         #Palauttaa jännitteen muodossa #AN0:nn.n:n.n
-        com.setCommand("?AKKU")
+        self.com.setCommand("?AKKU")
         #return "#AN0:nn.n:n.n"
 
 
@@ -109,34 +111,34 @@ class Kksoperations (object):
     def asetaHanke(self, tyonumero, hanke):
         """#HANKE:nnn..n:		HANKE Ty�numero, hanke"""
         """palauttaa #1"""
-        com.setCommand("HANKE:", tyonumero, "..", hanke)
+        self.com.setCommand("HANKE:", tyonumero, "..", hanke)
         #return "#1"
 
     def asetaPiste(self, piste):
         """#PISTE:ss..s:		kohdemuuttuja. palauttaa #1"""
-        com.setCommand("PISTE", piste)
+        self.com.setCommand("PISTE", piste)
         #return "#1"
 
     def asetaTapa(self, tapa):
         """#TAPA:ccc-cc:		Tutkimustapa (TEK-PA,TEK-HE,TEK-PH,TEK-PO ...). palauttaa (SGF-PA,SGF-HE,SGF-PH,SGF-PO ...)"""
-        com.setCommand(tapa)
+        self.com.setCommand(tapa)
         #return "#1"
 
     def tiedusteleTapa(self):
         """#?TAPA			palauta tutkimustavan #TAPA:ccc-cc:"""
-        com.setCommand("?TAPA")
+        self.com.setCommand("?TAPA")
         #return "#TAPA:CCC-CC"
 
 
     """AN_KANAVAT"""
     def asetaKanavanNolla(self, kanava, nolla_arvo):
         """palauttaa #1"""
-        com.setcommand("AN", kanava, "N:", nolla_arvo, ":")
+        self.com.setcommand("AN", kanava, "N:", nolla_arvo, ":")
         #return "#1"
 
     def asetaKanavanKerroin(self, kanava, kerroin):
         """palauttaa #1"""
-        com.setCommand("AN", kanava, "K:", kerroin, ":")
+        self.com.setCommand("AN", kanava, "K:", kerroin, ":")
         #return "#1"
 
     def annaKanavanAsetukset(self, kanava):
@@ -146,7 +148,7 @@ class Kksoperations (object):
 
     def annaKanavanTieto(self, kanava):
         """palauttaa kanavan tiedon: #AN1:2567:2222"""
-        com.setCommand("?AN", kanava,"D:")
+        self.com.setCommand("?AN", kanava,"D:")
         #return "#AN1:2567:2222"
 
 
@@ -156,18 +158,18 @@ class Kksoperations (object):
 
     def kuittaaTanko(self):
         """#TANKO			kuittaa tila pois. palauttaa #1"""
-        com.setCommand("TANKO")
+        self.com.setCommand("TANKO")
         #return "#1"
 
     def aloitaAlkukairaus(self):
         """aloittaa alkukairauksen, palauttaa #alkukairaus
         SIIRTYY ALKUKAIRAUSTILAAN -->
         PARSITAAN MYÖS #NOSKU #NOSTO"""
-        com.setCommand('ALKUK:1')
+        self.com.setCommand('ALKUK:1')
 
     def aloitaOdotustila(self):
         """menee mittauksen odotustilaan josta jatketaan kairausta. Palauttaa #MIT_ODOTUS"""
-        com.setCommand("M-ODOTUS")
+        self.com.setCommand("M-ODOTUS")
         #return "MIT-ODOTUS"
 
 
@@ -179,51 +181,51 @@ class Kksoperations (object):
     Nosto kuitattu KKS:ssa.			< - - - - - -    #NOSKU"""
 
 #    def kuunteleAlkukairausta(self):
-#        com.readValues()
+#        self.com.readValues()
 
     def asetaAlkusyvyys(self, syvyys):
-        com.setCommand("ALKUSYV:", syvyys)
+        self.com.setCommand("ALKUSYV:", syvyys)
 
     def aloitaAlkutila(self):
-        com.setCommand("HOME")
+        self.com.setCommand("HOME")
 
     def lopetaAlkukairaus(self):
         """lopettaa alkukairauksen ja siirtyy kairauksen odotustilaan (Saattaa palauttaa MIT_ODOTUS???)"""
-        com.setCommand("ALKUK:0")
+        self.com.setCommand("ALKUK:0")
 
 
     """"MITTAUKSEN ODOTUSTILA"""
     def asetaKairaussyvyys(self, syvyys):
-        com.setCommand("SYVYYS:", syvyys, ":")
+        self.com.setCommand("SYVYYS:", syvyys, ":")
         #return "#1"
 
     def aloitaKairaus(self):
         """aloittaa mittauksen --> SIIRTYY MITTAUSTILAAN (MITTAUSTILA-2???)"""
-        com.setCommand("START")
+        self.com.setCommand("START")
 
     def lopetaKairaus(self):
         """lopettaa kairauksen ja palaa alkutilaan Palauttaa END:123 15 vajaan patkan arvot"""
-        com.setCommand("END")
+        self.com.setCommand("END")
        # return "#END:123"
 
 
     """MITTAUSTILA-2"""
     def pysaytaKairaus(self):
         """lopettaa kairauksen ja siirtyy odotustilaan"""
-        com.setCommand("STOP")
+        self.com.setCommand("STOP")
         #return "MIT-ODOTUS"
 
     def asetaSekuntiaskellus(self, askellus):
-        com.setCommand("TIMER:", askellus, ":")
+        self.com.setCommand("TIMER:", askellus, ":")
         #return "#1"
 
     """MITTAUSTILA-1"""
     #def aloitaKairaus(self):
-        #com.setCommand("START")
+        #self.com.setCommand("START")
         #return "#KAIRAUS"
 
     def kuunteleKairausta(self):
-        com.readValues()
+        self.com.readValues()
 
 
 """NOSTOTILA VAIKUTTAA HIEMAN SEKAVALTA
@@ -244,15 +246,20 @@ Jatkuu kairaustilana.
 '''
 kks = Kksoperations()
 
+kks.kuittaaTanko()
 kks.pysaytaKairaus()
 kks.aloitaAlkutila()
 kks.tiedusteleAika()
 kks.aloitaAlkukairaus()
+time.sleep(5)
 kks.lopetaAlkukairaus()
 kks.aloitaKairaus()
 
-time.sleep(15)
+time.sleep(5)
+kks.kuittaaTanko()
+time.sleep(5)
 kks.pysaytaKairaus()
+time.sleep(.5)
 kks.aloitaAlkutila()
 kks.closeConnection()
 '''

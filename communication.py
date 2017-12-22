@@ -46,7 +46,7 @@ class Communication (object):
         #self.ser.flushOutput()
 
         self.ser.write(self.command.encode('UTF-8'))
-        time.sleep(0.5)
+        time.sleep(.5)
 
         #com.readValues()
         #return 1

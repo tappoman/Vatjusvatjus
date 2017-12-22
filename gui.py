@@ -16,21 +16,15 @@ import re
 import configparser
 import shutil
 import saving
+from saving import *
+from kks_operations import *
 
 # import communication
 # import guioperations
 # import threading
 # import serial
 
-'''
-from communication import threading
-import guioperations as gui
-com = Communication("com3", 9600)
-gui = Guioperations()
-threadin aloitus 
-t1 = threading.Thread(target=com.readValues()
-t1.start()
-'''
+#com = Communication()
 
 class windowClass(wx.Frame):
     def __init__(self, *args, **kwargs):
@@ -40,13 +34,17 @@ class windowClass(wx.Frame):
         self.basicGUI()
         self.data = TiedonKasittely()
         self.ba = ba
-        #self.com = communication
-        #self.gui = guioperations
-        #self.listener = self.com.Communication("com3", 9600)
-        #t1 = threading.Thread(target=self.com.Communication.readValues(self.listener))
-        #t1.start()
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.update, self.timer)
+
+        self.sa = Saving()
+        #self.com = Communication()
+
+    #NAMA PITAISI SAADA MYOS OIKEAN YLANURKAN PUNAISEESN AXAAN (SULKEMISNAPPI)
+    def onClose(self, event):
+#        self.kks.closeConnection()
+        self.data.kks.closeConnection()
+        self.Close()
 
     def basicGUI(self):
 
@@ -60,6 +58,9 @@ class windowClass(wx.Frame):
         font3.SetPointSize(35)
 
         # nappuloiden alustus
+        #Framen sulkemisnappi
+        closeBtn = wx.Button(panel, label="Close")
+        closeBtn.Bind(wx.EVT_BUTTON, self.onClose)
 
         # hanke
         # avaa hankkeen listalta
@@ -528,6 +529,11 @@ class TiedonKasittely(object):
         self.root = ROOT_DIR
         self.config = configparser.ConfigParser()
 
+        self.kks = Kksoperations()
+
+
+
+
     def asetaalkusyvyys(self, alkusyvyys):
         self.alkusyvyys = alkusyvyys
     def asetasyvyys(self, syvyys):
@@ -727,12 +733,67 @@ class TiedonKasittely(object):
     # luetaan tiedot tekstitiedostosta, mockup communication listenistä
     def ikuuntele(self):
         z = []
-        with open("data0.txt", 'r', encoding="utf-8") as textfile:
+        #with open("data0.txt", 'r', encoding="utf-8") as textfile:
+        self.config.read("USECONTROL.ini")
+        self.polku = self.config["DEFAULT"]["polku"]
+        self.tiedosto = "MIT_temp.txt"
+        self.fullpath = os.path.join(self.polku, self.tiedosto)
+        with open(self.fullpath, 'r', encoding="utf-8") as textfile:
             for line in textfile:
                 if len(line) > 1:
                     lineparts = line.replace('\n', '').split('\t')
-                    if lineparts[0][:4]==("#MIT"):
+
+                    #MITTAUS- JA TALLENNUSSANOMAT KKS:LTA
+                    if lineparts[0][:4] == "#MIT":
                         self.iparsitiedot(lineparts)
+
+                    if lineparts[0][:4] == "#TAL":
+                        #kutsutaan saving luokan metodia joka tallettaa sanoman tekla-tiedostoon
+                        #sa.tallennaTAL(self.data.hanke, line)
+
+                        #kutsutaan piirtäjää ja passataan tiedot sinne --> suoraan vaiko parserin kautta?
+                        #self.iparsitiedot(lineparts)
+                        print("TALTALTAL")
+
+                    if lineparts[0][:4] == "#SYV":
+                        #self.iparsitiedot(lineparts)
+                        print("ENDI")
+                        #TEHDAAN MITAMITA
+                        #Alkukairaussyvyys 1s välein. < - - - - - - #SYV:nnn
+
+                    if lineparts[0][:4] == "#END":
+                        print("ENDI")
+                        #self.iparsitiedot(lineparts)
+                        #TEHDÄÄN MITAMITA??
+
+                    #OHJAUSTIEDOT KKS:LTA
+                    if lineparts[0] == "#ALKUKAIRAUS":
+                        print("alkuk")
+
+                    if lineparts[0] == "MIT-ODOTUS":
+                        print("MIT-ODOTUS")
+
+                    if lineparts[0] == "#NOSTO":
+                        print("nosto")
+                        #TULOSTETAAN TILA GUISSA
+                        #SYTYTETÄÄN NOSTOVALO?
+
+                    if lineparts[0] == "#NOSKU":
+                        print("NOSTON KUITTAUS")
+                        #TULOSTETAAN NOSTON KUITTAUS
+                        #SAMMUTETAAN NOSTOVALO
+                        #JATKETAAN ARVOJEN PRINTTAUSTA GUISSA (JOS TÄTÄ TARVITSEE EDES LOPETTAA)
+
+                    if lineparts[0] == "#KAIRAUS":
+                        print("KAIRAUS")
+                        #JATKETAAN ARVOJEN PRINTTAUSTA GUISSA
+                        #SAMMUTETAAN NOSTOVALO
+
+
+                    #NAPIT KKS:LTA MITÄ IKINÄ TULEEKAAN --> TÄHÄN
+                    if lineparts[0] == "#JOKUKOMENTO":
+                        print("JOKUKOMENTO")
+                        #DO JOTAKI
 
     def iparsiheader(self):
         headlista = []
@@ -900,6 +961,12 @@ def main():
     frame = windowClass(None)
     frame.Show(True)
     app.MainLoop()
+    #ti = TiedonKasittely()
+    #ti.ikuuntele()
+
+    #self.kks = Kksoperations()
+    #self.kks.kuittaaTanko()
+    #self.kks.closeConnection()
 
 if __name__ == '__main__':
     main()
