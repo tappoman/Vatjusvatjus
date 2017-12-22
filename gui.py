@@ -41,7 +41,7 @@ class windowClass(wx.Frame):
         #self.com = Communication()
 
     #NAMA PITAISI SAADA MYOS OIKEAN YLANURKAN PUNAISEESN AXAAN (SULKEMISNAPPI)
-    def onClose(self, event):
+    def onClose(self):
 #        self.kks.closeConnection()
         self.data.kks.closeConnection()
         self.Close()
@@ -511,6 +511,9 @@ class windowClass(wx.Frame):
                     maatextfile.close()
                     hanketextfile.close()
 
+    def suljelistener(self, event):
+        if wx.CloseEvent():
+            self.onClose()
 
 #tietojenkäsittely luokka
 #tallentaa käyttäjän ja communicationin syöttämän datan ja syöttää sen eteenpäin windowclass luokalle
