@@ -61,8 +61,8 @@ class windowClass(wx.Frame):
 
         # nappuloiden alustus
         #Framen sulkemisnappi
-        closeBtn = wx.Button(panel, label="Close")
-        closeBtn.Bind(wx.EVT_BUTTON, self.onClose)
+        #closeBtn = wx.Button(panel, label="Close")
+        #closeBtn.Bind(wx.EVT_BUTTON, self.onClose)
         self.Bind(wx.EVT_WINDOW_DESTROY, self.suljelistener)
 
         # hanke
@@ -799,7 +799,6 @@ class TiedonKasittely(object):
                         print("KAIRAUS")
                         #JATKETAAN ARVOJEN PRINTTAUSTA GUISSA
                         #SAMMUTETAAN NOSTOVALO
-
 
                     #NAPIT KKS:LTA MITÄ IKINÄ TULEEKAAN --> TÄHÄN
                     if lineparts[0] == "#JOKUKOMENTO":
