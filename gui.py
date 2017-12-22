@@ -36,6 +36,7 @@ class windowClass(wx.Frame):
         self.ba = ba
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.data.ikuuntele, self.timer)
+        self.config = configparser.ConfigParser()
 
         self.sa = Saving()
         #self.com = Communication()
@@ -533,7 +534,7 @@ class windowClass(wx.Frame):
 #ja tallennettaviin tietoihin
 class TiedonKasittely(object):
     def __init__(self, hanke = None, piste=None, maalaji="", alkusyvyys=0, syvyys=0, voima=0,
-                 puolikierrokset=0, nopeus=0, figure=None, ROOT_DIR = os.path.dirname(os.path.abspath(__file__))):
+                 puolikierrokset=0, nopeus=0, figure=None, ROOT_DIR = os.path.dirname("C:\\tmp\\GEOXX")):
         super(TiedonKasittely, self).__init__()
 
         self.hanke = hanke
@@ -548,7 +549,7 @@ class TiedonKasittely(object):
         self.root = ROOT_DIR
         self.config = configparser.ConfigParser()
 
-        self.kks = Kksoperations()
+        # self.kks = Kksoperations()
 
 
 
@@ -954,9 +955,11 @@ class TiedonKasittely(object):
 
     def iluotempconfig(self):
         os.chdir(self.root)
-        shutil.copy('HANKETIEDOT.ini', 'GEOXX')
-        shutil.copy('PISTETIEDOT.ini', 'GEOXX')
-        shutil.copy('TUTKIMUSTIEDOT.ini', 'GEOXX')
+        self.config.read("USECONTROL.ini")
+        polku = self.config["DEFAULT"]["polku"]
+        shutil.copy('HANKETIEDOT.ini', polku)
+        shutil.copy('PISTETIEDOT.ini', polku)
+        shutil.copy('TUTKIMUSTIEDOT.ini', polku)
         self.config.read("USECONTROL.ini")
         os.chdir(self.config["DEFAULT"]["polku"])
         return None
@@ -982,7 +985,6 @@ def main():
     frame = windowClass(None)
     frame.Show(True)
     app.MainLoop()
-
 
     #ti = TiedonKasittely()
     #ti.ikuuntele()
