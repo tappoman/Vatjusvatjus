@@ -49,7 +49,7 @@ class Kksoperations (object):
         t1.start()
 
     def annaKasky(self, command):
-        self.com.setCommand()
+        self.com.setCommand(command)
 
 
 #KKS-YLEISKASKYT

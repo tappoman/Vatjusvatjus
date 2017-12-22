@@ -432,10 +432,13 @@ class windowClass(wx.Frame):
 
     # alustaa arvotekstit ja rullaa tekstipaneelin tyhjäksi
     def komennakks(self, event):
-        komento = wx.TextEntryDialog(None, "KKS Komento", "Kirjoita komento",
-                                    "STATE")
+        komento = wx.TextEntryDialog(None, "KKS Komento", "Kirjoita komento")
         if komento.ShowModal() == wx.ID_OK:
-            print("tottele saatana")
+            print(komento.GetValue)
+            self.data.kks.annaKasky(str(komento.GetValue))
+            #print("tottele saatana")
+            #self.data.kks.aloitaKairaus()
+
         else:
             return None
 
