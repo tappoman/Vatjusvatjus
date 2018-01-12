@@ -13,17 +13,6 @@ tallennuspolku,
 kommunikaation hallinta(portti, baudi) ..."""
 
 
-#Eli Kansio_1 --> Hankkeen nimi:
-#Tiedoston nimi --> Piste
-#Headeri --> Työnumero, Tutkimustapa, sijainti (E, N, syvyys). Päivämäärä, kalibrointiarvot
-#    --> perään TAL:
-
-#Maalaji (lisätään myös syvyyteen X kun maalaji muuttuu)
-
-#Tiedosto_2 (asetukset): Portti, baudi, polku,
-
-
-
 import sys
 import time
 import os.path
@@ -35,10 +24,15 @@ class Saving (object):
         self.asetus_polku = os.path.dirname(os.path.abspath(__file__))
         self._config = configparser.ConfigParser()
 
+        self._config.read("USECONTROL.ini", encoding='UTF-8')
+        self.tal_polku = self._config["DEFAULT"]["polku"]
+        if not os.path.exists(self.tal_polku):
+            os.mkdir(self.tal_polku)
+
 
     #Määrittää tallenustiedoston kaikelle kks-laitteelta tulevalle datalle ja tallettaa sen
     def tallennaMIT(self, MIT):
-        self._config.read("USECONTROL.ini")
+        self._config.read("USECONTROL.ini", encoding='UTF-8')
         self.tal_polku = self._config["DEFAULT"]["polku"]
         if not os.path.exists(self.tal_polku):
             os.mkdir(self.tal_polku)
@@ -218,7 +212,7 @@ class Saving (object):
     def tallennaTAL(self, hanke, TAL):
         self._config.read("USECONTROL.ini")
         self.tal_polku = self._config["DEFAULT"]["polku"]
-        self.hanke = hanke
+        self.hanke = hanke + ".txt"
         self.fullpath = os.path.join(self.tal_polku, self.hanke)
         file = open(self.fullpath, "a")
         file.write(TAL + "\n")
@@ -259,6 +253,7 @@ class Saving (object):
 #sa.koostaHankeheader()
 #sa.koostaPisteheader()
 #sa.koostaTutkimusheader()
+
 
 
 #config = configparser.ConfigParser()

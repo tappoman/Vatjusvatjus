@@ -131,6 +131,7 @@ class windowClass(wx.Frame):
         # heilutellaan sitä tankoa
         # disco
         self.tankobutton = wx.Button(panel, label="Tanko", pos=(500, 215), size=(50,50))
+
         self.tankobutton.SetFont(font1)
         self.tankobutton.Bind(wx.EVT_BUTTON, self.tanko)
 
@@ -284,7 +285,6 @@ class windowClass(wx.Frame):
             warning.ShowModal()
             warning.Destroy()
         else:
-
             os.chdir(self.data.root)
             z = []
             with open("alkukairaus.txt", "r") as textfile:
@@ -359,9 +359,12 @@ class windowClass(wx.Frame):
         if self.tankoarvolaatikko.GetBackgroundColour() == 'red':
             self.tankoarvolaatikko.SetBackgroundColour('green')
             self.tankoarvolaatikko.Refresh()
+            self.data.kks.kuittaaTanko()
+
         elif self.tankoarvolaatikko.GetBackgroundColour() == 'green':
             self.tankoarvolaatikko.SetBackgroundColour('red')
             self.tankoarvolaatikko.Refresh()
+
         return None
 
     def lataapiste(self, event):
@@ -376,7 +379,7 @@ class windowClass(wx.Frame):
         else:
             self.piste = self.pistenimiteksti.GetLabel()
             self.update()
-            self.timer.Start(500)
+            self.timer.Start(100)
 
     # kutsuu päivityksiä arvoteksteille ja paneelille
     def update(self):
@@ -549,7 +552,11 @@ class TiedonKasittely(object):
         self.root = ROOT_DIR
         self.config = configparser.ConfigParser()
 
+        self.oldline = ""
+
         self.kks = Kksoperations()
+        self.sa = Saving()
+
 
 
 
@@ -752,6 +759,7 @@ class TiedonKasittely(object):
         else:
             return None
 
+
     # luetaan tiedot tekstitiedostosta, mockup communication listenistä
     def ikuuntele(self, event):
         z = []
@@ -761,22 +769,34 @@ class TiedonKasittely(object):
         self.tiedosto = "MIT_temp.txt"
         self.fullpath = os.path.join(self.polku, self.tiedosto)
         with open(self.fullpath, 'r', encoding="utf-8") as textfile:
-            for line in textfile:
-                if len(line) > 1:
-                    lineparts = line.replace('\n', '').split('\t')
+#           for line in textfile:
+            line = textfile.read()
+            if len(line) > 1:
+                lineparts = line.replace('\n', '').split('\t')
+
+                if lineparts != self.oldline:
+                    print("--> ", lineparts)
 
                     #MITTAUS- JA TALLENNUSSANOMAT KKS:LTA
                     if lineparts[0][:4] == "#MIT":
-                        print("MITTIA PUKKAA")
-                        self.iparsitiedot(lineparts)
+                        if lineparts[0][:11] == "#MIT_ODOTUS":
+                            print("MIT ODOTELLAAN")
+                        else:
+                            #print("MITTIA PUKKAA")
+                            self.iparsitiedot(lineparts)
 
                     if lineparts[0][:4] == "#TAL":
                         #kutsutaan saving luokan metodia joka tallettaa sanoman tekla-tiedostoon
-                        #sa.tallennaTAL(self.data.hanke, line)
-
+                        sa.tallennaTAL(self.hanke, lineparts[0])
                         #kutsutaan piirtäjää ja passataan tiedot sinne --> suoraan vaiko parserin kautta?
+                        #Taidetaan tehdä piirto suoraan filesta
+
+                    if lineparts[0][:4] == "#END":
+                        print("ENDI")
                         #self.iparsitiedot(lineparts)
-                        print("TALTALTAL")
+                        #TEHDÄÄN MITAMITA??
+                        #EI TULE TALLAISTA SANOMAA DEMOLLA,
+                        sa.tallennaTAL(self.hanke, lineparts[0])
 
                     if lineparts[0][:4] == "#SYV":
                         #self.iparsitiedot(lineparts)
@@ -784,10 +804,6 @@ class TiedonKasittely(object):
                         #TEHDAAN MITAMITA
                         #Alkukairaussyvyys 1s välein. < - - - - - - #SYV:nnn
 
-                    if lineparts[0][:4] == "#END":
-                        print("ENDI")
-                        #self.iparsitiedot(lineparts)
-                        #TEHDÄÄN MITAMITA??
 
                     #OHJAUSTIEDOT KKS:LTA
                     if lineparts[0] == "#ALKUKAIRAUS":
@@ -800,22 +816,28 @@ class TiedonKasittely(object):
                         print("nosto")
                         #TULOSTETAAN TILA GUISSA
                         #SYTYTETÄÄN NOSTOVALO?
+                        #JUSSIIII
 
                     if lineparts[0] == "#NOSKU":
                         print("NOSTON KUITTAUS")
                         #TULOSTETAAN NOSTON KUITTAUS
                         #SAMMUTETAAN NOSTOVALO
                         #JATKETAAN ARVOJEN PRINTTAUSTA GUISSA (JOS TÄTÄ TARVITSEE EDES LOPETTAA)
+                        #JUSSSIII
 
                     if lineparts[0] == "#KAIRAUS":
                         print("KAIRAUS")
-                        #JATKETAAN ARVOJEN PRINTTAUSTA GUISSA
+
                         #SAMMUTETAAN NOSTOVALO
+                        #***JUSSI NOSTOVALO VIHREAKSI TASSA!!!!***
+
 
                     #NAPIT KKS:LTA MITÄ IKINÄ TULEEKAAN --> TÄHÄN
                     if lineparts[0] == "#JOKUKOMENTO":
                         print("JOKUKOMENTO")
                         #DO JOTAKI
+
+                    self.oldline = lineparts
 
     def iparsiheader(self):
         headlista = []
@@ -847,27 +869,29 @@ class TiedonKasittely(object):
 
     # parsitaan data merkittävään muotoon
     def iparsitiedot(self, line):
-        print(line)
-        line_sanoma = line[0].rpartition(":")[0]
 
-        #syvyys = int(line[0].rpartition(":")[2])
-        syvyys = line[0].rpartition(":")[2]
-        print(syvyys)
+        linearvot = line[0].rpartition(":")[2]
+        arvot = linearvot.split()
+
+        syvyys = int(arvot[0])
+        #print(syvyys, " syvyys")
         self.asetasyvyys(syvyys)
 
         #voima = int(line[1])
-        voima = line[1]
-        print(voima)
+        voima = int(arvot[1])
+        #print(voima, " voima")
         self.asetavoima(voima)
 
         #puolikierrokset = int(line[2])
-        puolikierrokset = line[2]
+        puolikierrokset = int(arvot[2])
         self.asetapuolikierrokset(puolikierrokset)
-        print(puolikierrokset)
+        #print(puolikierrokset, " puolik.")
+
         #nopeus = int(line[3])
-        nopeus = line[3]
-        print(nopeus)
+        nopeus = int(arvot[3])
+        #print(nopeus, " nopeus")
         self.asetanopeus(nopeus)
+
         # if line_sanoma =="TAL":
             #lätä takasin
         # if line_sanoma == "MIT":
@@ -917,7 +941,7 @@ class TiedonKasittely(object):
         if uusiorg.ShowModal() == wx.ID_OK:
             uusiorg = uusiorg.GetValue()
 
-        sa = saving.Saving()
+        #sa = saving.Saving()
         sa.asetaHanketiedot(uusifo, uusikj, uusiml, uusiom, uusiorg)
 
     def ipisteheader(self):
@@ -937,7 +961,7 @@ class TiedonKasittely(object):
         if uusila.ShowModal() == wx.ID_OK:
             uusila = uusila.GetValue()
 
-        sa = saving.Saving()
+        #sa = saving.Saving()
         sa.asetaPistetiedot(uusity, uusipk, uusila)
 
     def itutkimusheader(self):
@@ -962,7 +986,7 @@ class TiedonKasittely(object):
         if uusiln.ShowModal() == wx.ID_OK:
             uusiln = uusiln.GetValue()
 
-        sa = saving.Saving()
+        #sa = saving.Saving()
         sa.asetaTutkimustiedot(uusitt, uusitx, uusixy, uusiln)
 
     def iluotempconfig(self):

@@ -171,7 +171,7 @@ class Kksoperations (object):
 
     def aloitaOdotustila(self):
         """menee mittauksen odotustilaan josta jatketaan kairausta. Palauttaa #MIT_ODOTUS"""
-        self.com.setCommand("M-ODOTUS")
+        self.com.setCommand("ALKUK:0")
         #return "MIT-ODOTUS"
 
 
