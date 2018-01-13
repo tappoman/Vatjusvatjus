@@ -214,8 +214,16 @@ class Saving (object):
         self.tal_polku = self._config["DEFAULT"]["polku"]
         self.hanke = hanke + ".txt"
         self.fullpath = os.path.join(self.tal_polku, self.hanke)
+
+        #Parsitaan arvot irti Stringista
+        self.arvot = TAL.split()
+        self.apu = '{0:.2f}'.format(float(self.arvot[0]) / 100.00)
+        self.arvot[0] = str(self.apu)
+        self.TAL = "\t".join(self.arvot)
+        #self.TAL = "\t".join([str(x) for x in self.arvot])
+
         file = open(self.fullpath, "a")
-        file.write(TAL + "\n")
+        file.write("\t" + self.TAL + "\n")
 
     #lisaa maalajin datarivin peraan vaihdettaessa
     def tallennaMaalaji(self, hanke, maalaji):
@@ -226,22 +234,17 @@ class Saving (object):
         file = open(self.fullpath, "a")
         file.write(maalaji + "\n")
 
+    # lisaa huomautuksen datarivin peraan annettaessa
+    def tallennaHM(self, hanke, huomautus):
+        self._config.read("USECONTROL.ini")
+        self.tal_polku = self._config["DEFAULT"]["polku"]
+        self.hanke = hanke
+        self.fullpath = os.path.join(self.tal_polku, self.hanke)
+        file = open(self.fullpath, "a")
+        file.write(huomautus + "\n")
 
 
-        # sisältää "kiinteät" yksittäisestä mittauksesta riippumattomat asetukset esim. com
-        # Tätä ei tarvita, asetukset tulevat ohjelmistokansioon!!!.
-        '''def asetaAsetuspolku(self, polku):
-            self.asetus_polku = polku
-            if not os.path.exists(self.asetus_polku):
-                os.makedirs(self.asetus_polku)'''
 
-        # sisältää "kiinteät" yksittäisestä mittauksesta riippumattomat asetukset esim. com
-        '''def asetaMITpolku(self, polku):
-            self.asetus_polku = polku
-            if not os.path.exists(self.asetus_polku):
-                os.makedirs(self.asetus_polku)'''
-
-        #def tallennaParametrit (self, params):
 
 #sa = Saving()
 #sa.asetaParams("COM3", "9500", "c:/tmp/", "hanke1.txt")

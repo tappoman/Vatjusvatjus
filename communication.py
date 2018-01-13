@@ -4,6 +4,8 @@
 #******pip install pyserial**************
 #****************************************
 
+#TODO FIksaa serial.serialutil.SerialEXCPE ei toimi jos ei jotaki laitetta ehkä
+
 import threading
 import time
 import sys
@@ -59,7 +61,7 @@ class Communication (object):
                 self.ser.flushOutput()
                 self.value = self.ser.readline().decode()
                 if self.value:
-                    #print(self.value)
+                    #print("READ: ", self.value)
                     sa.tallennaMIT(self.value)
                 #time.sleep(0.5)
 

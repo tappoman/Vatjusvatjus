@@ -379,14 +379,14 @@ class windowClass(wx.Frame):
         else:
             self.piste = self.pistenimiteksti.GetLabel()
             self.update()
-            self.timer.Start(100)
+            self.timer.Start(50)
 
     # kutsuu päivityksiä arvoteksteille ja paneelille
     def update(self):
         # print(self.listener)
         # self.data.ikuuntele()
         self.updatepistearvot(self.data)
-        self.listenerupdate(self.data)
+        #self.listenerupdate(self.data)
 
     def pistetiedotpaneelille(self):
         self.config.read("USECONTROL.ini")
@@ -786,8 +786,12 @@ class TiedonKasittely(object):
                             self.iparsitiedot(lineparts)
 
                     if lineparts[0][:4] == "#TAL":
+                        #parsitaan vain arvot TEKLAAN vietavaksi
+                        linearvot = lineparts[0].rpartition(":")[2]
+
                         #kutsutaan saving luokan metodia joka tallettaa sanoman tekla-tiedostoon
-                        sa.tallennaTAL(self.hanke, lineparts[0])
+                        sa.tallennaTAL(self.hanke, linearvot)
+
                         #kutsutaan piirtäjää ja passataan tiedot sinne --> suoraan vaiko parserin kautta?
                         #Taidetaan tehdä piirto suoraan filesta
 
