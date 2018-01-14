@@ -74,18 +74,18 @@ class windowClass(wx.Frame):
 
         # piste
         # avaa pisteen hankkeen sisältä
-        self.pistebutton = wx.Button(panel, label="Piste", pos=(120, 10), size=(110, 110))
+        self.pistebutton = wx.Button(panel, label="Työnumero", pos=(120, 10), size=(110, 110))
         self.pistebutton.SetFont(font1)
         self.pistebutton.Bind(wx.EVT_BUTTON, self.pisteenavaus)
 
-        # ohjelma
-        # valitsee kairausohjelman
+        # tutkimus-tapa
+        #
         self.ohjelmabutton = wx.Button(panel, label="Tutkimus-\ntapa", pos=(235, 10), size=(110, 110))
         self.ohjelmabutton.SetFont(font1)
         self.ohjelmabutton.Bind(wx.EVT_BUTTON, self.valitseohjelma)
 
-        # hallinta
-        # hallitaan valtakuntaa
+        # Tietojen hallinta
+        # muokataan .ini-tiedostoja
         self.hallintabutton = wx.Button(panel, label="Tietojen\nhallinta", pos=(350, 10), size=(110, 110))
         self.hallintabutton.SetFont(font1)
         self.hallintabutton.Bind(wx.EVT_BUTTON, self.hallintamenu)
@@ -98,13 +98,13 @@ class windowClass(wx.Frame):
 
         # hae
         # communications listenerin mockup
-        self.loadbutton = wx.Button(panel, label="Hae", pos=(465, 120), size=(50, 50))
-        self.loadbutton.SetFont(font1)
-        self.loadbutton.Bind(wx.EVT_BUTTON, self.lataapiste)
+        self.huombutton = wx.Button(panel, label="Kirjoita\nhuom", pos=(400, 125), size=(75, 75))
+        self.huombutton.SetFont(font1)
+        self.huombutton.Bind(wx.EVT_BUTTON, self.kommenttirivi)
 
-        # alusta
-        # tyhjentää paneelin ja asettaa arvot alkuarvoiksi
-        self.alustabutton = wx.Button(panel, label="kks", pos=(520, 120), size=(65, 50))
+        # kks koment.
+        # lähettää kkssälle käyttäjän antaman komennon
+        self.alustabutton = wx.Button(panel, label="kks\nkomen.", pos=(480, 125), size=(75, 75))
         self.alustabutton.SetFont(font1)
         self.alustabutton.Bind(wx.EVT_BUTTON, self.komennakks)
 
@@ -123,15 +123,14 @@ class windowClass(wx.Frame):
         # kairauksen lopetus
         # käyttäjä valitsee lopetussyyn
         # tiedot kkssälle
-        self.lopetusbutton = wx.Button(panel, label="Lopeta", pos=(400, 215), size=(100,100))
+        self.lopetusbutton = wx.Button(panel, label="Lopeta\nkairaus", pos=(400, 215), size=(100,100))
         self.lopetusbutton.SetFont(font1)
         self.lopetusbutton.Bind(wx.EVT_BUTTON, self.lopetakairaus)
 
         # tankobutton
         # heilutellaan sitä tankoa
         # disco
-        self.tankobutton = wx.Button(panel, label="Tanko", pos=(500, 215), size=(50,50))
-
+        self.tankobutton = wx.Button(panel, label="Tanko", pos=(500, 215), size=(75, 75))
         self.tankobutton.SetFont(font1)
         self.tankobutton.Bind(wx.EVT_BUTTON, self.tanko)
 
@@ -143,32 +142,32 @@ class windowClass(wx.Frame):
         self.hankenimiteksti = wx.StaticText(panel, -1, ">hankkeen nimi<", pos=(120, 120))
         self.hankenimiteksti.SetFont(font2)
 
-        self.pisteteksti = wx.StaticText(panel, -1, "Piste: ", pos=(10, 165))
+        self.pisteteksti = wx.StaticText(panel, -1, "Työnro: ", pos=(10, 165))
         self.pisteteksti.SetFont(font2)
 
         # pistenimiteksti näyttää valitusta hankkeesta valitun pisteen
-        self.pistenimiteksti = wx.StaticText(panel, -1, ">pisteen nimi<", pos=(100, 165))
+        self.pistenimiteksti = wx.StaticText(panel, -1, ">työn numero<", pos=(120, 165))
         self.pistenimiteksti.SetFont(font2)
 
         # ohjelmanimiteksti näyttää valitusta ohjelmanappulasta käytössäolevan ohjelman
         self.ohjelmateksti = wx.StaticText(panel, -1, "TT:", pos=(230, 210))
         self.ohjelmateksti.SetFont(font1)
 
-        self.ohjelmaarvoteksti = wx.StaticText(panel, -1, "><", pos=(260, 200))
-        self.ohjelmaarvoteksti.SetFont(font2)
+        self.ohjelmaarvoteksti = wx.StaticText(panel, -1, "><", pos=(260, 210))
+        self.ohjelmaarvoteksti.SetFont(font1)
 
         # alkukairausteksti päivittyy käyttäjän valinnan mukaan
         self.alkukairausteksti = wx.StaticText(panel, -1, "AL:", pos=(230, 245))
         self.alkukairausteksti.SetFont(font1)
 
-        self.alkukairausarvoteksti = wx.StaticText(panel, -1, "><", pos=(260, 235))
-        self.alkukairausarvoteksti.SetFont(font2)
+        self.alkukairausarvoteksti = wx.StaticText(panel, -1, "><", pos=(260, 245))
+        self.alkukairausarvoteksti.SetFont(font1)
 
         self.alkusyvyysteksti = wx.StaticText(panel, -1, "A-syv:", pos=(230, 280))
         self.alkusyvyysteksti.SetFont(font1)
 
-        self.alkusyvyysarvoteksti = wx.StaticText(panel, -1, "><", pos=(295, 270))
-        self.alkusyvyysarvoteksti.SetFont(font2)
+        self.alkusyvyysarvoteksti = wx.StaticText(panel, -1, "><", pos=(295, 280))
+        self.alkusyvyysarvoteksti.SetFont(font1)
 
         # alatekstien alustus
         self.syvyysteksti = wx.StaticText(panel, -1, "Syvyys", pos=(10, 315))
@@ -217,7 +216,7 @@ class windowClass(wx.Frame):
         self.tankoteksti = wx.StaticText(panel, -1, "Tanko", pos=(515, 315))
         self.tankoteksti.SetFont(font1)
 
-        # iskuarvoteksti päivittyy käyttäjän valitessa isku
+        #  tankoarvolaatikko vaihtaa väriä tarpeen mukaan
         self.tankoarvolaatikko = wx.Panel(panel, pos=(515, 345), size=(50,50))
         self.tankoarvolaatikko.SetBackgroundColour('red')
 
@@ -354,6 +353,19 @@ class windowClass(wx.Frame):
                 self.linepanelille("Kairaus lopetettiin {} syvyydellä {}".format(kairausvalinta, self.data.haesyvyys()))
             else:
                 return None
+
+    def kommenttirivi(self, event):
+        z = []
+        os.chdir(self.config["DEFAULT"]["polku"])
+        with open("{}.txt".format(self.hankenimiteksti.GetLabel())) as textfile:
+            for line in textfile:
+                if line.__contains__("ty"):
+                    z.append(line.replace("ty = ", ""))
+        pistevalinta = wx.SingleChoiceDialog(None,
+                                             "Valitse kommentoitava työnumero", "Työt", z, wx.CHOICEDLG_STYLE)
+        if pistevalinta.ShowModal() == wx.ID_OK:
+            print("woo")
+            #oikeesti tähän saving luokan meotodi hoitaa def tallennaHM(self, hanke, huomautus)
 
     def tanko(self, event):
         if self.tankoarvolaatikko.GetBackgroundColour() == 'red':
@@ -554,11 +566,8 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        self.kks = Kksoperations()
+        # self.kks = Kksoperations()
         self.sa = Saving()
-
-
-
 
 
     def asetaalkusyvyys(self, alkusyvyys):
@@ -598,7 +607,6 @@ class TiedonKasittely(object):
         z = [nimi.replace(".txt","") for nimi in os.listdir(os.curdir) if nimi.endswith(".txt")]
         z.append("LUO UUSI HANKE")
         tiedostonvalinta = wx.SingleChoiceDialog(None, "Valitse hanke", "Hankkeet", z, wx.CHOICEDLG_STYLE)
-
         if tiedostonvalinta.ShowModal() == wx.ID_OK:
             if tiedostonvalinta.GetStringSelection() == "LUO UUSI HANKE":
                 self.iluohanke()
@@ -831,7 +839,7 @@ class TiedonKasittely(object):
 
                     if lineparts[0] == "#KAIRAUS":
                         print("KAIRAUS")
-
+                        windowClass.tankoarvolaatikko.SetBackgroundColour('green')
                         #SAMMUTETAAN NOSTOVALO
                         #***JUSSI NOSTOVALO VIHREAKSI TASSA!!!!***
 
