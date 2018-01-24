@@ -123,7 +123,8 @@ class Kksoperations (object):
 
     def asetaTapa(self, tapa):
         """#TAPA:ccc-cc:		Tutkimustapa (TEK-PA,TEK-HE,TEK-PH,TEK-PO ...). palauttaa (SGF-PA,SGF-HE,SGF-PH,SGF-PO ...)"""
-        self.com.setCommand(tapa)
+        print("TAPA:" + tapa)
+        self.com.setCommand("TAPA:" + tapa)
         #return "#1"
 
     def tiedusteleTapa(self):

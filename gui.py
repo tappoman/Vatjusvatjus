@@ -27,19 +27,29 @@ from kks_operations import *
 #com = Communication()
 
 class windowClass(wx.Frame):
+
     def __init__(self, *args, **kwargs):
         super(windowClass, self).__init__(*args, size=wx.Size(600, 960))
 
         self.Centre()
         self.basicGUI()
-        self.data = TiedonKasittely()
+        self.data = TiedonKasittely(gui=self)
         self.ba = ba
-        self.timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self.data.ikuuntele, self.timer)
+        #self.timer = wx.Timer(self)
+        #self.Bind(wx.EVT_TIMER, self.data.ikuuntele, self.timer)
         self.config = configparser.ConfigParser()
 
         self.sa = Saving()
         #self.com = Communication()
+
+        self.timer = wx.Timer(self)
+        #self.timer2 = wx.Timer(self)
+        #self.Bind(wx.EVT_TIMER, self.data.ikuuntele, self.timer)
+
+        self.Bind(wx.EVT_TIMER, self.update, self.timer)
+        #self.Bind(wx.EVT_TIMER, self.updatepistearvot(self.data), self.timer2)
+
+
 
     #NAMA PITAISI SAADA MYOS OIKEAN YLANURKAN PUNAISEESN AXAAN (SULKEMISNAPPI)
     def onClose(self):
@@ -230,6 +240,14 @@ class windowClass(wx.Frame):
         panelSizer.Add(self.scrolled_panel, 1, wx.EXPAND)
         panel.SetSizer(panelSizer)
 
+    #TANKOVARITYSTA
+    def vaihdatankovari(self):
+        #self.tankoarvolaatikko.SetBackgroundColour('green')
+        print("vaihdatankovari")
+        self.tankoarvolaatikko.SetBackgroundColour('red')
+        self.tankoarvolaatikko.Refresh()
+
+
     def hankkeenavaus(self, event):
 
         if self.hankenimiteksti.GetLabel() != ">hankkeen nimi<":
@@ -261,6 +279,9 @@ class windowClass(wx.Frame):
                 self.data.iluopiste(self.data.hanke)
                 self.pistenimiteksti.SetLabelText(self.data.piste)
                 self.pistetiedotpaneelille()
+                self.update()
+                self.timer.Start(50)
+                #self.timer2.Start(50)
             else:
                 self.pistetiedotpaneelille()
                 self.config.read("USECONTROL.ini")
@@ -274,6 +295,10 @@ class windowClass(wx.Frame):
                             pisteet.append(linepart)
                     self.pistenimiteksti.SetLabel(pisteet[len(pisteet)-1])
                 textfile.close()
+                #self.update()
+
+                self.timer.Start(50)
+                #self.timer2.Start(50)
                 os.chdir(self.data.root)
 
     # kysyy käyttäjältä alkusyvyyttä, joka tallennetaan
@@ -367,6 +392,7 @@ class windowClass(wx.Frame):
             print("woo")
             #oikeesti tähän saving luokan meotodi hoitaa def tallennaHM(self, hanke, huomautus)
 
+
     def tanko(self, event):
         if self.tankoarvolaatikko.GetBackgroundColour() == 'red':
             self.tankoarvolaatikko.SetBackgroundColour('green')
@@ -379,6 +405,7 @@ class windowClass(wx.Frame):
 
         return None
 
+
     def lataapiste(self, event):
         if self.pistenimiteksti.GetLabel() == ">pisteen nimi<":
             warning = wx.MessageDialog(None, "Valitse ensin piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
@@ -390,14 +417,16 @@ class windowClass(wx.Frame):
             warning.Destroy()
         else:
             self.piste = self.pistenimiteksti.GetLabel()
+
             self.update()
             self.timer.Start(50)
 
-    # kutsuu päivityksiä arvoteksteille ja paneelille
-    def update(self):
-        # print(self.listener)
-        # self.data.ikuuntele()
+    def update(self, event):
+        #print(self.listener)
+        #self.data.ikuuntele()
         self.updatepistearvot(self.data)
+        self.data.ikuuntele(event)
+
         #self.listenerupdate(self.data)
 
     def pistetiedotpaneelille(self):
@@ -427,6 +456,7 @@ class windowClass(wx.Frame):
 
     # päivittää tekstipaneelin yläpuolella olevat arvotekstit com-listenerin tietojen mukaan
     def updatepistearvot(self, data):
+        #print("uppaaa!!!!")
         self.voimaarvoteksti.SetLabelText(str(data.voima))
         self.puolikierroksetarvoteksti.SetLabelText(str(data.puolikierrokset))
         self.nopeusarvoteksti.SetLabelText(str(data.nopeus))
@@ -483,6 +513,11 @@ class windowClass(wx.Frame):
             ohjelma = self.data.ivalitseohjelma()
             self.ohjelmaarvoteksti.SetLabelText(ohjelma)
             self.linepanelille("TT {} syvyydellä {}".format(ohjelma, self.data.haesyvyys()))
+
+            #komento kks:lle kairaustavan valinnasta
+            self.tapa = "TEK-" + ohjelma
+            #print(self.tapa)
+            self.data.kks.asetaTapa(self.tapa)
 
     def hallintamenu(self, event):
         if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
@@ -549,7 +584,7 @@ class windowClass(wx.Frame):
 #ja tallennettaviin tietoihin
 class TiedonKasittely(object):
     def __init__(self, hanke = None, piste=None, maalaji="", alkusyvyys=0, syvyys=0, voima=0,
-                 puolikierrokset=0, nopeus=0, figure=None, ROOT_DIR = os.path.dirname("C:\\tmp\\GEOXX")):
+                 puolikierrokset=0, nopeus=0, figure=None, ROOT_DIR = os.path.dirname("C:\\tmp\\GEOXX"), gui=None):
         super(TiedonKasittely, self).__init__()
 
         self.hanke = hanke
@@ -566,8 +601,9 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        # self.kks = Kksoperations()
+        self.kks = Kksoperations()
         self.sa = Saving()
+        self.gui = gui
 
 
     def asetaalkusyvyys(self, alkusyvyys):
@@ -703,9 +739,11 @@ class TiedonKasittely(object):
                     z.append(line.rsplit(" ")[1])
         textfile.close()
         ohjelmavalinta = wx.SingleChoiceDialog(None, "Valitse ohjelma", "Ohjelmat", z, wx.CHOICEDLG_STYLE)
+
         if ohjelmavalinta.ShowModal() == wx.ID_OK:
             ohjelmavalinta = ohjelmavalinta.GetStringSelection()
             print("lähetetään kkssälle tieto tt syvyydellä {} on {}".format(self.haesyvyys(), ohjelmavalinta))
+
             self.config.read("USECONTROL.ini")
             os.chdir(self.config["DEFAULT"]["polku"])
             with open("{}.txt".format(self.hanke), 'a') as textfile:
@@ -829,6 +867,8 @@ class TiedonKasittely(object):
                         #TULOSTETAAN TILA GUISSA
                         #SYTYTETÄÄN NOSTOVALO?
                         #JUSSIIII
+                        #windowClass.vaihdatankovari()
+                        self.gui.vaihdatankovari()
 
                     if lineparts[0] == "#NOSKU":
                         print("NOSTON KUITTAUS")
@@ -839,9 +879,12 @@ class TiedonKasittely(object):
 
                     if lineparts[0] == "#KAIRAUS":
                         print("KAIRAUS")
-                        windowClass.tankoarvolaatikko.SetBackgroundColour('green')
+                        #windowClass.tankoarvolaatikko.SetBackgroundColour('green')
+                        #frame.tankoarvolaatikko.SetBackgroundColour('green')
+                        #windowClass.vaihdatankovari()
                         #SAMMUTETAAN NOSTOVALO
                         #***JUSSI NOSTOVALO VIHREAKSI TASSA!!!!***
+                        #windowClass.tankoarvolaatikko.SetBackgroundColour('green')
 
 
                     #NAPIT KKS:LTA MITÄ IKINÄ TULEEKAAN --> TÄHÄN
@@ -1029,8 +1072,13 @@ class OtherFrame(wx.Frame):
 def main():
     app = wx.App()
     frame = windowClass(None)
+
     frame.Show(True)
+    #frame.tankoarvolaatikko.SetBackgroundColor('green')
+    #frame.vaihdatankovari()
+    #frame.tanko()
     app.MainLoop()
+
 
 
     #ti = TiedonKasittely()
