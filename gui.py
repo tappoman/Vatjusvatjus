@@ -84,7 +84,7 @@ class windowClass(wx.Frame):
 
         # piste
         # avaa pisteen hankkeen sisältä
-        self.pistebutton = wx.Button(panel, label="Työnumero", pos=(120, 10), size=(110, 110))
+        self.pistebutton = wx.Button(panel, label="Työnro/\nuusi työ", pos=(120, 10), size=(110, 110))
         self.pistebutton.SetFont(font1)
         self.pistebutton.Bind(wx.EVT_BUTTON, self.pisteenavaus)
 
@@ -201,7 +201,6 @@ class windowClass(wx.Frame):
         self.puolikierroksetarvoteksti = wx.StaticText(panel, -1, "><", pos=(170, 345))
         self.puolikierroksetarvoteksti.SetFont(font2)
 
-
         self.nopeusteksti = wx.StaticText(panel, -1, "Nopeus", pos=(235, 315))
         self.nopeusteksti.SetFont(font1)
 
@@ -247,9 +246,28 @@ class windowClass(wx.Frame):
         self.tankoarvolaatikko.SetBackgroundColour('red')
         self.tankoarvolaatikko.Refresh()
 
+    #alustetaan näyttöarvot kairaustavan mukaan:
+    # PAINOK : Syvyys, voima, puolikierrokset, nopeus, maalaji
+    # HEIJARIK :
+    # PORAKAIR :
+    # TÄRYKAIR :
+    # PUR. / HEIJ.K :
+    def alustaarvopaneeli(self, kairaustapa):
+
+        if kairaustapa == "HE":
+            pass
+
+        if kairaustapa == "PO":
+            pass
+
+        if kairaustapa == "TR":
+            pass
+
+        if kairaustapa == "PH":
+            self.puolikierroksetteksti.SetLabelText("P / H")
+
 
     def hankkeenavaus(self, event):
-
         if self.hankenimiteksti.GetLabel() != ">hankkeen nimi<":
             self.data.iavaahanke()
             self.hankenimiteksti.SetLabelText(self.data.hanke)
@@ -286,19 +304,15 @@ class windowClass(wx.Frame):
                 self.pistetiedotpaneelille()
                 self.config.read("USECONTROL.ini")
                 os.chdir(self.config["DEFAULT"]["polku"])
-                print(self.hankenimiteksti.GetLabel())
                 pisteet = []
                 with open("{}.txt".format(self.hankenimiteksti.GetLabel())) as textfile:
                     for line in textfile:
-                        if line.__contains__("PISTENIMI"):
-                            linepart = line.replace("PISTENIMI: ", "").strip("\n")
+                        if line.__contains__("ty "):
+                            linepart = line.replace("ty = ", "").strip("\n")
                             pisteet.append(linepart)
                     self.pistenimiteksti.SetLabel(pisteet[len(pisteet)-1])
                 textfile.close()
-                #self.update()
-
                 self.timer.Start(50)
-                #self.timer2.Start(50)
                 os.chdir(self.data.root)
 
     # kysyy käyttäjältä alkusyvyyttä, joka tallennetaan
@@ -382,14 +396,15 @@ class windowClass(wx.Frame):
     def kommenttirivi(self, event):
         z = []
         os.chdir(self.config["DEFAULT"]["polku"])
-        with open("{}.txt".format(self.hankenimiteksti.GetLabel())) as textfile:
-            for line in textfile:
-                if line.__contains__("ty"):
-                    z.append(line.replace("ty = ", ""))
-        pistevalinta = wx.SingleChoiceDialog(None,
-                                             "Valitse kommentoitava työnumero", "Työt", z, wx.CHOICEDLG_STYLE)
-        if pistevalinta.ShowModal() == wx.ID_OK:
-            print("woo")
+        file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "a")
+        kommentti = wx.TextEntryDialog(None, "Kirjoita huomautus syvyydelle {}".format(self.data.syvyys),
+                                               "Kirjoita huomautus")
+        if kommentti.ShowModal() == wx.ID_OK:
+            kommentti = kommentti.GetValue()
+        file.write("\nHM {}".format(kommentti))
+        self.linepanelille("HM {}".format(kommentti))
+            # sa.tallennaHM(self.hankenimiteksti.GetLabel(), kommentti)
+        file.close()
             #oikeesti tähän saving luokan meotodi hoitaa def tallennaHM(self, hanke, huomautus)
 
 
@@ -512,6 +527,7 @@ class windowClass(wx.Frame):
         else:
             ohjelma = self.data.ivalitseohjelma()
             self.ohjelmaarvoteksti.SetLabelText(ohjelma)
+            self.alustaarvopaneeli(ohjelma)
             self.linepanelille("TT {} syvyydellä {}".format(ohjelma, self.data.haesyvyys()))
 
             #komento kks:lle kairaustavan valinnasta
@@ -601,7 +617,7 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        self.kks = Kksoperations()
+        # self.kks = Kksoperations()
         self.sa = Saving()
         self.gui = gui
 
@@ -709,8 +725,7 @@ class TiedonKasittely(object):
                 self.iluotempconfig()
                 file = open("{}.txt".format(hanke), "a", encoding="utf-8")
                 self.config.read("PISTETIEDOT.ini")
-                file.write("\n" + "PISTENIMI: {}".format(nimi))
-                file.write("\nty = " + self.config["DEFAULT"]["ty"])
+                file.write("\n" + "ty = {}".format(nimi))
                 file.write("\npk = " + self.config["DEFAULT"]["pk"])
                 file.write("\nla = " + self.config["DEFAULT"]["la"])
                 self.config.read("TUTKIMUSTIEDOT.ini")
