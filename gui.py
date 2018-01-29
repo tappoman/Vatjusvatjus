@@ -54,7 +54,7 @@ class windowClass(wx.Frame):
 
     #NAMA PITAISI SAADA MYOS OIKEAN YLANURKAN PUNAISEESN AXAAN (SULKEMISNAPPI)
     def onClose(self):
-#        self.kks.closeConnection()
+        #self.kks.closeConnection()
         self.data.kks.closeConnection()
         #self.Close()
         #self.Destroy()
@@ -360,13 +360,13 @@ class windowClass(wx.Frame):
             warning.ShowModal()
             warning.Destroy()
         elif self.alkukairausbutton.GetLabelText()=="Lopeta\nalkukair.":
-            # self.data.kks.aloitaOdotustila()
+            self.data.kks.aloitaOdotustila()
             self.alkukairausbutton.SetLabelText("Alku\nkairaus")
 
         else:
-            #self.data.kks.asetaHanke(self.data.piste, self.data.hanke)
-            #self.data.kks.asetaPiste(self.data.piste)
-            #self.data.kks.asetaTapa(self.data.tutkimustapa)
+            self.data.kks.asetaHanke(self.data.piste, self.data.hanke)
+            self.data.kks.asetaPiste(self.data.piste)
+            self.data.kks.asetaTapa(self.data.tutkimustapa)
             os.chdir(self.data.root)
             z = []
             with open("alkukairaus.txt", "r") as textfile:
@@ -378,6 +378,7 @@ class windowClass(wx.Frame):
             if kairausvalinta.ShowModal() == wx.ID_OK:
                 kairausvalinta = kairausvalinta.GetStringSelection()
                 if kairausvalinta == "OHITETAAN":
+                    self.data.kks.aloitaOdotustila()
                     self.config.read("USECONTROL.ini")
                     os.chdir(self.config["DEFAULT"]["polku"])
                     with open("{}.txt".format(self.data.hanke), 'a') as textfile:
@@ -395,7 +396,7 @@ class windowClass(wx.Frame):
                     alkusyvyys.ShowModal()
                     self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
                     self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
-                    #self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
+                    self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
                     alkusyvyys.Destroy()
                     self.alkukairausbutton.SetLabelText("Lopeta\nalkukair.")
                     self.config.read("USECONTROL.ini")
@@ -406,7 +407,7 @@ class windowClass(wx.Frame):
                     os.chdir(self.data.root)
 
                     #print("lähetetään kkssälle: työnumero, kairausvalinta, piste, pvm(timestä?)")
-                    #self.data.kks.aloitaAlkukairaus()
+                    self.data.kks.aloitaAlkukairaus()
 
                     self.linepanelille("Alkukairaus {} syvyydellä {}".format(kairausvalinta, alkusyvyys.GetValue()))
                     # print("lähetetään kkssälle: työnumero(hanke?), {}, {}, pvm(timestä?)".format(kairausvalinta)
@@ -418,7 +419,7 @@ class windowClass(wx.Frame):
             warning.ShowModal()
             warning.Destroy()
         elif self.lopetusbutton.GetLabel() == "Lopeta\nkairaus":
-            #self.data.kks.lopetaKairaus()
+            self.data.kks.lopetaKairaus()
             os.chdir(self.data.root)
             z = []
             with open("kairausloppu.txt", "r") as textfile:
@@ -449,7 +450,7 @@ class windowClass(wx.Frame):
                 return None
         else:
             self.lopetusbutton.SetLabel("Lopeta\nkairaus")
-            # self.data.kks.aloitaOdotustila()
+            self.data.kks.aloitaKairaus()
             print("kuunnellaan kks")
 
     def kommenttirivi(self, event):
@@ -474,7 +475,7 @@ class windowClass(wx.Frame):
         if self.tankoarvolaatikko.GetBackgroundColour() == 'red':
             self.tankoarvolaatikko.SetBackgroundColour('green')
             self.tankoarvolaatikko.Refresh()
-            #self.data.kks.kuittaaTanko()
+            self.data.kks.kuittaaTanko()
 
         elif self.tankoarvolaatikko.GetBackgroundColour() == 'green':
             self.tankoarvolaatikko.SetBackgroundColour('red')
@@ -568,9 +569,7 @@ class windowClass(wx.Frame):
         if komento.ShowModal() == wx.ID_OK:
             komento = str(komento.GetValue())
             print(komento)
-            #self.data.kks.annaKasky(komento)
-            #print("tottele saatana")
-            #self.data.kks.aloitaKairaus()
+            self.data.kks.annaKasky(komento)
 
         else:
             return None
@@ -595,7 +594,7 @@ class windowClass(wx.Frame):
             #komento kks:lle kairaustavan valinnasta
             #self.tapa = "TEK-" + ohjelma
             #print(self.tapa)
-            #self.data.kks.asetaTapa(self.tapa)
+            #self.data.kks.asetaTapa(self.data.tapa)
 
     def hallintamenu(self, event):
         if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
@@ -689,7 +688,7 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        #self.kks = Kksoperations()
+        self.kks = Kksoperations()
         self.sa = Saving()
         self.gui = gui
 
@@ -1209,14 +1208,6 @@ def main():
     #frame.tanko()
     app.MainLoop()
 
-
-
-    #ti = TiedonKasittely()
-    #ti.ikuuntele()
-
-    #self.kks = Kksoperations()
-    #self.kks.kuittaaTanko()
-    #self.kks.closeConnection()
 
 if __name__ == '__main__':
     main()
