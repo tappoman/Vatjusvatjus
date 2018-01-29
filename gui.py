@@ -249,23 +249,56 @@ class windowClass(wx.Frame):
 
     #alustetaan näyttöarvot kairaustavan mukaan:
     # PAINOK : Syvyys, voima, puolikierrokset, nopeus, maalaji
-    # HEIJARIK :
-    # PORAKAIR :
-    # TÄRYKAIR :
-    # PUR. / HEIJ.K :
+    # HEIJARIK : syvyys, heijari / isku
+    # PORAKAIR : syvyys, aika
+    # TÄRYKAIR : syvyys
+    # PUR. / HEIJ.K : syvyys, voima/paine, vääntö vaihe P
+    # PUR. / HEIJ.K : syvyys, iskut,vääntö, vaihe H
     def alustaarvopaneeli(self, kairaustapa):
 
+        if kairaustapa == "PA":
+            self.puolikierroksetteksti.SetLabelText("P-kierr")
+            self.puolikierroksetarvoteksti.SetLabelText("0")
+            self.syvyysteksti.SetLabelText("Syvyys")
+            self.syvyysarvoteksti.SetLabelText("0")
+            self.voimateksti.SetLabelText("Voima")
+            self.voimaarvoteksti.SetLabelText("0")
+            self.nopeusteksti.SetLabelText("Nopeus")
+            self.nopeusarvoteksti.SetLabelText("0")
+            self.maalajiteksti.SetLabelText("Maalaji")
+            self.maalajiarvoteksti.SetLabelText("")
+
         if kairaustapa == "HE":
-            pass
+            self.voimateksti.SetLabelText("H / I")
+            self.voimaarvoteksti.SetLabelText("H")
+            self.puolikierroksetteksti.SetLabelText("")
+            self.puolikierroksetarvoteksti.SetLabel("")
+            self.nopeusteksti.SetLabelText("")
+            self.nopeusarvoteksti.SetLabelText("")
 
         if kairaustapa == "PO":
-            pass
+            self.voimateksti.SetLabelText("Aika")
+            self.voimaarvoteksti.SetLabelText("0")
+            self.puolikierroksetteksti.SetLabelText("")
+            self.puolikierroksetarvoteksti.SetLabelText("")
+            self.nopeusteksti.SetLabelText("")
+            self.nopeusarvoteksti.SetLabelText("")
 
         if kairaustapa == "TR":
-            pass
+            self.voimateksti.SetLabelText("")
+            self.voimaarvoteksti.SetLabelText("")
+            self.puolikierroksetteksti.SetLabelText("")
+            self.puolikierroksetarvoteksti.SetLabelText("")
+            self.nopeusteksti.SetLabelText("")
+            self.nopeusarvoteksti.SetLabelText("")
 
         if kairaustapa == "PH":
-            self.puolikierroksetteksti.SetLabelText("P / H")
+            self.voimateksti.SetLabelText("Voima")
+            self.voimaarvoteksti.SetLabelText("0")
+            self.puolikierroksetteksti.SetLabelText("Vääntö")
+            self.puolikierroksetarvoteksti.SetLabelText("0")
+            self.nopeusteksti.SetLabelText("P / H")
+            self.nopeusarvoteksti.SetLabelText("P")
 
 
     def hankkeenavaus(self, event):
@@ -382,7 +415,12 @@ class windowClass(wx.Frame):
             with open("kairausloppu.txt", "r") as textfile:
                 for line in textfile:
                     if len(line) > 1:
-                        z.append(line.rsplit(" ")[1].strip("\n"))
+                        if line.__contains__("TIIVIS"):
+                            z.append(line.strip(",TM"+"\n"))
+                        elif line.__contains__("KALLIO"):
+                            z.append(line.strip(",KA"+",KK"+"\n"))
+                        else:
+                            z.append(line.rsplit(" ")[1].strip("\n"))
             textfile.close()
             kairausvalinta = wx.SingleChoiceDialog(None, "Valitse lopetussyy", "Kairauksen lopetus", z, wx.CHOICEDLG_STYLE)
             if kairausvalinta.ShowModal() == wx.ID_OK:
@@ -632,7 +670,7 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        self.kks = Kksoperations()
+        #self.kks = Kksoperations()
         self.sa = Saving()
         self.gui = gui
 
