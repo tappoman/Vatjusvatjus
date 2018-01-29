@@ -185,28 +185,28 @@ class windowClass(wx.Frame):
         self.syvyysteksti.SetFont(font1)
 
         # syvyysarvoteksti päivittyy alkusyvyys + listeneriltä tuleva syvyys
-        self.syvyysarvoteksti = wx.StaticText(panel, -1, "0", pos=(15, 345))
+        self.syvyysarvoteksti = wx.StaticText(panel, -1, "", pos=(15, 345))
         self.syvyysarvoteksti.SetFont(font2)
 
         self.voimateksti = wx.StaticText(panel, -1, "Voima", pos=(85, 315))
         self.voimateksti.SetFont(font1)
 
         # voima-arvoteksti päivittyy listeneriltä tulevan voiman mukaan
-        self.voimaarvoteksti = wx.StaticText(panel, -1, "0", pos=(95, 345))
+        self.voimaarvoteksti = wx.StaticText(panel, -1, "", pos=(95, 345))
         self.voimaarvoteksti.SetFont(font2)
 
         self.puolikierroksetteksti = wx.StaticText(panel, -1, "P-kierr", pos=(165, 315))
         self.puolikierroksetteksti.SetFont(font1)
 
         # puolikierroksetarvoteksti päivittyy listeneriltä tulevan voiman mukaan
-        self.puolikierroksetarvoteksti = wx.StaticText(panel, -1, "0", pos=(170, 345))
+        self.puolikierroksetarvoteksti = wx.StaticText(panel, -1, "", pos=(170, 345))
         self.puolikierroksetarvoteksti.SetFont(font2)
 
         self.nopeusteksti = wx.StaticText(panel, -1, "Nopeus", pos=(235, 315))
         self.nopeusteksti.SetFont(font1)
 
         # nopeusarvoteksti päivittyy listeneriltä tulevan voiman mukaan
-        self.nopeusarvoteksti = wx.StaticText(panel, -1, "0", pos=(240, 345))
+        self.nopeusarvoteksti = wx.StaticText(panel, -1, "", pos=(240, 345))
         self.nopeusarvoteksti.SetFont(font2)
 
         self.maalajiteksti = wx.StaticText(panel, -1, "Maalaji", pos=(315, 315))
@@ -345,6 +345,7 @@ class windowClass(wx.Frame):
                             linepart = line.replace("ty = ", "").strip("\n")
                             pisteet.append(linepart)
                     self.pistenimiteksti.SetLabel(pisteet[len(pisteet)-1])
+                    self.data.piste = self.pistenimiteksti.GetLabel()
                 textfile.close()
                 self.timer.Start(50)
                 os.chdir(self.data.root)
@@ -363,7 +364,7 @@ class windowClass(wx.Frame):
             self.alkukairausbutton.SetLabelText("Alku\nkairaus")
 
         else:
-            self.data.kks.asetaHanke(self.data.hanke, self.data.piste)
+            self.data.kks.asetaHanke(self.data.piste, self.data.hanke)
             self.data.kks.asetaPiste(self.data.piste)
             self.data.kks.asetaTapa(self.data.tutkimustapa)
             os.chdir(self.data.root)
@@ -377,7 +378,7 @@ class windowClass(wx.Frame):
             if kairausvalinta.ShowModal() == wx.ID_OK:
                 kairausvalinta = kairausvalinta.GetStringSelection()
                 if kairausvalinta == "OHITETAAN":
-                    #self.data.kks.aloitaOdotustila()
+                    self.data.kks.aloitaOdotustila()
                     self.config.read("USECONTROL.ini")
                     os.chdir(self.config["DEFAULT"]["polku"])
                     with open("{}.txt".format(self.data.hanke), 'a') as textfile:
@@ -487,7 +488,7 @@ class windowClass(wx.Frame):
             warning.ShowModal()
             warning.Destroy()
         else:
-            self.piste = self.pistenimiteksti.GetLabel()
+            self.data.piste = self.pistenimiteksti.GetLabel()
 
             self.update()
             self.timer.Start(50)
@@ -587,9 +588,9 @@ class windowClass(wx.Frame):
             self.linepanelille("TT {} syvyydellä {}".format(ohjelma, self.data.haesyvyys()))
 
             #komento kks:lle kairaustavan valinnasta
-            self.tapa = "TEK-" + ohjelma
+            #self.tapa = "TEK-" + ohjelma
             #print(self.tapa)
-            self.data.kks.asetaTapa(self.tapa)
+            #self.data.kks.asetaTapa(self.tapa)
 
     def hallintamenu(self, event):
         if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
@@ -683,7 +684,7 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        #self.kks = Kksoperations()
+        self.kks = Kksoperations()
         self.sa = Saving()
         self.gui = gui
 
@@ -1014,34 +1015,65 @@ class TiedonKasittely(object):
         return None
 
     # parsitaan data merkittävään muotoon
+    # parsitaan data merkittävään muotoon
     def iparsitiedot(self, line):
+
+        tutkimustapa = self.palautatutkimustapa()
 
         linearvot = line[0].rpartition(":")[2]
         arvot = linearvot.split()
 
-        syvyys = int(arvot[0])
-        #print(syvyys, " syvyys")
-        self.asetasyvyys(syvyys)
+        if tutkimustapa == "PA":
+            syvyys = int(arvot[0])
+            # print(syvyys, " syvyys")
+            self.asetasyvyys(syvyys)
 
-        #voima = int(line[1])
-        voima = int(arvot[1])
-        #print(voima, " voima")
-        self.asetavoima(voima)
+            voima = int(arvot[1])
+            # print(voima, " voima")
+            self.asetavoima(voima)
 
-        #puolikierrokset = int(line[2])
-        puolikierrokset = int(arvot[2])
-        self.asetapuolikierrokset(puolikierrokset)
-        #print(puolikierrokset, " puolik.")
+            puolikierrokset = int(arvot[2])
+            self.asetapuolikierrokset(puolikierrokset)
+            # print(puolikierrokset, " puolik.")
 
-        #nopeus = int(line[3])
-        nopeus = int(arvot[3])
-        #print(nopeus, " nopeus")
-        self.asetanopeus(nopeus)
+            nopeus = int(arvot[3])
+            # print(nopeus, " nopeus")
+            self.asetanopeus(nopeus)
 
-        # if line_sanoma =="TAL":
-            #lätä takasin
-        # if line_sanoma == "MIT":
-            #printtaa
+        if tutkimustapa == "HE":
+            syvyys = int(arvot[0])
+            self.asetasyvyys(syvyys)
+
+            voima = int(arvot[1])
+            self.asetavoima(voima)
+
+        if tutkimustapa == "TR":
+            syvyys = int(arvot[0])
+            self.asetasyvyys(syvyys)
+
+        if tutkimustapa == "PO":
+            syvyys = int(arvot[0])
+            self.asetasyvyys(syvyys)
+
+            voima = int(arvot[1])
+            self.asetavoima(voima)
+
+        if tutkimustapa == "PH":
+            syvyys = int(arvot[0])
+            # print(syvyys, " syvyys")
+            self.asetasyvyys(syvyys)
+
+            voima = int(arvot[1])
+            # print(voima, " voima")
+            self.asetavoima(voima)
+
+            puolikierrokset = int(arvot[2])
+            self.asetapuolikierrokset(puolikierrokset)
+            # print(puolikierrokset, " puolik.")
+
+            nopeus = int(arvot[3])
+            # print(nopeus, " nopeus")
+            self.asetanopeus(nopeus)
 
     def ihallinta(self):
         self.iluotempconfig()
