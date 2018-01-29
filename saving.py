@@ -28,6 +28,9 @@ class Saving (object):
         self.tal_polku = self._config["DEFAULT"]["polku"]
         if not os.path.exists(self.tal_polku):
             os.mkdir(self.tal_polku)
+        self.tiedosto = "MIT_temp.txt"
+        self.fullpath = os.path.join(self.tal_polku, self.tiedosto)
+        file = open(self.fullpath, "w")
 
 
     #Määrittää tallenustiedoston kaikelle kks-laitteelta tulevalle datalle ja tallettaa sen
@@ -36,7 +39,9 @@ class Saving (object):
         self.tal_polku = self._config["DEFAULT"]["polku"]
         if not os.path.exists(self.tal_polku):
             os.mkdir(self.tal_polku)
+
         self.tiedosto = "MIT_temp.txt"
+
         self.fullpath = os.path.join(self.tal_polku, self.tiedosto)
         file = open(self.fullpath, "w")
         file.write(MIT)
