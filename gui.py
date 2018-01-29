@@ -362,8 +362,10 @@ class windowClass(wx.Frame):
             # self.data.kks.aloitaOdotustila()
             self.alkukairausbutton.SetLabelText("Alku\nkairaus")
 
-
         else:
+            self.data.kks.asetaHanke(self.data.hanke, self.data.piste)
+            self.data.kks.asetaPiste(self.data.piste)
+            self.data.kks.asetaTapa(self.data.tutkimustapa)
             os.chdir(self.data.root)
             z = []
             with open("alkukairaus.txt", "r") as textfile:
@@ -393,6 +395,7 @@ class windowClass(wx.Frame):
                     alkusyvyys.ShowModal()
                     self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
                     self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
+                    self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
                     alkusyvyys.Destroy()
                     self.alkukairausbutton.SetLabelText("Lopeta\nalkukair.")
                     self.config.read("USECONTROL.ini")
