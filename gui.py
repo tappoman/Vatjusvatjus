@@ -39,7 +39,7 @@ class windowClass(wx.Frame):
         #self.Bind(wx.EVT_TIMER, self.data.ikuuntele, self.timer)
         self.config = configparser.ConfigParser()
 
-        self.sa = Saving()
+        self.sa = Saving
         #self.com = Communication()
 
         self.timer = wx.Timer(self)
@@ -49,6 +49,7 @@ class windowClass(wx.Frame):
         self.Bind(wx.EVT_TIMER, self.update, self.timer)
         #self.Bind(wx.EVT_TIMER, self.updatepistearvot(self.data), self.timer2)
 
+        #self.kks = Kksoperations()
 
 
     #NAMA PITAISI SAADA MYOS OIKEAN YLANURKAN PUNAISEESN AXAAN (SULKEMISNAPPI)
@@ -297,7 +298,7 @@ class windowClass(wx.Frame):
                 self.data.iluopiste(self.data.hanke)
                 self.pistenimiteksti.SetLabelText(self.data.piste)
                 self.pistetiedotpaneelille()
-                self.update()
+                self.update(event)
                 self.timer.Start(50)
                 #self.timer2.Start(50)
             else:
@@ -317,6 +318,8 @@ class windowClass(wx.Frame):
 
     # kysyy käyttäjältä alkusyvyyttä, joka tallennetaan
     # windowclassin.data luokkaan
+
+
     def aloitaalkukairaus(self, event):
         if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
             warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
@@ -359,7 +362,10 @@ class windowClass(wx.Frame):
                         textfile.write("\n" + "alkukairaus: {} syvyydellä {}".format(self.data.syvyys, kairausvalinta))
                         textfile.close()
                     os.chdir(self.data.root)
-                    print("lähetetään kkssälle: työnumero, kairausvalinta, piste, pvm(timestä?)")
+
+                    #print("lähetetään kkssälle: työnumero, kairausvalinta, piste, pvm(timestä?)")
+                    self.data.kks.aloitaAlkukairaus()
+
                     self.linepanelille("Alkukairaus {} syvyydellä {}".format(kairausvalinta, alkusyvyys.GetValue()))
                     # print("lähetetään kkssälle: työnumero(hanke?), {}, {}, pvm(timestä?)".format(kairausvalinta)
                     #       , self.data.piste)
@@ -600,8 +606,17 @@ class windowClass(wx.Frame):
 #ja tallennettaviin tietoihin
 class TiedonKasittely(object):
     def __init__(self, hanke = None, piste=None, maalaji="", alkusyvyys=0, syvyys=0, voima=0,
-                 puolikierrokset=0, nopeus=0, figure=None, ROOT_DIR = os.path.dirname("C:\\tmp\\GEOXX"), gui=None):
+                 puolikierrokset=0, nopeus=0, figure=None, gui=None):
         super(TiedonKasittely, self).__init__()
+
+        #ROOT_DIR = os.path.dirname("C:\\tmp\\GEOXX")
+
+        #self.polku = os.path.dirname(os.path.abspath(__file__))
+        self._config = configparser.ConfigParser()
+        self._config.read("USECONTROL.ini", encoding='UTF-8')
+        self.tallennus_polku = self._config["DEFAULT"]["polku"]
+        if not os.path.exists(self.tallennus_polku):
+            os.mkdir(self.tallennus_polku)
 
         self.hanke = hanke
         self.piste = piste
@@ -612,12 +627,12 @@ class TiedonKasittely(object):
         self.puolikierrokset = puolikierrokset
         self.nopeus = nopeus
         self.figure = figure
-        self.root = ROOT_DIR
+        self.root = os.path.dirname(os.path.abspath(__file__))
         self.config = configparser.ConfigParser()
 
         self.oldline = ""
 
-        # self.kks = Kksoperations()
+        self.kks = Kksoperations()
         self.sa = Saving()
         self.gui = gui
 
@@ -853,6 +868,13 @@ class TiedonKasittely(object):
                         #kutsutaan saving luokan metodia joka tallettaa sanoman tekla-tiedostoon
                         sa.tallennaTAL(self.hanke, linearvot)
 
+                        self.arvot = linearvot.split()
+                        self.apu = '{0:.2f}'.format(float(self.arvot[0]) / 100.00)
+                        self.arvot[0] = str(self.apu)
+                        self.TAL = "\t" + "\t" .join(self.arvot)
+
+                        self.gui.linepanelille(self.TAL)
+
                         #kutsutaan piirtäjää ja passataan tiedot sinne --> suoraan vaiko parserin kautta?
                         #Taidetaan tehdä piirto suoraan filesta
 
@@ -1060,6 +1082,8 @@ class TiedonKasittely(object):
         sa.asetaTutkimustiedot(uusitt, uusitx, uusixy, uusiln)
 
     def iluotempconfig(self):
+        #os.chdir(self.root)
+        print(self.root)
         os.chdir(self.root)
         shutil.copy('HANKETIEDOT.ini', 'GEOXX')
         shutil.copy('PISTETIEDOT.ini', 'GEOXX')
