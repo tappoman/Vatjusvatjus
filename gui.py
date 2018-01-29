@@ -646,7 +646,7 @@ class windowClass(wx.Frame):
 #tallentaa käyttäjän ja communicationin syöttämän datan ja syöttää sen eteenpäin windowclass luokalle
 #ja tallennettaviin tietoihin
 class TiedonKasittely(object):
-    def __init__(self, hanke = None, piste=None, maalaji="", alkusyvyys=0, syvyys=0, voima=0,
+    def __init__(self, hanke = None, piste=None, maalaji="", tutkimustapa="", alkusyvyys=0, syvyys=0, voima=0,
                  puolikierrokset=0, nopeus=0, figure=None, gui=None):
         super(TiedonKasittely, self).__init__()
 
@@ -670,6 +670,7 @@ class TiedonKasittely(object):
         self.figure = figure
         self.root = os.path.dirname(os.path.abspath(__file__))
         self.config = configparser.ConfigParser()
+        self.tutkimustapa = tutkimustapa
 
         self.oldline = ""
 
@@ -677,6 +678,8 @@ class TiedonKasittely(object):
         self.sa = Saving()
         self.gui = gui
 
+    def palautatutkimustapa(self):
+        return self.tutkimustapa
 
     def asetaalkusyvyys(self, alkusyvyys):
         self.alkusyvyys = alkusyvyys
@@ -824,6 +827,7 @@ class TiedonKasittely(object):
             with open("tutkimustavat.txt", "r", encoding="utf-8-sig") as textfile:
                 for line in textfile:
                     if line.__contains__(ohjelmavalinta):
+                        self.tutkimustapa = line[:2]
                         return line[:2]
 
     # valitaan luokalle maalaji listalta
