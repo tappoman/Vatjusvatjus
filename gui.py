@@ -164,20 +164,20 @@ class windowClass(wx.Frame):
         self.ohjelmateksti = wx.StaticText(panel, -1, "TT:", pos=(230, 210))
         self.ohjelmateksti.SetFont(font1)
 
-        self.ohjelmaarvoteksti = wx.StaticText(panel, -1, "><", pos=(260, 210))
+        self.ohjelmaarvoteksti = wx.StaticText(panel, -1, "", pos=(260, 210))
         self.ohjelmaarvoteksti.SetFont(font1)
 
         # alkukairausteksti päivittyy käyttäjän valinnan mukaan
         self.alkukairausteksti = wx.StaticText(panel, -1, "AL:", pos=(230, 245))
         self.alkukairausteksti.SetFont(font1)
 
-        self.alkukairausarvoteksti = wx.StaticText(panel, -1, "><", pos=(260, 245))
+        self.alkukairausarvoteksti = wx.StaticText(panel, -1, "", pos=(260, 245))
         self.alkukairausarvoteksti.SetFont(font1)
 
         self.alkusyvyysteksti = wx.StaticText(panel, -1, "A-syv:", pos=(230, 280))
         self.alkusyvyysteksti.SetFont(font1)
 
-        self.alkusyvyysarvoteksti = wx.StaticText(panel, -1, "><", pos=(295, 280))
+        self.alkusyvyysarvoteksti = wx.StaticText(panel, -1, "0", pos=(295, 280))
         self.alkusyvyysarvoteksti.SetFont(font1)
 
         # alatekstien alustus
@@ -185,35 +185,35 @@ class windowClass(wx.Frame):
         self.syvyysteksti.SetFont(font1)
 
         # syvyysarvoteksti päivittyy alkusyvyys + listeneriltä tuleva syvyys
-        self.syvyysarvoteksti = wx.StaticText(panel, -1, "><", pos=(15, 345))
+        self.syvyysarvoteksti = wx.StaticText(panel, -1, "0", pos=(15, 345))
         self.syvyysarvoteksti.SetFont(font2)
 
         self.voimateksti = wx.StaticText(panel, -1, "Voima", pos=(85, 315))
         self.voimateksti.SetFont(font1)
 
         # voima-arvoteksti päivittyy listeneriltä tulevan voiman mukaan
-        self.voimaarvoteksti = wx.StaticText(panel, -1, "><", pos=(95, 345))
+        self.voimaarvoteksti = wx.StaticText(panel, -1, "0", pos=(95, 345))
         self.voimaarvoteksti.SetFont(font2)
 
         self.puolikierroksetteksti = wx.StaticText(panel, -1, "P-kierr", pos=(165, 315))
         self.puolikierroksetteksti.SetFont(font1)
 
         # puolikierroksetarvoteksti päivittyy listeneriltä tulevan voiman mukaan
-        self.puolikierroksetarvoteksti = wx.StaticText(panel, -1, "><", pos=(170, 345))
+        self.puolikierroksetarvoteksti = wx.StaticText(panel, -1, "0", pos=(170, 345))
         self.puolikierroksetarvoteksti.SetFont(font2)
 
         self.nopeusteksti = wx.StaticText(panel, -1, "Nopeus", pos=(235, 315))
         self.nopeusteksti.SetFont(font1)
 
         # nopeusarvoteksti päivittyy listeneriltä tulevan voiman mukaan
-        self.nopeusarvoteksti = wx.StaticText(panel, -1, "><", pos=(240, 345))
+        self.nopeusarvoteksti = wx.StaticText(panel, -1, "0", pos=(240, 345))
         self.nopeusarvoteksti.SetFont(font2)
 
         self.maalajiteksti = wx.StaticText(panel, -1, "Maalaji", pos=(315, 315))
         self.maalajiteksti.SetFont(font1)
 
         # maalajiarvoteksti päivittyy käyttäjän valitessa maalaji
-        self.maalajiarvoteksti = wx.StaticText(panel, -1, "><", pos=(320, 345))
+        self.maalajiarvoteksti = wx.StaticText(panel, -1, "", pos=(320, 345))
         self.maalajiarvoteksti.SetFont(font2)
 
         self.iskuteksti = wx.StaticText(panel, -1, "Isku", pos=(455, 315))
@@ -445,8 +445,11 @@ class windowClass(wx.Frame):
                                                "Kirjoita huomautus")
         if kommentti.ShowModal() == wx.ID_OK:
             kommentti = kommentti.GetValue()
-        file.write("\nHM {}".format(kommentti))
-        self.linepanelille("HM {}".format(kommentti))
+            file.write("\nHM {}".format(kommentti))
+            self.linepanelille("HM {}".format(kommentti))
+        else:
+            file.close()
+            return None
             # sa.tallennaHM(self.hankenimiteksti.GetLabel(), kommentti)
         file.close()
             #oikeesti tähän saving luokan meotodi hoitaa def tallennaHM(self, hanke, huomautus)
