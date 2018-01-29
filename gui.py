@@ -358,6 +358,11 @@ class windowClass(wx.Frame):
             warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             warning.ShowModal()
             warning.Destroy()
+        elif self.alkukairausbutton.GetLabelText()=="Lopeta\nalkukair.":
+            # self.data.kks.aloitaOdotustila()
+            self.alkukairausbutton.SetLabelText("Alku\nkairaus")
+
+
         else:
             os.chdir(self.data.root)
             z = []
@@ -370,7 +375,7 @@ class windowClass(wx.Frame):
             if kairausvalinta.ShowModal() == wx.ID_OK:
                 kairausvalinta = kairausvalinta.GetStringSelection()
                 if kairausvalinta == "OHITETAAN":
-                    print("lähetä tieto kks alkukairaus ohitetaan")
+                    #self.data.kks.aloitaOdotustila()
                     self.config.read("USECONTROL.ini")
                     os.chdir(self.config["DEFAULT"]["polku"])
                     with open("{}.txt".format(self.data.hanke), 'a') as textfile:
@@ -389,6 +394,7 @@ class windowClass(wx.Frame):
                     self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
                     self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
                     alkusyvyys.Destroy()
+                    self.alkukairausbutton.SetLabelText("Lopeta\nalkukair.")
                     self.config.read("USECONTROL.ini")
                     os.chdir(self.config["DEFAULT"]["polku"])
                     with open("{}.txt".format(self.data.hanke), 'a') as textfile:
