@@ -134,7 +134,7 @@ class windowClass(wx.Frame):
         # kairauksen lopetus
         # käyttäjä valitsee lopetussyyn
         # tiedot kkssälle
-        self.lopetusbutton = wx.Button(panel, label="Lopeta\nkairaus", pos=(400, 215), size=(100,100))
+        self.lopetusbutton = wx.Button(panel, label="Aloita\nkairaus", pos=(400, 215), size=(100,100))
         self.lopetusbutton.SetFont(font1)
         self.lopetusbutton.Bind(wx.EVT_BUTTON, self.lopetakairaus)
 
@@ -364,9 +364,9 @@ class windowClass(wx.Frame):
             self.alkukairausbutton.SetLabelText("Alku\nkairaus")
 
         else:
-            self.data.kks.asetaHanke(self.data.piste, self.data.hanke)
-            self.data.kks.asetaPiste(self.data.piste)
-            self.data.kks.asetaTapa(self.data.tutkimustapa)
+            #self.data.kks.asetaHanke(self.data.piste, self.data.hanke)
+            #self.data.kks.asetaPiste(self.data.piste)
+            #self.data.kks.asetaTapa(self.data.tutkimustapa)
             os.chdir(self.data.root)
             z = []
             with open("alkukairaus.txt", "r") as textfile:
@@ -378,7 +378,6 @@ class windowClass(wx.Frame):
             if kairausvalinta.ShowModal() == wx.ID_OK:
                 kairausvalinta = kairausvalinta.GetStringSelection()
                 if kairausvalinta == "OHITETAAN":
-                    self.data.kks.aloitaOdotustila()
                     self.config.read("USECONTROL.ini")
                     os.chdir(self.config["DEFAULT"]["polku"])
                     with open("{}.txt".format(self.data.hanke), 'a') as textfile:
@@ -396,7 +395,7 @@ class windowClass(wx.Frame):
                     alkusyvyys.ShowModal()
                     self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
                     self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
-                    self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
+                    #self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
                     alkusyvyys.Destroy()
                     self.alkukairausbutton.SetLabelText("Lopeta\nalkukair.")
                     self.config.read("USECONTROL.ini")
@@ -407,7 +406,7 @@ class windowClass(wx.Frame):
                     os.chdir(self.data.root)
 
                     #print("lähetetään kkssälle: työnumero, kairausvalinta, piste, pvm(timestä?)")
-                    self.data.kks.aloitaAlkukairaus()
+                    #self.data.kks.aloitaAlkukairaus()
 
                     self.linepanelille("Alkukairaus {} syvyydellä {}".format(kairausvalinta, alkusyvyys.GetValue()))
                     # print("lähetetään kkssälle: työnumero(hanke?), {}, {}, pvm(timestä?)".format(kairausvalinta)
@@ -418,21 +417,22 @@ class windowClass(wx.Frame):
             warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             warning.ShowModal()
             warning.Destroy()
-        else:
-
+        elif self.lopetusbutton.GetLabel() == "Lopeta\nkairaus":
+            #self.data.kks.lopetaKairaus()
             os.chdir(self.data.root)
             z = []
             with open("kairausloppu.txt", "r") as textfile:
                 for line in textfile:
                     if len(line) > 1:
                         if line.__contains__("TIIVIS"):
-                            z.append(line.strip(",TM"+"\n"))
+                            z.append(line.strip(",TM" + "\n"))
                         elif line.__contains__("KALLIO"):
-                            z.append(line.strip(",KA"+",KK"+"\n"))
+                            z.append(line.strip(",KA" + ",KK" + "\n"))
                         else:
                             z.append(line.rsplit(" ")[1].strip("\n"))
             textfile.close()
-            kairausvalinta = wx.SingleChoiceDialog(None, "Valitse lopetussyy", "Kairauksen lopetus", z, wx.CHOICEDLG_STYLE)
+            kairausvalinta = wx.SingleChoiceDialog(None, "Valitse lopetussyy", "Kairauksen lopetus", z,
+                                                   wx.CHOICEDLG_STYLE)
             if kairausvalinta.ShowModal() == wx.ID_OK:
                 kairausvalinta = kairausvalinta.GetStringSelection()
                 print("lähetetään kkssälle tieto kairaus lopetettiin syvyydellä {} syystä {}"
@@ -444,8 +444,13 @@ class windowClass(wx.Frame):
                     textfile.close()
                 os.chdir(self.data.root)
                 self.linepanelille("Kairaus lopetettiin {} syvyydellä {}".format(kairausvalinta, self.data.haesyvyys()))
+                self.lopetusbutton.SetLabel("Aloita\nkairaus")
             else:
                 return None
+        else:
+            self.lopetusbutton.SetLabel("Lopeta\nkairaus")
+            # self.data.kks.aloitaOdotustila()
+            print("kuunnellaan kks")
 
     def kommenttirivi(self, event):
         z = []
@@ -469,7 +474,7 @@ class windowClass(wx.Frame):
         if self.tankoarvolaatikko.GetBackgroundColour() == 'red':
             self.tankoarvolaatikko.SetBackgroundColour('green')
             self.tankoarvolaatikko.Refresh()
-            self.data.kks.kuittaaTanko()
+            #self.data.kks.kuittaaTanko()
 
         elif self.tankoarvolaatikko.GetBackgroundColour() == 'green':
             self.tankoarvolaatikko.SetBackgroundColour('red')
@@ -563,7 +568,7 @@ class windowClass(wx.Frame):
         if komento.ShowModal() == wx.ID_OK:
             komento = str(komento.GetValue())
             print(komento)
-            self.data.kks.annaKasky(komento)
+            #self.data.kks.annaKasky(komento)
             #print("tottele saatana")
             #self.data.kks.aloitaKairaus()
 
@@ -684,7 +689,7 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        self.kks = Kksoperations()
+        #self.kks = Kksoperations()
         self.sa = Saving()
         self.gui = gui
 
