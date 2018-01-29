@@ -175,6 +175,9 @@ class Kksoperations (object):
         self.com.setCommand("ALKUK:0")
         #return "MIT-ODOTUS"
 
+    def aloitaOdotustila(self):
+        self.com.setCommand("M-ODOTUS")
+
 
     """ALKUKAIRAUSTILA"""
 
