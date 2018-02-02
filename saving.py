@@ -98,7 +98,7 @@ class Saving (object):
                                    "OM": OM,
                                    "ML": ML,
                                    "ORG": ORG}
-        with open ("ALOITUSTIEDOT.ini", "w") as cfgfile:
+        with open ("HANKETIEDOT.ini", "w") as cfgfile:
             self._config.write(cfgfile)
 
 #lisää nämä
@@ -166,7 +166,7 @@ class Saving (object):
         file = open(self.fullpath, "w")
 
         #TIEDOSTOKOHTAISET
-        self._config.read("ALOITUSTIEDOT.ini")
+        self._config.read("HANKETIEDOT.ini")
         file.write("FO\t" + self._config["DEFAULT"]["fo"] + "\n" +
                     "KJ\t" + self._config["DEFAULT"]["kj"] + "\n" +
                     "OM\t" + self._config["DEFAULT"]["om"] + "\n" +

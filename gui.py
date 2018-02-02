@@ -597,7 +597,17 @@ class windowClass(wx.Frame):
             #self.data.kks.asetaTapa(self.data.tapa)
 
     def hallintamenu(self, event):
-            hallinta = self.data.ihallinta()
+        '''
+        if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
+            varoitus = wx.MessageDialog(None, "Valitse ensin hanke ja piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
+            varoitus.ShowModal()
+            varoitus.Destroy()
+        elif self.pistenimiteksti.GetLabel() == ">pisteen nimi<":
+            warning = wx.MessageDialog(None, "Valitse ensin piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
+            warning.ShowModal()
+        else:
+        '''
+        self.data.ihallinta()
 
     # käyttäjä valitsee listalta maalajin, joka tallennetaan data-luokkaan
     def valitsemaalaji(self, event):
@@ -1075,9 +1085,12 @@ class TiedonKasittely(object):
             self.asetanopeus(nopeus)
 
     def ihallinta(self):
-        self.iluotempconfig()
-        x = [config.replace(".ini", "") for config in os.listdir(os.curdir) if config.endswith(".ini")]
-        valinta = wx.SingleChoiceDialog(None, "Valitse muokattavat tiedot", "Hallinta", x,  wx.CHOICEDLG_STYLE)
+        os.chdir(self.root)
+        print("Tämän pitäisi olla root kansio= "+os.getcwd())
+        x = [config.replace(".ini", "") for config in os.listdir(os.curdir) if config.endswith(".ini")
+             and config != "USECONTROL.ini" and config != "HWCONTROL.ini"]
+        valinta = wx.SingleChoiceDialog(None, "Valitse muokattavat tiedot", "Hallinta",
+                                        x,  wx.CHOICEDLG_STYLE)
         if valinta.ShowModal() == wx.ID_OK:
             muokattava = valinta.GetStringSelection()
             valinta.Destroy()
