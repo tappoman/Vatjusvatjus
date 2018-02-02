@@ -241,10 +241,8 @@ class windowClass(wx.Frame):
         panel.SetSizer(panelSizer)
 
     #TANKOVARITYSTA
-    def vaihdatankovari(self):
-        #self.tankoarvolaatikko.SetBackgroundColour('green')
-        print("vaihdatankovari")
-        self.tankoarvolaatikko.SetBackgroundColour('red')
+    def vaihdatankovari(self, color):
+        self.tankoarvolaatikko.SetBackgroundColour(color)
         self.tankoarvolaatikko.Refresh()
 
     #alustetaan näyttöarvot kairaustavan mukaan:
@@ -420,6 +418,7 @@ class windowClass(wx.Frame):
             warning.Destroy()
         elif self.lopetusbutton.GetLabel() == "Lopeta\nkairaus":
             self.data.kks.lopetaKairaus()
+            self.vaihdatankovari('red')
             os.chdir(self.data.root)
             z = []
             with open("kairausloppu.txt", "r") as textfile:
@@ -451,6 +450,7 @@ class windowClass(wx.Frame):
         else:
             self.lopetusbutton.SetLabel("Lopeta\nkairaus")
             self.data.kks.aloitaKairaus()
+            #self.vaihdatankovari()
             print("kuunnellaan kks")
 
     def kommenttirivi(self, event):
@@ -472,14 +472,7 @@ class windowClass(wx.Frame):
 
 
     def tanko(self, event):
-        if self.tankoarvolaatikko.GetBackgroundColour() == 'red':
-            self.tankoarvolaatikko.SetBackgroundColour('green')
-            self.tankoarvolaatikko.Refresh()
-            self.data.kks.kuittaaTanko()
-
-        elif self.tankoarvolaatikko.GetBackgroundColour() == 'green':
-            self.tankoarvolaatikko.SetBackgroundColour('red')
-            self.tankoarvolaatikko.Refresh()
+        self.data.kks.kuittaaTanko()
 
         return None
 
@@ -690,7 +683,7 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        #self.kks = Kksoperations()
+        self.kks = Kksoperations()
         self.sa = Saving()
         self.gui = gui
 
@@ -965,27 +958,15 @@ class TiedonKasittely(object):
 
                     if lineparts[0] == "#NOSTO":
                         print("nosto")
-                        #TULOSTETAAN TILA GUISSA
-                        #SYTYTETÄÄN NOSTOVALO?
-                        #JUSSIIII
-                        #windowClass.vaihdatankovari()
-                        self.gui.vaihdatankovari()
+                        self.gui.vaihdatankovari('red')
 
                     if lineparts[0] == "#NOSKU":
                         print("NOSTON KUITTAUS")
-                        #TULOSTETAAN NOSTON KUITTAUS
-                        #SAMMUTETAAN NOSTOVALO
-                        #JATKETAAN ARVOJEN PRINTTAUSTA GUISSA (JOS TÄTÄ TARVITSEE EDES LOPETTAA)
-                        #JUSSSIII
+                        #self.gui.vaihdatankovari
 
                     if lineparts[0] == "#KAIRAUS":
                         print("KAIRAUS")
-                        #windowClass.tankoarvolaatikko.SetBackgroundColour('green')
-                        #frame.tankoarvolaatikko.SetBackgroundColour('green')
-                        #windowClass.vaihdatankovari()
-                        #SAMMUTETAAN NOSTOVALO
-                        #***JUSSI NOSTOVALO VIHREAKSI TASSA!!!!***
-                        #windowClass.tankoarvolaatikko.SetBackgroundColour('green')
+                        self.gui.vaihdatankovari('green')
 
 
                     #NAPIT KKS:LTA MITÄ IKINÄ TULEEKAAN --> TÄHÄN

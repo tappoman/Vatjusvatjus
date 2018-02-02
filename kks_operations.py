@@ -118,7 +118,7 @@ class Kksoperations (object):
 
     def asetaPiste(self, piste):
         """#PISTE:ss..s:		kohdemuuttuja. palauttaa #1"""
-        self.com.setCommand("PISTE", piste)
+        self.com.setCommand("PISTE" + piste)
         #return "#1"
 
     def asetaTapa(self, tapa):
