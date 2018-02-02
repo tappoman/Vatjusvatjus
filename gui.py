@@ -18,6 +18,7 @@ import shutil
 import saving
 from saving import *
 from kks_operations import *
+from piirto import *
 
 # import communication
 # import guioperations
@@ -49,7 +50,6 @@ class windowClass(wx.Frame):
         self.Bind(wx.EVT_TIMER, self.update, self.timer)
         #self.Bind(wx.EVT_TIMER, self.updatepistearvot(self.data), self.timer2)
 
-        #self.kks = Kksoperations()
 
 
     #NAMA PITAISI SAADA MYOS OIKEAN YLANURKAN PUNAISEESN AXAAN (SULKEMISNAPPI)
@@ -70,6 +70,8 @@ class windowClass(wx.Frame):
         font1.SetPointSize(15)
         font2.SetPointSize(25)
         font3.SetPointSize(35)
+
+
 
         # nappuloiden alustus
         #Framen sulkemisnappi
@@ -570,8 +572,13 @@ class windowClass(wx.Frame):
     def graafinpiirto(self, event):
         # if ba.fig == None:
         #     graafi.show()
-        ba.main(self.data)
-        print("lululu noob noob")
+        #ba.main(self.data)
+        #print("lululu noob noob")
+
+
+        #luodaan piirto-olio ja passataan meidän scrollipaneli sille
+        self.piirto = CanvasPanel(self.scrolled_panel)
+        self.piirto.draw()
 
     def valitseohjelma(self, event):
         if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
@@ -683,7 +690,7 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        #self.kks = Kksoperations()
+        self.kks = Kksoperations()
         self.sa = Saving()
         self.gui = gui
 
