@@ -86,7 +86,7 @@ class Saving (object):
 
 
     #Aina tiedoston alkuun, määritellään ylläpidosta
-    def asetaAloitustiedot(self, FO="2.3", KJ="KKJ-N60", OM="TILAAJA", ML="GEO", ORG="GEOPOJAT"):
+    def asetaHanketiedot(self, FO, KJ, OM, ML, ORG):
         '''self.fo = FO
         self.kj = KJ
         self.om = OM

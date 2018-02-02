@@ -597,14 +597,6 @@ class windowClass(wx.Frame):
             #self.data.kks.asetaTapa(self.data.tapa)
 
     def hallintamenu(self, event):
-        if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
-            varoitus = wx.MessageDialog(None, "Valitse ensin hanke ja piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
-            varoitus.ShowModal()
-            varoitus.Destroy()
-        elif self.pistenimiteksti.GetLabel() == ">pisteen nimi<":
-            warning = wx.MessageDialog(None, "Valitse ensin piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
-            warning.ShowModal()
-        else:
             hallinta = self.data.ihallinta()
 
     # käyttäjä valitsee listalta maalajin, joka tallennetaan data-luokkaan
@@ -688,7 +680,7 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        self.kks = Kksoperations()
+        #self.kks = Kksoperations()
         self.sa = Saving()
         self.gui = gui
 
@@ -749,6 +741,7 @@ class TiedonKasittely(object):
     # erikoismerkit parsittu pois
     # estetään ylikirjoitus try-exceptillä
     def iluohanke(self):
+        print(os.getcwd())
         hankenimi = wx.TextEntryDialog(None, "Anna uudelle hankkeelle nimi", "Uuden hankkeen luonti")
         if hankenimi.ShowModal() == wx.ID_OK:
             hankenimi = hankenimi.GetValue()
@@ -767,6 +760,7 @@ class TiedonKasittely(object):
                     self.iluotempconfig()
                     file = open("{}.txt".format(hankenimi), 'a')
                     self.hanke = hankenimi
+                    print(os.getcwd())
                     self.config.read("HANKETIEDOT.ini")
                     file.write("fo = " + self.config["DEFAULT"]["fo"])
                     file.write("\nkj = "+self.config["DEFAULT"]["kj"])
@@ -774,7 +768,7 @@ class TiedonKasittely(object):
                     file.write("\nml = "+self.config["DEFAULT"]["ml"])
                     file.write("\norg = "+self.config["DEFAULT"]["org"])
                     file.close()
-                    self.ituhoatempconfig()
+                    #self.ituhoatempconfig()
                     os.chdir(self.root)
             else:
                 os.chdir(self.root)
@@ -786,6 +780,7 @@ class TiedonKasittely(object):
 
     # luodaan piste käyttäjän antamalla nimellä
     def iluopiste(self, hanke):
+        print(os.getcwd())
         pistenimi = wx.TextEntryDialog(None, "Anna hankkeen {} uudelle pisteelle nimi".format(hanke),
                                        "Uuden pisteen luonti hankkeelle {}".format(hanke))
         if pistenimi.ShowModal() == wx.ID_OK:
@@ -835,7 +830,7 @@ class TiedonKasittely(object):
             self.config.read("USECONTROL.ini")
             os.chdir(self.config["DEFAULT"]["polku"])
             with open("{}.txt".format(self.hanke), 'a') as textfile:
-                textfile.write("{} syvyydellä {}".format(self.syvyys, ohjelmavalinta))
+                textfile.write("\n{} syvyydellä {}".format(self.syvyys, ohjelmavalinta))
                 textfile.close()
             os.chdir(self.root)
             with open("tutkimustavat.txt", "r", encoding="utf-8-sig") as textfile:
@@ -1172,12 +1167,10 @@ class TiedonKasittely(object):
         sa.asetaTutkimustiedot(uusitt, uusitx, uusixy, uusiln)
 
     def iluotempconfig(self):
-        #os.chdir(self.root)
-        print(self.root)
         os.chdir(self.root)
-        shutil.copy('HANKETIEDOT.ini', 'GEOXX')
-        shutil.copy('PISTETIEDOT.ini', 'GEOXX')
-        shutil.copy('TUTKIMUSTIEDOT.ini', 'GEOXX')
+        shutil.copy('HANKETIEDOT.ini', self.config["DEFAULT"]["polku"])
+        shutil.copy('PISTETIEDOT.ini', self.config["DEFAULT"]["polku"])
+        shutil.copy('TUTKIMUSTIEDOT.ini', self.config["DEFAULT"]["polku"])
         self.config.read("USECONTROL.ini")
         os.chdir(self.config["DEFAULT"]["polku"])
         return None
