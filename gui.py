@@ -51,14 +51,8 @@ class windowClass(wx.Frame):
         #self.Bind(wx.EVT_TIMER, self.updatepistearvot(self.data), self.timer2)
 
 
-
-    #NAMA PITAISI SAADA MYOS OIKEAN YLANURKAN PUNAISEESN AXAAN (SULKEMISNAPPI)
     def onClose(self):
-        #self.kks.closeConnection()
         self.data.kks.closeConnection()
-        #self.Close()
-        #self.Destroy()
-
 
     def basicGUI(self):
 
@@ -70,8 +64,6 @@ class windowClass(wx.Frame):
         font1.SetPointSize(15)
         font2.SetPointSize(25)
         font3.SetPointSize(35)
-
-
 
         # nappuloiden alustus
         #Framen sulkemisnappi
@@ -357,10 +349,6 @@ class windowClass(wx.Frame):
                 self.timer.Start(50)
                 os.chdir(self.data.root)
 
-    # kysyy käyttäjältä alkusyvyyttä, joka tallennetaan
-    # windowclassin.data luokkaan
-
-
     def aloitaalkukairaus(self, event):
         if self.hankenimiteksti.GetLabel() == "":
             warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
@@ -461,7 +449,6 @@ class windowClass(wx.Frame):
         else:
             self.lopetusbutton.SetLabel("Lopeta\nkairaus")
             self.data.kks.aloitaKairaus()
-            #self.vaihdatankovari()
             print("kuunnellaan kks")
 
     def kommenttirivi(self, event):
@@ -477,39 +464,29 @@ class windowClass(wx.Frame):
         else:
             file.close()
             return None
-            # sa.tallennaHM(self.hankenimiteksti.GetLabel(), kommentti)
         file.close()
-            #oikeesti tähän saving luokan meotodi hoitaa def tallennaHM(self, hanke, huomautus)
-
 
     def tanko(self, event):
         self.data.kks.kuittaaTanko()
-
         return None
-
 
     def lataapiste(self, event):
         if self.pistenimiteksti.GetLabel() == "":
             warning = wx.MessageDialog(None, "Valitse ensin työ", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             warning.ShowModal()
             warning.Destroy()
-        elif self.ohjelmaarvoteksti.GetLabel() == "><":
+        elif self.ohjelmaarvoteksti.GetLabel() == "":
             warning = wx.MessageDialog(None, "Valitse tutkimustapa", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             warning.ShowModal()
             warning.Destroy()
         else:
             self.data.piste = self.pistenimiteksti.GetLabel()
-
             self.update()
             self.timer.Start(50)
 
     def update(self, event):
-        #print(self.listener)
-        #self.data.ikuuntele()
         self.updatepistearvot(self.data)
         self.data.ikuuntele(event)
-
-        #self.listenerupdate(self.data)
 
     def pistetiedotpaneelille(self):
         self.config.read("USECONTROL.ini")
@@ -593,6 +570,7 @@ class windowClass(wx.Frame):
                 self.scrolled_panel.Refresh()
             # luodaan piirto-olio ja passataan meidän scrollipaneli sille
             self.piirto = CanvasPanel(self.scrolled_panel)
+            self.piirto.getValues(self.data.hanke, self.data.piste)
             self.piirto.draw()
 
         elif self.graphbutton.GetLabelText() == "Tekla":
@@ -622,16 +600,6 @@ class windowClass(wx.Frame):
             #self.data.kks.asetaTapa(self.data.tapa)
 
     def hallintamenu(self, event):
-        '''
-        if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
-            varoitus = wx.MessageDialog(None, "Valitse ensin hanke ja piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
-            varoitus.ShowModal()
-            varoitus.Destroy()
-        elif self.pistenimiteksti.GetLabel() == ">pisteen nimi<":
-            warning = wx.MessageDialog(None, "Valitse ensin piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
-            warning.ShowModal()
-        else:
-        '''
         self.data.ihallinta()
 
     # käyttäjä valitsee listalta maalajin, joka tallennetaan data-luokkaan
@@ -1189,7 +1157,6 @@ class TiedonKasittely(object):
         else:
             return None
 
-        #sa = saving.Saving()
         sa.asetaHanketiedot(uusifo, uusikj, uusiml, uusiom, uusiorg)
 
     def ipisteheader(self):
@@ -1215,7 +1182,6 @@ class TiedonKasittely(object):
         else:
             return None
 
-        #sa = saving.Saving()
         sa.asetaPistetiedot(uusity, uusipk, uusila)
 
     def itutkimusheader(self):
@@ -1248,7 +1214,6 @@ class TiedonKasittely(object):
         else:
             return None
 
-        #sa = saving.Saving()
         sa.asetaTutkimustiedot(uusitt, uusitx, uusixy, uusiln)
 
     def iluotempconfig(self):
@@ -1265,32 +1230,15 @@ class TiedonKasittely(object):
         os.remove('PISTETIEDOT.ini')
         os.remove('TUTKIMUSTIEDOT.ini')
 
-# saisko tästä graafille uuden ikkunan jotenkin hienosti
-class OtherFrame(wx.Frame):
-    """"""
-
-    # ----------------------------------------------------------------------
-    def __init__(self):
-        """Constructor"""
-        wx.Frame.__init__(self, None, wx.ID_ANY, "Piirto", size=(500,500))
-        panel = wx.Panel(self)
-
-
 def main():
     app = wx.App()
     frame = windowClass(None)
-
     frame.Show(True)
-    #frame.tankoarvolaatikko.SetBackgroundColor('green')
-    #frame.vaihdatankovari()
-    #frame.tanko()
     app.MainLoop()
 
 
 if __name__ == '__main__':
     main()
 
-
-#tiedontallennukset saving.py palautaTalpolku tallennuspolku, avaustiedosto jne
 
 
