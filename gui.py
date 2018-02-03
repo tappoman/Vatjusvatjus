@@ -81,13 +81,13 @@ class windowClass(wx.Frame):
 
         # hanke
         # avaa hankkeen listalta
-        self.hankebutton = wx.Button(panel, label="Hanke", pos=(5, 10), size=(110, 110))
+        self.hankebutton = wx.Button(panel, label="Valitse\nhanke", pos=(5, 10), size=(110, 110))
         self.hankebutton.SetFont(font1)
         self.hankebutton.Bind(wx.EVT_BUTTON, self.hankkeenavaus)
 
         # piste
         # avaa pisteen hankkeen sisältä
-        self.pistebutton = wx.Button(panel, label="Työnro/\nuusi työ", pos=(120, 10), size=(110, 110))
+        self.pistebutton = wx.Button(panel, label="Näytä\ntekla /\nuusi työ", pos=(120, 10), size=(110, 110))
         self.pistebutton.SetFont(font1)
         self.pistebutton.Bind(wx.EVT_BUTTON, self.pisteenavaus)
 
@@ -152,14 +152,14 @@ class windowClass(wx.Frame):
         self.hanketeksti.SetFont(font2)
 
         # tiedostonimiteksti näyttää valitun hankkeen nimen
-        self.hankenimiteksti = wx.StaticText(panel, -1, ">hankkeen nimi<", pos=(120, 120))
+        self.hankenimiteksti = wx.StaticText(panel, -1, "", pos=(120, 120))
         self.hankenimiteksti.SetFont(font2)
 
         self.pisteteksti = wx.StaticText(panel, -1, "Työnro: ", pos=(10, 165))
         self.pisteteksti.SetFont(font2)
 
         # pistenimiteksti näyttää valitusta hankkeesta valitun pisteen
-        self.pistenimiteksti = wx.StaticText(panel, -1, ">työn numero<", pos=(120, 165))
+        self.pistenimiteksti = wx.StaticText(panel, -1, "", pos=(120, 165))
         self.pistenimiteksti.SetFont(font2)
 
         # ohjelmanimiteksti näyttää valitusta ohjelmanappulasta käytössäolevan ohjelman
@@ -302,23 +302,26 @@ class windowClass(wx.Frame):
 
 
     def hankkeenavaus(self, event):
-        if self.hankenimiteksti.GetLabel() != ">hankkeen nimi<":
+        if self.hankenimiteksti.GetLabel() != "":
             self.data.iavaahanke()
             self.hankenimiteksti.SetLabelText(self.data.hanke)
-            self.pistenimiteksti.SetLabelText(">pisteen nimi<")
-            self.syvyysarvoteksti.SetLabelText("><")
-            self.voimaarvoteksti.SetLabelText("><")
-            self.puolikierroksetarvoteksti.SetLabelText("><")
-            self.nopeusarvoteksti.SetLabelText("><")
+            self.pistenimiteksti.SetLabelText("")
+            self.syvyysarvoteksti.SetLabelText("")
+            self.voimaarvoteksti.SetLabelText("")
+            self.puolikierroksetarvoteksti.SetLabelText("")
+            self.nopeusarvoteksti.SetLabelText("")
         else:
             self.data.iavaahanke()
-            self.hankenimiteksti.SetLabelText(self.data.hanke)
+            try:
+                self.hankenimiteksti.SetLabelText(self.data.hanke)
+            except TypeError:
+                print("Hanketta ei avattu")
 
     # jos ei luoda uutta pistettä, niin jatketaan vanhasta
     # avataan tekstifile, joka luetaan kunnes viimeinen pistenimi-tunnistin tulee
     # ja tämän perään jatketaan datan kirjoittamista
     def pisteenavaus(self, event):
-        if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
+        if self.hankenimiteksti.GetLabel() == "":
             warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             warning.ShowModal()
             warning.Destroy()
@@ -329,11 +332,15 @@ class windowClass(wx.Frame):
             uusikysymys.Destroy()
             if uusivastaus == wx.ID_YES:
                 self.data.iluopiste(self.data.hanke)
-                self.pistenimiteksti.SetLabelText(self.data.piste)
+                try:
+                    self.pistenimiteksti.SetLabelText(self.data.piste)
+                except TypeError:
+                    print(self.pistenimiteksti.GetLabelText())
+                    if self.pistenimiteksti.GetLabelText() == "":
+                        return None
                 self.pistetiedotpaneelille()
                 self.update(event)
                 self.timer.Start(50)
-                #self.timer2.Start(50)
             else:
                 self.pistetiedotpaneelille()
                 self.config.read("USECONTROL.ini")
@@ -355,7 +362,7 @@ class windowClass(wx.Frame):
 
 
     def aloitaalkukairaus(self, event):
-        if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
+        if self.hankenimiteksti.GetLabel() == "":
             warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             warning.ShowModal()
             warning.Destroy()
@@ -412,9 +419,11 @@ class windowClass(wx.Frame):
                     self.linepanelille("Alkukairaus {} syvyydellä {}".format(kairausvalinta, alkusyvyys.GetValue()))
                     # print("lähetetään kkssälle: työnumero(hanke?), {}, {}, pvm(timestä?)".format(kairausvalinta)
                     #       , self.data.piste)
+            else:
+                return None
 
     def lopetakairaus(self, event):
-        if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
+        if self.hankenimiteksti.GetLabel() == "":
             warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             warning.ShowModal()
             warning.Destroy()
@@ -480,8 +489,8 @@ class windowClass(wx.Frame):
 
 
     def lataapiste(self, event):
-        if self.pistenimiteksti.GetLabel() == ">pisteen nimi<":
-            warning = wx.MessageDialog(None, "Valitse ensin piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
+        if self.pistenimiteksti.GetLabel() == "":
+            warning = wx.MessageDialog(None, "Valitse ensin työ", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             warning.ShowModal()
             warning.Destroy()
         elif self.ohjelmaarvoteksti.GetLabel() == "><":
@@ -505,7 +514,6 @@ class windowClass(wx.Frame):
     def pistetiedotpaneelille(self):
         self.config.read("USECONTROL.ini")
         os.chdir(self.config["DEFAULT"]["polku"])
-        print(self.hankenimiteksti.GetLabel())
         with open("{}.txt".format(self.hankenimiteksti.GetLabel())) as textfile:
             for line in textfile:
                 self.linepanelille(line)
@@ -565,7 +573,6 @@ class windowClass(wx.Frame):
             komento = str(komento.GetValue())
             print(komento)
             self.data.kks.annaKasky(komento)
-
         else:
             return None
 
@@ -596,15 +603,18 @@ class windowClass(wx.Frame):
 
 
     def valitseohjelma(self, event):
-        if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
+        if self.hankenimiteksti.GetLabel() == "":
             varoitus = wx.MessageDialog(None, "Valitse ensin hanke ja piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             varoitus.ShowModal()
             varoitus.Destroy()
         else:
-            ohjelma = self.data.ivalitseohjelma()
-            self.ohjelmaarvoteksti.SetLabelText(ohjelma)
-            self.alustaarvopaneeli(ohjelma)
-            self.linepanelille("TT {} syvyydellä {}".format(ohjelma, self.data.haesyvyys()))
+            try:
+                ohjelma = self.data.ivalitseohjelma()
+                self.ohjelmaarvoteksti.SetLabelText(ohjelma)
+                self.alustaarvopaneeli(ohjelma)
+                self.linepanelille("TT {} syvyydellä {}".format(ohjelma, self.data.haesyvyys()))
+            except TypeError:
+                print("Tutkimustapaa ei valittu")
 
             #komento kks:lle kairaustavan valinnasta
             #self.tapa = "TEK-" + ohjelma
@@ -626,16 +636,20 @@ class windowClass(wx.Frame):
 
     # käyttäjä valitsee listalta maalajin, joka tallennetaan data-luokkaan
     def valitsemaalaji(self, event):
-        if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
-            warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
+        if self.hankenimiteksti.GetLabel() == "":
+            warning = wx.MessageDialog(None, "Valitse ensin hanke ja työ", "Varoitus", wx.OK | wx.ICON_INFORMATION)
+            warning.ShowModal()
+            warning.Destroy()
+        elif self.pistenimiteksti.GetLabel() == "":
+            warning = wx.MessageDialog(None, "Valitse ensin työ", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             warning.ShowModal()
             warning.Destroy()
         else:
             self.data.iluemaalajit()
-            print("tägättiin maalaji {} syvyydelle {}".format(self.data.haemaalaji(), self.data.haesyvyys()))
             tagi = self.data.haemaalaji()
-            os.chdir(self.data.root)
-
+            if tagi == "":
+                os.chdir(self.data.root)
+                return None
             if tagi == "Lieju":
                 self.maalajiarvoteksti.SetLabelText("Lj")
                 self.config.read("USECONTROL.ini")
@@ -652,7 +666,6 @@ class windowClass(wx.Frame):
                     tagi = tagi.upper()
                 if tagi == "humusmaa":
                     tagi = tagi.upper()
-                print(tagi)
                 with open("maalajit.txt", "r", encoding="utf-8") as maatextfile:
                     for line in maatextfile:
                         if len(line) > 1:
@@ -660,10 +673,13 @@ class windowClass(wx.Frame):
                             if lineparts.__contains__("{}".format(tagi)):
                                 lyhenne = lineparts.rsplit(' ')[0].replace(',', "")
                                 self.maalajiarvoteksti.SetLabelText(lyhenne)
+                                self.linepanelille("{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(),
+                                                                             self.data.syvyys))
                 self.config.read("USECONTROL.ini")
                 os.chdir(self.config["DEFAULT"]["polku"])
                 with open("{}.txt".format(self.data.hanke), 'a') as hanketextfile:
-                    hanketextfile.write("\n" + "{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(), self.data.syvyys))
+                    hanketextfile.write("\n" + "{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(),
+                                                                         self.data.syvyys))
                     os.chdir(self.data.root)
                     maatextfile.close()
                     hanketextfile.close()
@@ -803,11 +819,13 @@ class TiedonKasittely(object):
 
     # luodaan piste käyttäjän antamalla nimellä
     def iluopiste(self, hanke):
-        pistenimi = wx.TextEntryDialog(None, "Anna hankkeen {} uudelle pisteelle nimi".format(hanke),
-                                       "Uuden pisteen luonti hankkeelle {}".format(hanke))
+        pistenimi = wx.TextEntryDialog(None, "Työn nimi",
+                                       "Uuden työn luonti hankkeelle {}".format(hanke))
+
         if pistenimi.ShowModal() == wx.ID_OK:
             nimi = pistenimi.GetValue()
-            varmistus = wx.MessageDialog(None, "Luodaan piste {} hankkeelle {}".format(nimi, hanke)
+            pistenimi.Destroy()
+            varmistus = wx.MessageDialog(None, "Luodaan työ {} hankkeelle {}".format(nimi, hanke)
                                          , "Luodaan..", wx.YES_NO)
             luo = varmistus.ShowModal()
             if luo == wx.ID_YES:
@@ -830,8 +848,9 @@ class TiedonKasittely(object):
                 os.chdir(self.root)
                 return None
         else:
+            pistenimi.Destroy()
+            print("työtä ei luotu")
             os.chdir(self.root)
-            return None
 
     # valitaan ohjelma ohjelma-napista
     # tiedot luetaan tutkimustavat-tiedostosta
@@ -860,6 +879,8 @@ class TiedonKasittely(object):
                     if line.__contains__(ohjelmavalinta):
                         self.tutkimustapa = line[:2]
                         return line[:2]
+        else:
+            return None
 
     # valitaan luokalle maalaji listalta
     # maalajit kakkosikkunaan valitaan tekstitiedostosta ensimmäisen ikkunan
@@ -869,7 +890,11 @@ class TiedonKasittely(object):
         temp_lista = []
         maalaji = wx.SingleChoiceDialog(None, "Valitse maalaji", "Maalaji", lista,
                                            wx.CHOICEDLG_STYLE)
-        if maalaji.ShowModal() == wx.ID_OK:
+        if maalaji.ShowModal() == wx.ID_CANCEL:
+            print("maalajia ei valittu")
+            maalaji.Destroy()
+            return None
+        else:
             maalaji = maalaji.GetStringSelection()
             if maalaji == "Liejut":
                 self.asetamaalaji("Lieju")
@@ -880,6 +905,9 @@ class TiedonKasittely(object):
                     turvelaji = turvelaji.GetStringSelection()
                     self.asetamaalaji(turvelaji)
                     return None
+                else:
+                    print("Maalajia ei valittu")
+                    return None
             elif maalaji == "Muut":
                 maalaji = wx.SingleChoiceDialog(None, "Valitse maalaji", "Muut maat", ['TÄYTEMAA', 'KIVI', 'LOHKARE',
                                                                                        'LAPIPOR.LOHK', 'KALLIO', 'VESI',
@@ -887,6 +915,13 @@ class TiedonKasittely(object):
                 if maalaji.ShowModal() == wx.ID_OK:
                     maalaji = maalaji.GetStringSelection()
                     self.asetamaalaji(maalaji)
+                    return None
+                elif maalaji.ShowModal() == wx.ID_CANCEL:
+                    print("Maalajia ei valittu")
+                    maalaji.Destroy()
+                    return None
+                else:
+                    print("Maalajia ei valittu")
                     return None
             else:
                 maalaji = maalaji.lower()
@@ -904,12 +939,19 @@ class TiedonKasittely(object):
                     maalista.append(parsittu)
                 maatyyppi = wx.SingleChoiceDialog(None, "Valitse maatyyppi", "{}".format(maalaji),
                                                   maalista, wx.CHOICEDLG_STYLE)
+
                 if maatyyppi.ShowModal() == wx.ID_OK:
                     maatyyppi = maatyyppi.GetStringSelection()
                     self.asetamaalaji(maatyyppi)
                     return None
-        else:
-            return None
+                elif maatyyppi == wx.ID_CANCEL:
+                    print("Maalajia ei valittu")
+                    maatyyppi.Destroy()
+                    return None
+                else:
+                    print("Maalajia ei valittu")
+                    maatyyppi.Destroy()
+                    return None
 
 
     # luetaan tiedot tekstitiedostosta, mockup communication listenistä
@@ -986,6 +1028,11 @@ class TiedonKasittely(object):
                     if lineparts[0] == "#KAIRAUS":
                         print("KAIRAUS")
                         self.gui.vaihdatankovari('green')
+
+
+                    if lineparts[0] == "#ALKUTILA":
+                        print("ALKUTILA")
+                        self.gui.vaihdatankovari('red')
 
 
                     #NAPIT KKS:LTA MITÄ IKINÄ TULEEKAAN --> TÄHÄN
@@ -1100,6 +1147,7 @@ class TiedonKasittely(object):
             if muokattava == "TUTKIMUSTIEDOT":
                 self.itutkimusheader()
         else:
+            print("Tietoja ei muutettu")
             return None
 
     def ihankeheader(self):
@@ -1108,26 +1156,38 @@ class TiedonKasittely(object):
                                     self.config["DEFAULT"]["FO"])
         if uusifo.ShowModal() == wx.ID_OK:
             uusifo = uusifo.GetValue()
+        else:
+            return None
 
         uusikj = wx.TextEntryDialog(None, "KJ", "HANKETIEDOT",
                                     self.config["DEFAULT"]["KJ"])
+
         if uusikj.ShowModal() == wx.ID_OK:
             uusikj = uusikj.GetValue()
+        else:
+            return None
 
         uusiom = wx.TextEntryDialog(None, "OM", "HANKETIEDOT",
                                     self.config["DEFAULT"]["OM"])
+
         if uusiom.ShowModal() == wx.ID_OK:
             uusiom = uusiom.GetValue()
+        else:
+            return None
 
         uusiml = wx.TextEntryDialog(None, "ML", "HANKETIEDOT",
                                     self.config["DEFAULT"]["ML"])
         if uusiml.ShowModal() == wx.ID_OK:
             uusiml = uusiml.GetValue()
+        else:
+            return None
 
         uusiorg = wx.TextEntryDialog(None, "ORG", "HANKETIEDOT",
                                      self.config["DEFAULT"]["ORG"])
         if uusiorg.ShowModal() == wx.ID_OK:
             uusiorg = uusiorg.GetValue()
+        else:
+            return None
 
         #sa = saving.Saving()
         sa.asetaHanketiedot(uusifo, uusikj, uusiml, uusiom, uusiorg)
@@ -1138,16 +1198,22 @@ class TiedonKasittely(object):
                                     self.config["DEFAULT"]["TY"])
         if uusity.ShowModal() == wx.ID_OK:
             uusity = uusity.GetValue()
+        else:
+            return None
 
         uusipk = wx.TextEntryDialog(None, "PK", "PISTETIEDOT",
                                     self.config["DEFAULT"]["PK"])
         if uusipk.ShowModal() == wx.ID_OK:
             uusipk = uusipk.GetValue()
+        else:
+            return None
 
         uusila = wx.TextEntryDialog(None, "LA", "PISTETIEDOT",
                                     self.config["DEFAULT"]["LA"])
         if uusila.ShowModal() == wx.ID_OK:
             uusila = uusila.GetValue()
+        else:
+            return None
 
         #sa = saving.Saving()
         sa.asetaPistetiedot(uusity, uusipk, uusila)
@@ -1158,21 +1224,29 @@ class TiedonKasittely(object):
                                     self.config["DEFAULT"]["TT"])
         if uusitt.ShowModal() == wx.ID_OK:
             uusitt = uusitt.GetValue()
+        else:
+            return None
 
         uusitx = wx.TextEntryDialog(None, "TX", "TUTKIMUSTIEDOT",
                                     self.config["DEFAULT"]["TX"])
         if uusitx.ShowModal() == wx.ID_OK:
             uusitx = uusitx.GetValue()
+        else:
+            return None
 
         uusixy = wx.TextEntryDialog(None, "XY", "TUTKIMUSTIEDOT",
                                     self.config["DEFAULT"]["XY"])
         if uusixy.ShowModal() == wx.ID_OK:
             uusixy = uusixy.GetValue()
+        else:
+            return None
 
         uusiln = wx.TextEntryDialog(None, "LN", "TUTKIMUSTIEDOT",
                                         self.config["DEFAULT"]["LN"])
         if uusiln.ShowModal() == wx.ID_OK:
             uusiln = uusiln.GetValue()
+        else:
+            return None
 
         #sa = saving.Saving()
         sa.asetaTutkimustiedot(uusitt, uusitx, uusixy, uusiln)
