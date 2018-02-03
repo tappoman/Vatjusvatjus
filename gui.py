@@ -570,15 +570,30 @@ class windowClass(wx.Frame):
             return None
 
     def graafinpiirto(self, event):
-        # if ba.fig == None:
-        #     graafi.show()
-        #ba.main(self.data)
-        #print("lululu noob noob")
+        if self.data.hanke == None:
+            varoitus = wx.MessageDialog(None, "Valitse ensin hanke ja piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
+            varoitus.ShowModal()
+            varoitus.Destroy()
+        if self.graphbutton.GetLabelText() =="Piirto":
+            self.graphbutton.SetLabelText("Tekla")
+            for i in range(20):
+                line = ""
+                new_text = wx.StaticText(self.scrolled_panel, -1, line, size=(550, 30))
+                self.spSizer.Add(new_text)
+                self.scrolled_panel.ScrollLines(10)
+                self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
+                self.scrolled_panel.Layout()
+                self.scrolled_panel.Refresh()
+            # luodaan piirto-olio ja passataan meidän scrollipaneli sille
+            self.piirto = CanvasPanel(self.scrolled_panel)
+            self.piirto.draw()
 
+        elif self.graphbutton.GetLabelText() == "Tekla":
+            self.graphbutton.SetLabelText("Piirto")
+            self.pistetiedotpaneelille()
+        else:
+            return None
 
-        #luodaan piirto-olio ja passataan meidän scrollipaneli sille
-        self.piirto = CanvasPanel(self.scrolled_panel)
-        self.piirto.draw()
 
     def valitseohjelma(self, event):
         if self.hankenimiteksti.GetLabel() == ">hankkeen nimi<":
@@ -690,7 +705,7 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        self.kks = Kksoperations()
+        #self.kks = Kksoperations()
         self.sa = Saving()
         self.gui = gui
 
