@@ -28,6 +28,8 @@ class CanvasPanel(wx.Panel):
         #plt.ion()
 
         self.axes = self.figure.add_subplot(111)
+        plt.axes(xlim=(-120, 150), ylim=(0, 5))
+        plt.subplots_adjust(left=0.12, bottom=0.12, wspace=0.2, hspace=0.2)
 
         self.canvas = FigureCanvas(self, -1, self.figure)
         self.sizer = wx.BoxSizer(wx.VERTICAL)
@@ -82,13 +84,15 @@ class CanvasPanel(wx.Panel):
 
                             print(self.syvyys, " : ", self.x1, " : ", self.x2)
 
-                            plt.barh(float(self.syvyys), width=float(self.x1), height=1, color='b')
-                            plt.barh(float(self.syvyys), width=-float(self.x2), height=1, color='g')
+                            plt.barh(float(self.syvyys), width=float(self.x1),
+                                     height=0.1, linewidth=1, color='b', edgecolor='k')
+                            plt.barh(float(self.syvyys), width=-float(self.x2),
+                                     height=0.1, linewidth=1, color='g', edgecolor='k')
 
                             self.figure.canvas.draw()
 
-
-
+    def addValues(self, syvyys, voima, puolikierrokset):
+        pass
 
 
 
