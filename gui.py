@@ -963,10 +963,16 @@ class TiedonKasittely(object):
                         self.arvot[0] = str(self.apu)
                         self.TAL = "\t" + "\t" .join(self.arvot)
 
-                        self.gui.linepanelille(self.TAL)
+                        #paivitetaan arvot piirtajalle. PITAISI OLLA LUOTU;PAINETTU NAPPIA PIIRTO KOSKA LUODAAN VASTA SILLOIN
+                        if self.gui.graphbutton.GetLabelText() == "Tekla":
+                            self.gui.piirto.setValues(self.hanke, self.piste)
+                            self.gui.piirto.draw()
+                        else:
+                            #paivitetaan paneeli
+                            # paivitetaan arvot scrollipanelille.
+                            self.gui.linepanelille(self.TAL)
+                            self.gui.scrolled_panel.Refresh()
 
-                        #kutsutaan piirtäjää ja passataan tiedot sinne --> suoraan vaiko parserin kautta?
-                        #Taidetaan tehdä piirto suoraan filesta
 
                     if lineparts[0][:4] == "#END":
                         print("ENDI")

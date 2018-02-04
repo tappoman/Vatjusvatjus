@@ -195,6 +195,7 @@ class CanvasPanel(wx.Panel):
 
 
     def draw(self):
+        self.figure.canvas.draw()
         #DATA
         #t = arange(0.0, 3.0, 0.01)
         #s = sin(2 * pi * t)
