@@ -377,7 +377,7 @@ class windowClass(wx.Frame):
                     self.config.read("USECONTROL.ini")
                     os.chdir(self.config["DEFAULT"]["polku"])
                     with open("{}.txt".format(self.data.hanke), 'a') as textfile:
-                        textfile.write("\n" + "alkukairaus ohitetaan")
+                        textfile.write("\n" + "alkukairaus ohitetaan\n")
                         textfile.close()
                     os.chdir(self.data.root)
                 else:
@@ -389,9 +389,12 @@ class windowClass(wx.Frame):
                                                     style=wx.OK)
                     alkusyvyys.Centre()
                     alkusyvyys.ShowModal()
+
                     self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
                     self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
+
                     self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
+
                     alkusyvyys.Destroy()
                     self.alkukairausbutton.SetLabelText("Lopeta\nalkukair.")
                     self.config.read("USECONTROL.ini")
@@ -568,9 +571,10 @@ class windowClass(wx.Frame):
                 self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
                 self.scrolled_panel.Layout()
                 self.scrolled_panel.Refresh()
+
             # luodaan piirto-olio ja passataan meidän scrollipaneli sille
             self.piirto = CanvasPanel(self.scrolled_panel)
-            self.piirto.getValues(self.data.hanke, self.data.piste)
+            self.piirto.setValues(self.data.hanke, self.data.piste)
             self.piirto.draw()
 
         elif self.graphbutton.GetLabelText() == "Tekla":
@@ -689,7 +693,7 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        #self.kks = Kksoperations()
+        self.kks = Kksoperations()
         self.sa = Saving()
         self.gui = gui
 
@@ -1002,6 +1006,11 @@ class TiedonKasittely(object):
                         print("ALKUTILA")
                         self.gui.vaihdatankovari('red')
 
+                    if lineparts[0] =="#STOP":
+                        print("STOPPI")
+                        self.gui.vaihdatankovari('red')
+                        #vaihda kairausnapin tila
+
 
                     #NAPIT KKS:LTA MITÄ IKINÄ TULEEKAAN --> TÄHÄN
                     if lineparts[0] == "#JOKUKOMENTO":
@@ -1087,6 +1096,7 @@ class TiedonKasittely(object):
             # print(syvyys, " syvyys")
             self.asetasyvyys(syvyys)
 
+            '''
             voima = int(arvot[1])
             # print(voima, " voima")
             self.asetavoima(voima)
@@ -1098,6 +1108,7 @@ class TiedonKasittely(object):
             nopeus = int(arvot[3])
             # print(nopeus, " nopeus")
             self.asetanopeus(nopeus)
+            '''
 
     def ihallinta(self):
         os.chdir(self.root)

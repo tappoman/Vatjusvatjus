@@ -40,17 +40,17 @@ class CanvasPanel(wx.Panel):
         #kopsattu vanhasta
         plt.gca().invert_yaxis()
         plt.axvline(0, color='k')
-        plt.ylabel("syvyys")
-        plt.xlabel('voima / puolikierrokset')
+
         #plt.subplots_adjust(left=0.12, bottom=0.12, wspace=0.2, hspace=0.2)
 
         #self.figure.gca().invert_yaxis()
 
-    def getValues(self, hanke, piste):
+    def setValues(self, hanke, piste):
         self.config.read("USECONTROL.ini")
         self.polku = self.config["DEFAULT"]["polku"]
         self.tiedosto = hanke
         self.piste = piste
+        self.tutkimustapa = ""
 
         print(self.polku, self.tiedosto, self.piste)
 
@@ -64,32 +64,122 @@ class CanvasPanel(wx.Panel):
 
         with open(self.fullpath, 'r') as textfile:
             for line in textfile:
-                #print(line)
-                if len(line) > 1:
+                #print(len(line))
+                if len(line) > 2:
                     if "ty = " in line:
+                        #Tutkitaan onko tyonumero teklassa sama kuin annetussa hankeessa ja pisteessa
                         if line.strip() == haluttupiste.strip():
-                            print("oikea TY")
+                            print("oikea TY: ", line.strip())
                             self.muisti = True
                         else:
                             self.muisti = False
-                            print("vaara TY")
+                            print("vaara TY: ", line.strip())
 
+                    #kun oikessa pisteessa
                     if self.muisti:
+                        #tutkitaan teklasta kyseisen pisteen kairaustapa
+                        if "tt = " in line:
+                            apu = line.split("=")
+                            self.tutkimustapa = str(apu[1]).strip()
+                            #print(self.tutkimustapa)
+
+                        #Splittaillaan arvot
                         lineparts = line.replace('\n', '').split('\t')
-                        if lineparts[0][:1] == "":
-                            #print(lineparts)
-                            self.syvyys = lineparts[1][:4]
-                            self.x1 = lineparts[2][:3]
-                            self.x2 = lineparts[3][:4]
 
-                            print(self.syvyys, " : ", self.x1, " : ", self.x2)
+                        #JOS PAINOKAIRAUS (PA) --> muotoillaan chart ja arvot
+                        if self.tutkimustapa == "PA":
+                            if lineparts[0][:1] == "":
+                                #print(lineparts)
+                                self.syvyys = lineparts[1][:4]
+                                self.x2 = lineparts[2][:3]
+                                self.x1 = lineparts[3][:4]
 
-                            plt.barh(float(self.syvyys), width=float(self.x1),
-                                     height=0.1, linewidth=1, color='b', edgecolor='k')
-                            plt.barh(float(self.syvyys), width=-float(self.x2),
-                                     height=0.1, linewidth=1, color='g', edgecolor='k')
+                                print(self.syvyys, " : ", self.x1, " : ", self.x2)
 
-                            self.figure.canvas.draw()
+                                plt.ylabel("syvyys")
+                                plt.xlabel('voima / puolikierrokset')
+
+                                plt.barh(float(self.syvyys), width=float(self.x1),
+                                         height=0.1, linewidth=1, color='b', edgecolor='k')
+                                plt.barh(float(self.syvyys), width=-float(self.x2),
+                                         height=0.1, linewidth=1, color='g', edgecolor='k')
+                                self.figure.canvas.draw()
+
+                        # JOS HEIJARIK (HE) --> muotoillaan chart ja arvot
+                        if self.tutkimustapa == "HE":
+                            if lineparts[0][:1] == "":
+                                # print(lineparts)
+                                self.syvyys = lineparts[1][:4]
+                                self.x2 = lineparts[2][:3]
+                                #self.x1 = lineparts[3][:4]
+
+                                print(self.syvyys, " : ", self.x2)
+
+                                plt.ylabel("syvyys")
+                                plt.xlabel('heijari / isku')
+
+                                plt.barh(float(self.syvyys), width=-float(self.x2),
+                                         height=0.1, linewidth=1, color='g', edgecolor='k')
+                                self.figure.canvas.draw()
+
+                        # JOS PORAK (PO) --> muotoillaan chart ja arvot
+                        if self.tutkimustapa == "P0":
+                            if lineparts[0][:1] == "":
+                                # print(lineparts)
+                                self.syvyys = lineparts[1][:4]
+                                self.x2 = lineparts[2][:3]
+                                #self.x1 = lineparts[3][:4]
+
+                                print(self.syvyys, " : ", self.x2)
+
+                                plt.ylabel("syvyys")
+                                plt.xlabel('aika')
+
+                                plt.barh(float(self.syvyys), width=-float(self.x2),
+                                         height=0.1, linewidth=1, color='g', edgecolor='k')
+                                self.figure.canvas.draw()
+
+                        # JOS TARYK (TK) --> muotoillaan chart ja arvot
+                        #vain syvyytta, miten muotoillaan etta nakyy selkeästi
+                        if self.tutkimustapa == "TR":
+                            if lineparts[0][:1] == "":
+                                # print(lineparts)
+                                self.syvyys = lineparts[1][:4]
+                                self.x2 = -1
+                                self.x1 = 1
+
+                                print(self.syvyys, " : ", self.x2)
+
+                                plt.ylabel("syvyys")
+                                plt.xlabel('')
+
+                                plt.barh(float(self.syvyys), width=float(self.x1),
+                                         height=0.1, linewidth=1, color='b', edgecolor='k')
+
+                                plt.barh(float(self.syvyys), width=-float(self.x2),
+                                         height=0.1, linewidth=1, color='g', edgecolor='k')
+                                self.figure.canvas.draw()
+
+                        # JOS PURISTIHEIJARI (PH) --> muotoillaan chart ja arvot
+                        # Vaikuttaisi tulevan vain yksi arvo #TAL sanomassa = syvyys
+                        if self.tutkimustapa == "PH":
+                            if lineparts[0][:1] == "":
+                                # print(lineparts)
+                                self.syvyys = lineparts[1][:4]
+                                self.x2 = -1
+                                self.x1 = 1
+
+                                print(self.syvyys, " : ", self.x2)
+
+                                plt.ylabel("syvyys")
+                                plt.xlabel('')
+                                plt.barh(float(self.syvyys), width=float(self.x1),
+                                         height=0.1, linewidth=1, color='b', edgecolor='k')
+
+                                plt.barh(float(self.syvyys), width=-float(self.x2),
+                                         height=0.1, linewidth=1, color='g', edgecolor='k')
+                                self.figure.canvas.draw()
+
 
     def addValues(self, syvyys, voima, puolikierrokset):
         pass

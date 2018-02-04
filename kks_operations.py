@@ -151,7 +151,7 @@ class Kksoperations (object):
 
     def annaKanavanTieto(self, kanava):
         """palauttaa kanavan tiedon: #AN1:2567:2222"""
-        self.com.setCommand("?AN", kanava,"D:")
+        self.com.setCommand("AN", kanava,"D:")
         #return "#AN1:2567:2222"
 
 
