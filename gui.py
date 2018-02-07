@@ -855,7 +855,6 @@ class TiedonKasittely(object):
                     file.write("\nml = "+self.config["DEFAULT"]["ml"])
                     file.write("\norg = "+self.config["DEFAULT"]["org"])
                     file.close()
-                    #self.ituhoatempconfig()
                     os.chdir(self.root)
             else:
                 os.chdir(self.root)
@@ -950,6 +949,8 @@ class TiedonKasittely(object):
                 file.write("\nln = " + self.config["DEFAULT"]["ln"] + "\n")
                 file.close()
                 self.ituhoatempconfig()
+                self.syvyys = 0
+                self.alkusyvyys = 0
                 os.chdir(self.root)
             else:
                 os.chdir(self.root)
