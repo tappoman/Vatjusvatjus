@@ -81,6 +81,7 @@ class windowClass(wx.Frame):
         self.pistebutton = wx.Button(panel, label="valitse piste/\nluo uusi piste", pos=(120, 10), size=(110, 110))
         self.pistebutton.SetFont(font1)
         self.pistebutton.Bind(wx.EVT_BUTTON, self.pisteenavaus)
+        self.pistebutton.Disable()
 
         # tutkimus-tapa
         #
@@ -99,6 +100,7 @@ class windowClass(wx.Frame):
         self.maalajibutton = wx.Button(panel, label="Maalaji", pos=(465, 10), size=(110, 110))
         self.maalajibutton.SetFont(font1)
         self.maalajibutton.Bind(wx.EVT_BUTTON, self.valitsemaalaji)
+        self.maalajibutton.Disable()
 
         # hae
         # communications listenerin mockup
@@ -117,19 +119,21 @@ class windowClass(wx.Frame):
         self.graphbutton = wx.Button(panel, label="Piirto", pos=(10, 215), size=(100, 100))
         self.graphbutton.SetFont(font1)
         self.graphbutton.Bind(wx.EVT_BUTTON, self.graafinpiirto)
+        self.graphbutton.Disable()
 
         # alkukairaus
         # käyttäjä valitsee kairaustyypin ja alkusyvyyden, joka lähetetään kkssälle
         self.alkukairausbutton = wx.Button(panel, label="Alku\nkairaus", pos=(120, 215), size=(100,100))
         self.alkukairausbutton.SetFont(font1)
         self.alkukairausbutton.Bind(wx.EVT_BUTTON, self.aloitaalkukairaus)
-
+        self.alkukairausbutton.Disable()
         # kairauksen lopetus
         # käyttäjä valitsee lopetussyyn
         # tiedot kkssälle
         self.lopetusbutton = wx.Button(panel, label="Aloita\nkairaus", pos=(400, 215), size=(100,100))
         self.lopetusbutton.SetFont(font1)
         self.lopetusbutton.Bind(wx.EVT_BUTTON, self.lopetakairaus)
+        self.lopetusbutton.Disable()
 
         # tankobutton
         # heilutellaan sitä tankoa
@@ -137,6 +141,7 @@ class windowClass(wx.Frame):
         self.tankobutton = wx.Button(panel, label="Tanko", pos=(500, 215), size=(75, 75))
         self.tankobutton.SetFont(font1)
         self.tankobutton.Bind(wx.EVT_BUTTON, self.tanko)
+        self.tankobutton.Disable()
 
         # tietotekstien alustus
         self.hanketeksti = wx.StaticText(panel, -1, "Hanke: ", pos=(10, 120))
@@ -263,7 +268,7 @@ class windowClass(wx.Frame):
             self.voimateksti.SetLabelText("H / I")
             self.voimaarvoteksti.SetLabelText("H")
             self.puolikierroksetteksti.SetLabelText("")
-            self.puolikierroksetarvoteksti.SetLabel("")
+            self.puolikierroksetarvoteksti.SetLabelText("")
             self.nopeusteksti.SetLabelText("")
             self.nopeusarvoteksti.SetLabelText("")
 
@@ -305,6 +310,7 @@ class windowClass(wx.Frame):
             self.data.iavaahanke()
             try:
                 self.hankenimiteksti.SetLabelText(self.data.hanke)
+                self.pistebutton.Enable()
             except TypeError:
                 print("Hanketta ei avattu")
 
@@ -334,6 +340,9 @@ class windowClass(wx.Frame):
             '''
             self.update(event)
             self.timer.Start(50)
+            self.graphbutton.Enable()
+            self.alkukairausbutton.Enable()
+            self.maalajibutton.Enable()
             '''
             else:
                 self.pistetiedotpaneelille()
@@ -364,6 +373,9 @@ class windowClass(wx.Frame):
             warning.Destroy()
         elif self.alkukairausbutton.GetLabelText()=="Lopeta\nalkukair.":
             self.data.kks.lopetaAlkukairaus()
+            self.lopetusbutton.Enable()
+            self.alkukairausbutton.Enable()
+            self.tankobutton.Enable()
             self.alkukairausbutton.SetLabelText("Alku\nkairaus")
 
         else:
@@ -381,6 +393,8 @@ class windowClass(wx.Frame):
             if kairausvalinta.ShowModal() == wx.ID_OK:
                 kairausvalinta = kairausvalinta.GetStringSelection()
                 if kairausvalinta == "OHITETAAN":
+                    self.lopetusbutton.Enable()
+                    self.tankobutton.Enable()
                     self.data.kks.aloitaOdotustila()
 
                     self.data.kks.asetaKairaussyvyys("0")
@@ -434,6 +448,8 @@ class windowClass(wx.Frame):
             warning.Destroy()
         elif self.lopetusbutton.GetLabel() == "Lopeta\nkairaus":
             self.data.kks.lopetaKairaus()
+            self.alkukairausbutton.Enable()
+            self.tankobutton.Enable()
             self.vaihdatankovari('red')
             os.chdir(self.data.root)
             z = []
@@ -542,7 +558,6 @@ class windowClass(wx.Frame):
             print("Kommenttia ei kirjoitettu")
             return None
 
-
     def tanko(self, event):
         self.data.kks.kuittaaTanko()
         return None
@@ -594,14 +609,23 @@ class windowClass(wx.Frame):
 
     # päivittää tekstipaneelin yläpuolella olevat arvotekstit com-listenerin tietojen mukaan
     def updatepistearvot(self, data):
-        #print("uppaaa!!!!")
-        self.voimaarvoteksti.SetLabelText(str(data.voima))
-        self.puolikierroksetarvoteksti.SetLabelText(str(data.puolikierrokset))
-        self.nopeusarvoteksti.SetLabelText(str(data.nopeus))
-        if self.data.alkusyvyys != 0:
+        if self.data.tutkimustapa == "PA":
+            self.voimaarvoteksti.SetLabelText(str(data.voima))
+            self.puolikierroksetarvoteksti.SetLabelText(str(data.puolikierrokset))
+            self.nopeusarvoteksti.SetLabelText(str(data.nopeus))
             self.syvyysarvoteksti.SetLabelText(str(data.syvyys))
-        else:
+        elif self.data.tutkimustapa == "HE":
             self.syvyysarvoteksti.SetLabelText(str(data.syvyys))
+            self.voimaarvoteksti.SetLabelText(str(data.voima))
+        elif self.data.tutkimustapa == "PO":
+            self.syvyysarvoteksti.SetLabelText(str(data.syvyys))
+            self.voimaarvoteksti.SetLabelText(str(data.voima))
+        elif self.data.tutkimustapa == "TR":
+            self.syvyysarvoteksti.SetLabelText(str(data.syvyys))
+        elif self.data.tutkimustapa == "PH":
+            self.syvyysarvoteksti.SetLabelText(str(data.syvyys))
+            self.voimaarvoteksti.SetLabelText(str(data.voima))
+            self.puolikierroksetarvoteksti.SetLabelText(str(data.puolikierrokset))
 
     # kirjoittaa tekstipaneelille uuden elementin data-luokan tiedoista
     def listenerupdate(self, data):
@@ -663,6 +687,7 @@ class windowClass(wx.Frame):
 
     def valitseohjelma(self, event):
         if self.hankenimiteksti.GetLabel() == "":
+
             varoitus = wx.MessageDialog(None, "Valitse ensin hanke ja piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             varoitus.ShowModal()
             varoitus.Destroy()
@@ -771,13 +796,14 @@ class TiedonKasittely(object):
         self.oldline = ""
 
         self.com = Communication()
+        '''
         self.comcheck = self.com.openConnection()
         if not self.comcheck:
             warning = wx.MessageDialog(None, "TARKASTA COM-PORTTI", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             warning.ShowModal()
             warning.Destroy()
             sys.exit(0)
-
+        '''
         self.kks = Kksoperations(self.com)
         self.sa = Saving()
         self.gui = gui
