@@ -545,7 +545,7 @@ class windowClass(wx.Frame):
                             syvyysindex = tiedosto[syvyyshead]
                             if syvyysindex.strip("\t").__contains__(syvyysvalinta.strip("\t")):
                                 tiedosto.insert(syvyyshead+1, "HM {}\n".format(huomautus))
-                                self.linepanelille("HM {}\n".format(huomautus))
+                                #self.linepanelille("HM {}\n".format(huomautus))
                                 file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "w")
                                 for i in tiedosto:
                                     file.write(i)
@@ -795,7 +795,6 @@ class TiedonKasittely(object):
         self.tutkimustapa = tutkimustapa
 
         self.oldline = ""
-
         self.com = Communication()
 
         self.comcheck = self.com.openConnection()
@@ -804,8 +803,9 @@ class TiedonKasittely(object):
             warning.ShowModal()
             warning.Destroy()
             sys.exit(0)
-
+        
         self.kks = Kksoperations(self.com)
+        '''
         self.sa = Saving()
         self.gui = gui
 
@@ -934,6 +934,7 @@ class TiedonKasittely(object):
 
     def iparsipiste(self, pistenimi):
         pistedata = []
+        alku = 0
         self.config.read("USECONTROL.ini")
         os.chdir(self.config["DEFAULT"]["polku"])
         file = open("{}.txt".format(self.hanke), "r")
@@ -950,25 +951,26 @@ class TiedonKasittely(object):
                 pistedata.append(line)
             if line.__contains__("org"):
                 pistedata.append(line)
-            if line.__contains__("ty = {}".format(pistenimi)):
-                pistedata.append(line)
-                alku = tiedosto.index(line) + 1
-                while alku < len(tiedosto):
-                    linepartindex = tiedosto[alku]
-                    if linepartindex[0:2] == ("ty"):
-                        break
-                    else:
-                        pistedata.append(linepartindex)
-                        alku = alku + 1
-        self.piste = pistenimi
-
-        self.gui.linepanelille("")
-        for i in pistedata:
-            self.gui.linepanelille(i)
-        self.gui.pistenimiteksti.SetLabel(pistenimi.strip())
-        self.gui.graphbutton.SetLabelText("Piirto")
-        os.chdir(self.root)
-        return None
+            if alku == 0:
+                if line.__contains__("ty = {}".format(pistenimi)):
+                    pistedata.append(line)
+                    alku = tiedosto.index(line) + 1
+                    while alku < len(tiedosto):
+                        linepartindex = tiedosto[alku]
+                        if linepartindex[0:2] == ("ty"):
+                            break
+                        else:
+                            pistedata.append(linepartindex)
+                            alku = alku + 1
+            else:
+                self.piste = pistenimi
+                self.gui.linepanelille("")
+                for i in pistedata:
+                    self.gui.linepanelille(i)
+                self.gui.pistenimiteksti.SetLabel(pistenimi.strip())
+                self.gui.graphbutton.SetLabelText("Piirto")
+                os.chdir(self.root)
+                return None
 
     # luodaan piste käyttäjän antamalla nimellä
     def iluopiste(self, hanke):
