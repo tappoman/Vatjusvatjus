@@ -495,7 +495,6 @@ class windowClass(wx.Frame):
                 break
             else:
                 syvyyslista.append(rivi)
-
         syvyyslista.reverse()
 
         for s in syvyyslista:
@@ -506,9 +505,6 @@ class windowClass(wx.Frame):
 
         for i in parsilista:
             if len(printtilista) < len(syvyyslista):
-                #if i.__contains__("HM"):
-                    #continue
-                #else:
                     printtilista.append(i[0])
 
         syvyysvalinta = wx.SingleChoiceDialog(None, "Valitse syvyys", "Kirjoita huomautus",
@@ -658,7 +654,6 @@ class windowClass(wx.Frame):
             #self.pistetiedotpaneelille()
         else:
             return None
-
 
     def valitseohjelma(self, event):
         if self.hankenimiteksti.GetLabel() == "":
@@ -900,7 +895,17 @@ class TiedonKasittely(object):
         tiedosto = file.readlines()
         file.close()
         for line in tiedosto:
-            if line.__contains__(pistenimi):
+            if line.__contains__("fo"):
+                pistedata.append(line)
+            if line.__contains__("kj"):
+                pistedata.append(line)
+            if line.__contains__("om"):
+                pistedata.append(line)
+            if line.__contains__("ml"):
+                pistedata.append(line)
+            if line.__contains__("org"):
+                pistedata.append(line)
+            if line.__contains__("ty = {}".format(pistenimi)):
                 pistedata.append(line)
                 alku = tiedosto.index(line) + 1
                 while alku < len(tiedosto):
@@ -910,8 +915,8 @@ class TiedonKasittely(object):
                     else:
                         pistedata.append(linepartindex)
                         alku = alku + 1
-        self.gui.linepanelille("")
-        self.gui.linepanelille("")
+        self.piste = pistenimi
+
         self.gui.linepanelille("")
         for i in pistedata:
             self.gui.linepanelille(i)
@@ -951,6 +956,7 @@ class TiedonKasittely(object):
                 self.ituhoatempconfig()
                 self.syvyys = 0
                 self.alkusyvyys = 0
+                self.iparsipiste(self.piste)
                 os.chdir(self.root)
             else:
                 os.chdir(self.root)
@@ -1067,7 +1073,6 @@ class TiedonKasittely(object):
                     print("Maalajia ei valittu")
                     maatyyppi.Destroy()
                     return None
-
 
     # luetaan tiedot tekstitiedostosta, mockup communication listenistä
     def ikuuntele(self, event):
