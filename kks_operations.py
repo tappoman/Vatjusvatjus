@@ -21,7 +21,7 @@ import queue
 
 class Kksoperations (object):
 
-    def __init__(self):
+    def __init__(self, com=None):
 
         """Thread for KKS-reader
         # lck = threading.Lock()
@@ -33,8 +33,8 @@ class Kksoperations (object):
         #result = que.get()
         #print(result)"""
 
-        #self.com = com
-        self.com = Communication()
+        self.com = com
+        #self.com = Communication()
         self.t1 = threading.Thread(target=self.com.readValues)
         self.t1.start()
 
@@ -203,7 +203,7 @@ class Kksoperations (object):
 
     """"MITTAUKSEN ODOTUSTILA"""
     def asetaKairaussyvyys(self, syvyys):
-        self.com.setCommand("SYVYYS:" + syvyys)
+        self.com.setCommand("SYVYYS:" + str(syvyys))
         #return "#1"
 
     def aloitaKairaus(self):

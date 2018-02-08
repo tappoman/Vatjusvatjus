@@ -28,14 +28,23 @@ class Communication (object):
         self.hands = self._config["DEFAULT"]["hands"]
         self.stopbits = int(self._config["DEFAULT"]["stopbits"])
         self.bytesize = int(self._config["DEFAULT"]["bytesize"])
+        #self.ser = serial.Serial()
+        #try:
+            #self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, bytesize=self.bytesize, parity=self.hands, stopbits=self.stopbits, timeout=2)
+        #except (FileNotFoundError, serial.serialutil.SerialException):
+            #print("Serial Connection Problem")
+            #closeConnection()
+            #sys.exit(0)
+
+    def openConnection(self):
         try:
             self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, bytesize=self.bytesize, parity=self.hands, stopbits=self.stopbits, timeout=2)
+            return True
         except (FileNotFoundError, serial.serialutil.SerialException):
-            #TÄHÄN HUUTELUA GUILLE KUN PORTTI KUSEE
-
             print("Serial Connection Problem")
-            closeConnection()
+            return False
             sys.exit(0)
+
 
     def closeConnection(self):
         self.keep_running = False

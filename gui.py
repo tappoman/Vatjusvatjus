@@ -19,7 +19,7 @@ from saving import *
 from kks_operations import *
 from piirto import *
 
-# import communication
+import communication
 # import guioperations
 # import threading
 # import serial
@@ -34,6 +34,7 @@ class windowClass(wx.Frame):
         self.Centre()
         self.basicGUI()
         self.data = TiedonKasittely(gui=self)
+
         #self.timer = wx.Timer(self)
         #self.Bind(wx.EVT_TIMER, self.data.ikuuntele, self.timer)
         self.config = configparser.ConfigParser()
@@ -362,7 +363,7 @@ class windowClass(wx.Frame):
             warning.ShowModal()
             warning.Destroy()
         elif self.alkukairausbutton.GetLabelText()=="Lopeta\nalkukair.":
-            self.data.kks.aloitaOdotustila()
+            self.data.kks.lopetaAlkukairaus()
             self.alkukairausbutton.SetLabelText("Alku\nkairaus")
 
         else:
@@ -403,7 +404,9 @@ class windowClass(wx.Frame):
                     self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
 
                     self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
+                    print(alkusyvyys.GetValue())
                     self.data.kks.lopetaAlkukairaus()
+
                     #self.data.kks.aloitaOdotustila()
 
                     alkusyvyys.Destroy()
@@ -462,6 +465,7 @@ class windowClass(wx.Frame):
                 return None
         else:
             self.lopetusbutton.SetLabel("Lopeta\nkairaus")
+            self.data.kks.asetaKairaussyvyys(self.data.alkusyvyys)
             self.data.kks.aloitaKairaus()
             print("kuunnellaan kks")
 
@@ -595,7 +599,7 @@ class windowClass(wx.Frame):
         self.puolikierroksetarvoteksti.SetLabelText(str(data.puolikierrokset))
         self.nopeusarvoteksti.SetLabelText(str(data.nopeus))
         if self.data.alkusyvyys != 0:
-            self.syvyysarvoteksti.SetLabelText(str(data.syvyys+data.alkusyvyys))
+            self.syvyysarvoteksti.SetLabelText(str(data.syvyys))
         else:
             self.syvyysarvoteksti.SetLabelText(str(data.syvyys))
 
@@ -766,9 +770,20 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        self.kks = Kksoperations()
+        self.com = Communication()
+        self.comcheck = self.com.openConnection()
+        if not self.comcheck:
+            warning = wx.MessageDialog(None, "TARKASTA COM-PORTTI", "Varoitus", wx.OK | wx.ICON_INFORMATION)
+            warning.ShowModal()
+            warning.Destroy()
+            sys.exit(0)
+
+        self.kks = Kksoperations(self.com)
         self.sa = Saving()
         self.gui = gui
+
+
+
 
     def palautatutkimustapa(self):
         return self.tutkimustapa
