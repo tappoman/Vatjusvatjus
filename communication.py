@@ -21,7 +21,6 @@ sa = Saving()
 class Communication (object):
 
     def __init__(self):
-
         self._config = configparser.ConfigParser()
         self._config.read("USECONTROL.ini")
         self.port = self._config["DEFAULT"]["port"]
@@ -32,6 +31,8 @@ class Communication (object):
         try:
             self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, bytesize=self.bytesize, parity=self.hands, stopbits=self.stopbits, timeout=2)
         except (FileNotFoundError, serial.serialutil.SerialException):
+            #TÄHÄN HUUTELUA GUILLE KUN PORTTI KUSEE
+
             print("Serial Connection Problem")
             closeConnection()
             sys.exit(0)

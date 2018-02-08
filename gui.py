@@ -11,7 +11,6 @@ wx.lib.scrolledpanel
 import wx
 import os
 import wx.lib.scrolledpanel as scrolled
-import bar_animation as ba
 import re
 import configparser
 import shutil
@@ -35,7 +34,6 @@ class windowClass(wx.Frame):
         self.Centre()
         self.basicGUI()
         self.data = TiedonKasittely(gui=self)
-        self.ba = ba
         #self.timer = wx.Timer(self)
         #self.Bind(wx.EVT_TIMER, self.data.ikuuntele, self.timer)
         self.config = configparser.ConfigParser()
@@ -383,6 +381,8 @@ class windowClass(wx.Frame):
                 kairausvalinta = kairausvalinta.GetStringSelection()
                 if kairausvalinta == "OHITETAAN":
                     self.data.kks.aloitaOdotustila()
+
+                    self.data.kks.asetaKairaussyvyys("0")
                     self.config.read("USECONTROL.ini")
                     os.chdir(self.config["DEFAULT"]["polku"])
                     with open("{}.txt".format(self.data.hanke), 'a') as textfile:
@@ -403,6 +403,8 @@ class windowClass(wx.Frame):
                     self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
 
                     self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
+                    self.data.kks.lopetaAlkukairaus()
+                    #self.data.kks.aloitaOdotustila()
 
                     alkusyvyys.Destroy()
                     self.alkukairausbutton.SetLabelText("Lopeta\nalkukair.")
@@ -764,7 +766,7 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        #self.kks = Kksoperations()
+        self.kks = Kksoperations()
         self.sa = Saving()
         self.gui = gui
 
@@ -807,6 +809,7 @@ class TiedonKasittely(object):
         os.chdir(self.config["DEFAULT"]["polku"])
         z = [nimi.replace(".txt","") for nimi in os.listdir(os.curdir) if nimi.endswith(".txt")]
         z.append("LUO UUSI HANKE")
+        z.remove("MIT_temp")
         tiedostonvalinta = wx.SingleChoiceDialog(None, "Valitse hanke", "Hankkeet", z, wx.CHOICEDLG_STYLE)
         if tiedostonvalinta.ShowModal() == wx.ID_OK:
             if tiedostonvalinta.GetStringSelection() == "LUO UUSI HANKE":
@@ -948,7 +951,7 @@ class TiedonKasittely(object):
                 file.write("\npk = " + self.config["DEFAULT"]["pk"])
                 file.write("\nla = " + self.config["DEFAULT"]["la"])
                 self.config.read("TUTKIMUSTIEDOT.ini")
-                file.write("\ntt = " + self.config["DEFAULT"]["tt"])
+                file.write("\ntt = " + tutkimustapa)
                 file.write("\ntx = " + self.config["DEFAULT"]["tx"])
                 file.write("\nxy = " + self.config["DEFAULT"]["xy"])
                 file.write("\nln = " + self.config["DEFAULT"]["ln"] + "\n")
