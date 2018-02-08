@@ -409,7 +409,7 @@ class windowClass(wx.Frame):
                         for line in textfile:
                             if line.__contains__(kairausvalinta):
                                 self.alkukairausarvoteksti.SetLabelText(line[1:3])
-                    alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys',"Alkusyvyys","",
+                    alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys sentteinä',"Alkusyvyys","",
                                                     style=wx.OK)
                     alkusyvyys.Centre()
                     alkusyvyys.ShowModal()
@@ -477,6 +477,7 @@ class windowClass(wx.Frame):
                 os.chdir(self.data.root)
                 self.linepanelille("Kairaus lopetettiin {} syvyydellä {}".format(kairausvalinta, self.data.haesyvyys()))
                 self.lopetusbutton.SetLabel("Aloita\nkairaus")
+                self.lopetusbutton.Disable()
             else:
                 return None
         else:
@@ -796,14 +797,14 @@ class TiedonKasittely(object):
         self.oldline = ""
 
         self.com = Communication()
-        '''
+
         self.comcheck = self.com.openConnection()
         if not self.comcheck:
             warning = wx.MessageDialog(None, "TARKASTA COM-PORTTI", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             warning.ShowModal()
             warning.Destroy()
             sys.exit(0)
-        '''
+
         self.kks = Kksoperations(self.com)
         self.sa = Saving()
         self.gui = gui
@@ -965,6 +966,7 @@ class TiedonKasittely(object):
         for i in pistedata:
             self.gui.linepanelille(i)
         self.gui.pistenimiteksti.SetLabel(pistenimi.strip())
+        self.gui.graphbutton.SetLabelText("Piirto")
         os.chdir(self.root)
         return None
 
@@ -1207,8 +1209,11 @@ class TiedonKasittely(object):
                     if lineparts[0] =="#STOP":
                         print("STOPPI")
                         self.gui.vaihdatankovari('red')
-                        #vaihda kairausnapin tila
+                        self.gui.lopetusbutton.SetLabel("Aloita\nkairaus")
 
+                    if lineparts[0] == "#MIT_ODOTUS":
+                        self.gui.vaihdatankovari('red')
+                        self.gui.lopetusbutton.SetLabel("Aloita\nkairaus")
 
                     #NAPIT KKS:LTA MITÄ IKINÄ TULEEKAAN --> TÄHÄN
                     if lineparts[0] == "#JOKUKOMENTO":

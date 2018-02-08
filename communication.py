@@ -57,11 +57,14 @@ class Communication (object):
         self.command = '#' + command + "\r"
         #self.ser.flushOutput()
 
-        self.ser.write(self.command.encode('UTF-8'))
-        time.sleep(.5)
+        try:
+            self.ser.write(self.command.encode('UTF-8'))
+            time.sleep(.5)
 
-        #com.readValues()
-        #return 1
+        except (KeyboardInterrupt, SystemExit, serial.serialutil.SerialException):
+
+            self.ser.close
+            sys.exit(0)
 
     def readValues(self):
 
@@ -75,7 +78,7 @@ class Communication (object):
                     sa.tallennaMIT(self.value)
                 #time.sleep(0.5)
 
-            except (KeyboardInterrupt, SystemExit):
+            except (KeyboardInterrupt, SystemExit, serial.serialutil.SerialException):
                 self.ser.close
                 sys.exit(0)
 

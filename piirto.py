@@ -81,7 +81,7 @@ class CanvasPanel(wx.Panel):
                         if "tt = " in line:
                             apu = line.split("=")
                             self.tutkimustapa = str(apu[1]).strip()
-                            #print(self.tutkimustapa)
+                            print("TUTUTKTKTKT: ", self.tutkimustapa)
 
                         #Splittaillaan arvot
                         lineparts = line.replace('\n', '').split('\t')
@@ -123,17 +123,28 @@ class CanvasPanel(wx.Panel):
                                 self.figure.canvas.draw()
 
                         # JOS PORAK (PO) --> muotoillaan chart ja arvot
-                        if self.tutkimustapa == "P0":
+                        #PORAK ANTAA DATAA MUODOSSA ['#MIT:61      0    1.7   30']
+                        #TAL KUITENKIN _AINA_ MUODOSSA ['#TAL:60      0    ']
+                        #LAITETAAN NYT SYVYYS NÄKYVIIN ARVOILLA self.x1=-1, self.x2=1
+                        if self.tutkimustapa.strip() == "P0":
+                            print(lineparts)
                             if lineparts[0][:1] == "":
-                                # print(lineparts)
+                                print(lineparts)
+                                print("pPoraklrara")
                                 self.syvyys = lineparts[1][:4]
-                                self.x2 = lineparts[2][:3]
+                                #self.x2 = lineparts[2][:3]
                                 #self.x1 = lineparts[3][:4]
+
+                                self.x1 = 10
+                                self.x2 = -10
 
                                 print(self.syvyys, " : ", self.x2)
 
                                 plt.ylabel("syvyys")
                                 plt.xlabel('aika')
+
+                                plt.barh(float(self.syvyys), width=float(self.x1),
+                                         height=0.1, linewidth=1, color='b', edgecolor='k')
 
                                 plt.barh(float(self.syvyys), width=-float(self.x2),
                                          height=0.1, linewidth=1, color='g', edgecolor='k')
@@ -141,12 +152,13 @@ class CanvasPanel(wx.Panel):
 
                         # JOS TARYK (TK) --> muotoillaan chart ja arvot
                         #vain syvyytta, miten muotoillaan etta nakyy selkeästi
+                        #TARYKAIRAUS EI ANNA TAL SANOMAA: EI VOIDA NÄYTTÄÄ
                         if self.tutkimustapa == "TR":
                             if lineparts[0][:1] == "":
                                 # print(lineparts)
                                 self.syvyys = lineparts[1][:4]
-                                self.x2 = -1
-                                self.x1 = 1
+                                self.x2 = -10
+                                self.x1 = 10
 
                                 print(self.syvyys, " : ", self.x2)
 
@@ -166,8 +178,8 @@ class CanvasPanel(wx.Panel):
                             if lineparts[0][:1] == "":
                                 # print(lineparts)
                                 self.syvyys = lineparts[1][:4]
-                                self.x2 = -1
-                                self.x1 = 1
+                                self.x2 = -10
+                                self.x1 = 10
 
                                 print(self.syvyys, " : ", self.x2)
 
