@@ -31,6 +31,7 @@ class Saving (object):
         self.tiedosto = "MIT_temp.txt"
         self.fullpath = os.path.join(self.tal_polku, self.tiedosto)
         file = open(self.fullpath, "w")
+        file.write("")
 
 
     #Määrittää tallenustiedoston kaikelle kks-laitteelta tulevalle datalle ja tallettaa sen

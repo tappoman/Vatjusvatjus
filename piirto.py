@@ -81,7 +81,7 @@ class CanvasPanel(wx.Panel):
                         if "tt = " in line:
                             apu = line.split("=")
                             self.tutkimustapa = str(apu[1]).strip()
-                            print("TUTUTKTKTKT: ", self.tutkimustapa)
+                            print("TUTKIMUSTAPA: ", self.tutkimustapa)
 
                         #Splittaillaan arvot
                         lineparts = line.replace('\n', '').split('\t')
@@ -106,7 +106,7 @@ class CanvasPanel(wx.Panel):
                                 self.figure.canvas.draw()
 
                         # JOS HEIJARIK (HE) --> muotoillaan chart ja arvot
-                        if self.tutkimustapa == "HE":
+                        elif self.tutkimustapa == "HE":
                             if lineparts[0][:1] == "":
                                 # print(lineparts)
                                 self.syvyys = lineparts[1][:4]
@@ -125,18 +125,15 @@ class CanvasPanel(wx.Panel):
                         # JOS PORAK (PO) --> muotoillaan chart ja arvot
                         #PORAK ANTAA DATAA MUODOSSA ['#MIT:61      0    1.7   30']
                         #TAL KUITENKIN _AINA_ MUODOSSA ['#TAL:60      0    ']
-                        #LAITETAAN NYT SYVYYS NÄKYVIIN ARVOILLA self.x1=-1, self.x2=1
-                        if self.tutkimustapa.strip() == "P0":
-                            print(lineparts)
+                        #LAITETAAN NYT SYVYYS NÄKYVIIN ARVOILLA self.x1=10, self.x2=10
+                        elif self.tutkimustapa == "PO":
                             if lineparts[0][:1] == "":
-                                print(lineparts)
-                                print("pPoraklrara")
                                 self.syvyys = lineparts[1][:4]
                                 #self.x2 = lineparts[2][:3]
                                 #self.x1 = lineparts[3][:4]
 
                                 self.x1 = 10
-                                self.x2 = -10
+                                self.x2 = 10
 
                                 print(self.syvyys, " : ", self.x2)
 
@@ -157,7 +154,7 @@ class CanvasPanel(wx.Panel):
                             if lineparts[0][:1] == "":
                                 # print(lineparts)
                                 self.syvyys = lineparts[1][:4]
-                                self.x2 = -10
+                                self.x2 = 10
                                 self.x1 = 10
 
                                 print(self.syvyys, " : ", self.x2)
@@ -178,7 +175,7 @@ class CanvasPanel(wx.Panel):
                             if lineparts[0][:1] == "":
                                 # print(lineparts)
                                 self.syvyys = lineparts[1][:4]
-                                self.x2 = -10
+                                self.x2 = 10
                                 self.x1 = 10
 
                                 print(self.syvyys, " : ", self.x2)
@@ -197,65 +194,5 @@ class CanvasPanel(wx.Panel):
         pass
 
 
-
-        ''' with open(self.fullpath, 'r', encoding="utf-8") as textfile:
-#           for line in textfile:
-            line = textfile.read()
-            if len(line) > 1:
-                if line is self.piste   
-                lineparts = line.replace('\n', '').split('\t')'''
-
-
     def draw(self):
         self.figure.canvas.draw()
-        #DATA
-        #t = arange(0.0, 3.0, 0.01)
-        #s = sin(2 * pi * t)
-
-        #Piirto
-        #self.axes.plot(t, s, '-b')
-
-        #x = linspace(0, 10 * pi, 100)
-        #y = sin(x)
-
-        puolikierrokset = 0
-        voima = 0
-        syvyys = 10
-        arvo = 0
-
-        #line1, = self.axes.plot(voima, syvyys, 'b-')
-
-        #line1 = self.axes.bar(syvyys, arvo, height=10, color='b')
-        #line1, = self.axes.plot(x, y, 'b-')
-
-        #for i in range(10):
-            #line1.set_ydata(sin(0.5 * x + phase))
-
-
-            #plt.barh(i, width=puolikierrokset, height=10, color='b')
-            #plt.barh(i, width=-voima, height=10, color='g')
-
-            #plt.barh(i, width=self.x1, height=10, color='b')
-            #plt.barh(i, width=-self.x2, height=10, color='g')
-
-            #self.figure.canvas.draw()
-
-            #puolikierrokset = puolikierrokset + 1
-            #voima = voima + 2
-
-            #plt.draw()
-'''
-        for phase in linspace(0, 10 * pi, 100):
-            line1.set_ydata(sin(0.5 * x + phase))
-            self.figure.canvas.draw() 
-'''
-
-'''
-if __name__ == "__main__":
-    app = wx.PySimpleApp()
-    fr = wx.Frame(None, title='test')
-    panel = CanvasPanel(fr)
-    panel.draw()
-    fr.Show()
-    app.MainLoop()
-'''
