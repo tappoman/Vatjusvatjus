@@ -107,6 +107,7 @@ class windowClass(wx.Frame):
         self.huombutton = wx.Button(panel, label="Kirjoita\nhuom", pos=(400, 125), size=(75, 75))
         self.huombutton.SetFont(font1)
         self.huombutton.Bind(wx.EVT_BUTTON, self.kommenttirivi)
+        self.huombutton.Disable()
 
         # kks koment.
         # lähettää kkssälle käyttäjän antaman komennon
@@ -296,15 +297,19 @@ class windowClass(wx.Frame):
             self.nopeusteksti.SetLabelText("P / H")
             self.nopeusarvoteksti.SetLabelText("P")
 
-
     def hankkeenavaus(self, event):
         if self.hankenimiteksti.GetLabel() != "":
-            self.data.iavaahanke()
-            self.hankenimiteksti.SetLabelText(self.data.hanke)
+            self.hankenimiteksti.SetLabelText("")
+            self.pistenimiteksti.SetLabelText("")
             self.syvyysarvoteksti.SetLabelText("")
             self.voimaarvoteksti.SetLabelText("")
             self.puolikierroksetarvoteksti.SetLabelText("")
             self.nopeusarvoteksti.SetLabelText("")
+            self.graphbutton.Disable()
+            self.alkukairausbutton.Disable()
+            self.lopetusbutton.Disable()
+            self.huombutton.Disable()
+            self.data.iavaahanke()
         else:
             self.data.iavaahanke()
             try:
@@ -317,17 +322,68 @@ class windowClass(wx.Frame):
     # avataan tekstifile, joka luetaan kunnes viimeinen pistenimi-tunnistin tulee
     # ja tämän perään jatketaan datan kirjoittamista
     def pisteenavaus(self, event):
-        if self.hankenimiteksti.GetLabel() == "":
-            warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
-            warning.ShowModal()
-            warning.Destroy()
+        self.alkukairausbutton.Disable()
+        self.lopetusbutton.Disable()
+        self.graphbutton.SetLabelText("Piirto")
+        self.graphbutton.Disable()
+        self.data.iavaapiste()
+        self.syvyysarvoteksti.SetLabelText("")
+        self.data.syvyys = 0
+        self.update(event)
+        self.timer.Start(50)
+
+    #tarkistetaan onko pisteessä mittaustietoja
+    def tarkistapiste(self):
+        piste = []
+        pistevalinta = self.pistenimiteksti.GetLabel().strip()
+        syvyyslista = []
+        printtilista = []
+        parsilista = []
+        os.chdir(self.data.config["DEFAULT"]["polku"])
+        file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "r")
+        tiedosto = file.readlines()
+        file.close()
+
+        for line in tiedosto:
+            if line.__contains__(pistevalinta):
+                piste.append(line)
+                alku = tiedosto.index(line) + 1
+                while alku < len(tiedosto):
+                    linepartindex = tiedosto[alku]
+                    if linepartindex[0:2] == ("ty"):
+                        break
+                    else:
+                        piste.append(linepartindex)
+                        alku = alku + 1
+
+        for rivi in piste[::-1]:
+            if rivi.__contains__("HM"):
+                continue
+            elif rivi == "\n":
+                continue
+            elif rivi.__contains__("ln"):
+                break
+            else:
+                syvyyslista.append(rivi)
+        syvyyslista.reverse()
+
+        for s in syvyyslista:
+            if s == "\n":
+                syvyyslista.remove(s)
+            else:
+                parsilista.append(s.rsplit(None, 3))
+
+        for i in parsilista:
+            if len(printtilista) < len(syvyyslista):
+                printtilista.append(i[0])
+
+        if printtilista == []:
+            varoitus = wx.MessageDialog(None, "Pisteessä ei ole mittaustuloksia", "Huom!")
+            varoitus.ShowModal()
+            varoitus.Destroy()
+            return None
         else:
-            self.data.iavaapiste()
-            self.update(event)
-            self.timer.Start(50)
-            self.graphbutton.Enable()
-            self.alkukairausbutton.Enable()
-            self.maalajibutton.Enable()
+            return True
 
     def aloitaalkukairaus(self, event):
         if self.hankenimiteksti.GetLabel() == "":
@@ -391,7 +447,7 @@ class windowClass(wx.Frame):
                     self.config.read("USECONTROL.ini")
                     os.chdir(self.config["DEFAULT"]["polku"])
                     with open("{}.txt".format(self.data.hanke), 'a') as textfile:
-                        textfile.write("\n" + "alkukairaus: {} syvyydellä {}".format(self.data.syvyys, kairausvalinta))
+                        textfile.write("\n" + "alkukairaus: {} syvyydellä {}\n".format(self.data.syvyys, kairausvalinta))
                         textfile.close()
                     os.chdir(self.data.root)
 
@@ -435,7 +491,7 @@ class windowClass(wx.Frame):
                 self.config.read("USECONTROL.ini")
                 os.chdir(self.config["DEFAULT"]["polku"])
                 with open("{}.txt".format(self.data.hanke), 'a') as textfile:
-                    textfile.write("\n" + "lopetus: {} syvyydellä {}".format(self.data.syvyys, kairausvalinta))
+                    textfile.write("\n" + "lopetus: {} syvyydellä {}\n".format(self.data.syvyys, kairausvalinta))
                     textfile.close()
                 os.chdir(self.data.root)
                 self.linepanelille("Kairaus lopetettiin {} syvyydellä {}".format(kairausvalinta, self.data.haesyvyys()))
@@ -450,56 +506,19 @@ class windowClass(wx.Frame):
             print("kuunnellaan kks")
 
     def kommenttirivi(self, event):
-        piste = []
-        pistevalinta = self.pistenimiteksti.GetLabel().strip()
-        syvyyslista = []
-        printtilista = []
-        parsilista = []
+
         os.chdir(self.data.config["DEFAULT"]["polku"])
         file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "r")
         tiedosto = file.readlines()
         file.close()
+        pistevalinta = self.pistenimiteksti.GetLabel()
 
-        for line in tiedosto:
-            if line.__contains__(pistevalinta):
-                piste.append(line)
-                alku = tiedosto.index(line)+1
-                while alku < len(tiedosto):
-                    linepartindex = tiedosto[alku]
-                    if linepartindex[0:2] == ("ty"):
-                        break
-                    else:
-                        piste.append(linepartindex)
-                        alku = alku + 1
-
-        for rivi in piste[::-1]:
-            if rivi.__contains__("HM"):
-                continue
-            elif rivi == "\n":
-                continue
-            elif rivi.__contains__("ln"):
-                break
-            else:
-                syvyyslista.append(rivi)
-        syvyyslista.reverse()
-
-        for s in syvyyslista:
-            if s == "\n":
-                syvyyslista.remove(s)
-            else:
-                parsilista.append(s.rsplit(None,3))
-
-        for i in parsilista:
-            if len(printtilista) < len(syvyyslista):
-                    printtilista.append(i[0])
-        if printtilista == []:
-            varoitus = wx.MessageDialog(None, "Pisteessä ei ole mittaustuloksia", "Huom!")
-            varoitus.ShowModal()
-            varoitus.Destroy()
-            return None
+        printtilista = self.data.iparsipistesyvyydet(pistevalinta)
 
         syvyysvalinta = wx.SingleChoiceDialog(None, "Valitse syvyys", "Kirjoita huomautus",
                                               printtilista, wx.CHOICEDLG_STYLE)
+        print(printtilista)
+
         if syvyysvalinta.ShowModal() == wx.ID_OK:
             syvyysvalinta = syvyysvalinta.GetStringSelection()
             huomautus = wx.TextEntryDialog(None, "Kirjoita huomautus",
@@ -509,7 +528,7 @@ class windowClass(wx.Frame):
                 for a in tiedosto:
                     if a.__contains__(pistevalinta):
                         syvyyshead = tiedosto.index(a) + 7
-                        while syvyyshead < syvyyshead+len(syvyyslista):
+                        while syvyyshead < syvyyshead+len(printtilista):
                             syvyysindex = tiedosto[syvyyshead]
                             if syvyysindex.strip("\t").__contains__(syvyysvalinta.strip("\t")):
                                 tiedosto.insert(syvyyshead+1, "HM {}\n".format(huomautus))
@@ -518,7 +537,7 @@ class windowClass(wx.Frame):
                                 for i in tiedosto:
                                     file.write(i)
                                 file.close()
-                                self.data.iparsipiste(self.pistenimiteksti.GetLabel())
+                                #self.data.iparsipiste(self.pistenimiteksti.GetLabel())
                                 break
                             else:
                                 syvyyshead = syvyyshead + 1
@@ -531,35 +550,9 @@ class windowClass(wx.Frame):
         self.data.kks.kuittaaTanko()
         return None
 
-    def lataapiste(self, event):
-        if self.pistenimiteksti.GetLabel() == "":
-            warning = wx.MessageDialog(None, "Valitse ensin työ", "Varoitus", wx.OK | wx.ICON_INFORMATION)
-            warning.ShowModal()
-            warning.Destroy()
-        elif self.ohjelmaarvoteksti.GetLabel() == "":
-            warning = wx.MessageDialog(None, "Valitse tutkimustapa", "Varoitus", wx.OK | wx.ICON_INFORMATION)
-            warning.ShowModal()
-            warning.Destroy()
-        else:
-            self.data.piste = self.pistenimiteksti.GetLabel()
-            self.update()
-            self.timer.Start(50)
-
     def update(self, event):
         self.updatepistearvot(self.data)
         self.data.ikuuntele(event)
-
-    def pistetiedotpaneelille(self):
-        piste = []
-        self.config.read("USECONTROL.ini")
-        os.chdir(self.config["DEFAULT"]["polku"])
-        with open("{}.txt".format(self.hankenimiteksti.GetLabel())) as textfile:
-            for line in textfile:
-                if line.__contains__(self.pistenimiteksti.GetLabel()):
-                    piste.append(line)
-                self.linepanelille(line)
-        textfile.close()
-        os.chdir(self.data.root)
 
     def linepanelille(self, line):
         self.scrolled_panel.ScrollLines(10)
@@ -627,10 +620,6 @@ class windowClass(wx.Frame):
             return None
 
     def graafinpiirto(self, event):
-        if self.data.hanke == None:
-            varoitus = wx.MessageDialog(None, "Valitse ensin hanke ja piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
-            varoitus.ShowModal()
-            varoitus.Destroy()
         if self.graphbutton.GetLabelText() =="Piirto":
             self.graphbutton.SetLabelText("Tekla")
             for i in range(20):
@@ -649,7 +638,7 @@ class windowClass(wx.Frame):
 
         elif self.graphbutton.GetLabelText() == "Tekla":
             self.graphbutton.SetLabelText("Piirto")
-            self.data.iparsipiste(self.pistenimiteksti.GetLabel())
+            self.data.iparsipiste(self.pistenimiteksti.GetLabel().strip())
             #self.pistetiedotpaneelille()
         else:
             return None
@@ -679,53 +668,44 @@ class windowClass(wx.Frame):
 
     # käyttäjä valitsee listalta maalajin, joka tallennetaan data-luokkaan
     def valitsemaalaji(self, event):
-        if self.hankenimiteksti.GetLabel() == "":
-            warning = wx.MessageDialog(None, "Valitse ensin hanke ja työ", "Varoitus", wx.OK | wx.ICON_INFORMATION)
-            warning.ShowModal()
-            warning.Destroy()
-        elif self.pistenimiteksti.GetLabel() == "":
-            warning = wx.MessageDialog(None, "Valitse ensin työ", "Varoitus", wx.OK | wx.ICON_INFORMATION)
-            warning.ShowModal()
-            warning.Destroy()
-        else:
-            self.data.iluemaalajit()
-            tagi = self.data.haemaalaji()
-            if tagi == "":
+        self.data.iluemaalajit()
+        tagi = self.data.haemaalaji()
+        if tagi == "":
+            os.chdir(self.data.root)
+            return None
+        if tagi == "Lieju":
+            self.maalajiarvoteksti.SetLabelText("Lj")
+            self.config.read("USECONTROL.ini")
+            os.chdir(self.config["DEFAULT"]["polku"])
+            with open("{}.txt".format(self.data.hanke), 'a') as hanketextfile:
+                hanketextfile.write(
+                    "\n" + "{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(), self.data.syvyys))
                 os.chdir(self.data.root)
-                return None
-            if tagi == "Lieju":
-                self.maalajiarvoteksti.SetLabelText("Lj")
-                self.config.read("USECONTROL.ini")
-                os.chdir(self.config["DEFAULT"]["polku"])
-                with open("{}.txt".format(self.data.hanke), 'a') as hanketextfile:
-                    hanketextfile.write(
-                        "\n" + "{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(), self.data.syvyys))
-                    os.chdir(self.data.root)
-                    hanketextfile.close()
-            else:
-                if tagi == "turve":
-                     tagi = tagi.upper()
-                if tagi == "multa":
-                    tagi = tagi.upper()
-                if tagi == "humusmaa":
-                    tagi = tagi.upper()
-                with open("maalajit.txt", "r", encoding="utf-8") as maatextfile:
-                    for line in maatextfile:
-                        if len(line) > 1:
-                            lineparts = line.replace("\n", "").strip("\t")
-                            if lineparts.__contains__("{}".format(tagi)):
-                                lyhenne = lineparts.rsplit(' ')[0].replace(',', "")
-                                self.maalajiarvoteksti.SetLabelText(lyhenne)
-                                self.linepanelille("{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(),
-                                                                             self.data.syvyys))
-                self.config.read("USECONTROL.ini")
-                os.chdir(self.config["DEFAULT"]["polku"])
-                with open("{}.txt".format(self.data.hanke), 'a') as hanketextfile:
-                    hanketextfile.write("\n" + "{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(),
+                hanketextfile.close()
+        else:
+            if tagi == "turve":
+                 tagi = tagi.upper()
+            if tagi == "multa":
+                tagi = tagi.upper()
+            if tagi == "humusmaa":
+                tagi = tagi.upper()
+            with open("maalajit.txt", "r", encoding="utf-8") as maatextfile:
+                for line in maatextfile:
+                    if len(line) > 1:
+                        lineparts = line.replace("\n", "").strip("\t")
+                        if lineparts.__contains__("{}".format(tagi)):
+                            lyhenne = lineparts.rsplit(' ')[0].replace(',', "")
+                            self.maalajiarvoteksti.SetLabelText(lyhenne)
+                            self.linepanelille("{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(),
                                                                          self.data.syvyys))
-                    os.chdir(self.data.root)
-                    maatextfile.close()
-                    hanketextfile.close()
+            self.config.read("USECONTROL.ini")
+            os.chdir(self.config["DEFAULT"]["polku"])
+            with open("{}.txt".format(self.data.hanke), 'a') as hanketextfile:
+                hanketextfile.write("\n" + "{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(),
+                                                                     self.data.syvyys))
+                os.chdir(self.data.root)
+                maatextfile.close()
+                hanketextfile.close()
 
     def suljelistener(self, event):
             event.Skip()
@@ -778,9 +758,6 @@ class TiedonKasittely(object):
         self.sa = Saving()
         self.gui = gui
 
-
-
-
     def palautatutkimustapa(self):
         return self.tutkimustapa
 
@@ -830,24 +807,23 @@ class TiedonKasittely(object):
             else:
                 pisteet = []
                 self.hanke = tiedostonvalinta.GetStringSelection()
+                self.gui.hankenimiteksti.SetLabelText(self.hanke)
                 os.chdir(self.config["DEFAULT"]["polku"])
                 file = open("{}.txt".format(self.hanke), "r")
                 tiedosto = file.readlines()
                 file.close()
-                print("avattiin {}".format(self.hanke))
                 if len(tiedosto) == 5:
-                    print("jee")
                     tiedostonvalinta.Destroy()
                     self.gui.pistenimiteksti.SetLabelText("Ei pisteitä")
+                    self.gui.lopetusbutton.Disable()
                     os.chdir(self.root)
                     return None
                 else:
-                    print("päästäänkö tänne koskaan pls ")
                     for i in tiedosto:
                         if i.__contains__("ty "):
                             pisteet.append(i)
                     pisteet.reverse()
-                    self.iparsipiste(pisteet[0].replace("ty = ", ""))
+                    self.iparsiuusinpiste(pisteet[0].replace("ty = ", ""))
                     tiedostonvalinta.Destroy()
                     os.chdir(self.root)
         else:
@@ -906,10 +882,16 @@ class TiedonKasittely(object):
         pisteet.append("LUO UUSI PISTE")
         valinta = wx.SingleChoiceDialog(None, "Valitse piste", "Pisteet",
                                         pisteet, wx.CHOICEDLG_STYLE)
+        pisteet.remove("LUO UUSI PISTE")
+        pisteet.reverse()
         if valinta.ShowModal() == wx.ID_OK:
             pistevalinta = valinta.GetStringSelection()
             if valinta.GetStringSelection() == "LUO UUSI PISTE":
                 self.iluopiste(self.hanke)
+                os.chdir(self.root)
+                return None
+            elif valinta.GetStringSelection() == pisteet[0]:
+                self.iparsiuusinpiste(valinta.GetStringSelection())
                 os.chdir(self.root)
                 return None
             else:
@@ -924,6 +906,7 @@ class TiedonKasittely(object):
     def iparsipiste(self, pistenimi):
         pistedata = []
         alku = 0
+        pisteet = []
         self.config.read("USECONTROL.ini")
         os.chdir(self.config["DEFAULT"]["polku"])
         file = open("{}.txt".format(self.hanke), "r")
@@ -943,23 +926,145 @@ class TiedonKasittely(object):
             if alku == 0:
                 if line.__contains__("ty = {}".format(pistenimi)):
                     pistedata.append(line)
+                    pisteet.append(line)
                     alku = tiedosto.index(line) + 1
                     while alku < len(tiedosto):
                         linepartindex = tiedosto[alku]
-                        if linepartindex[0:2] == ("ty"):
+                        if linepartindex[0:2] == "ty":
                             break
                         else:
                             pistedata.append(linepartindex)
                             alku = alku + 1
+        else:
+            data = self.iparsipistesyvyydet(pistenimi)
+            self.gui.linepanelille("")
+            for i in pistedata:
+                self.gui.linepanelille(i)
+            self.gui.pistenimiteksti.SetLabelText(pistenimi.strip())
+            os.chdir(self.root)
+            return None
+
+
+    def iparsiuusinpiste(self, pistenimi):
+        pistedata = []
+        alku = 0
+        pisteet = []
+        self.config.read("USECONTROL.ini")
+        os.chdir(self.config["DEFAULT"]["polku"])
+        file = open("{}.txt".format(self.hanke), "r")
+        tiedosto = file.readlines()
+        file.close()
+        for line in tiedosto:
+            if line.__contains__("fo"):
+                pistedata.append(line)
+            if line.__contains__("kj"):
+                pistedata.append(line)
+            if line.__contains__("om"):
+                pistedata.append(line)
+            if line.__contains__("ml"):
+                pistedata.append(line)
+            if line.__contains__("org"):
+                pistedata.append(line)
+            if alku == 0:
+                if line.__contains__("ty = {}".format(pistenimi)):
+                    pistedata.append(line)
+                    pisteet.append(line)
+                    alku = tiedosto.index(line) + 1
+                    while alku < len(tiedosto):
+                        linepartindex = tiedosto[alku]
+                        if linepartindex[0:2] == "ty":
+                            break
+                        else:
+                            pistedata.append(linepartindex)
+                            alku = alku + 1
+
             else:
+                pisteet.reverse()
+                if pistenimi == pisteet[0]:
+                    self.gui.alkukairausbutton.Enable()
                 self.piste = pistenimi
                 self.gui.linepanelille("")
                 for i in pistedata:
                     self.gui.linepanelille(i)
                 self.gui.pistenimiteksti.SetLabelText(pistenimi.strip())
-                self.gui.graphbutton.SetLabelText("Piirto")
-                os.chdir(self.root)
-                return None
+
+                syvyysdata = self.iparsipistesyvyydet(pistenimi)
+                if syvyysdata:
+                    self.gui.lopetusbutton.Enable()
+                    self.gui.graphbutton.Enable()
+                    self.gui.huombutton.Enable()
+                    syvyysdata.reverse()
+                    jatkasyvyys = syvyysdata[0]
+                    self.gui.syvyysarvoteksti.SetLabelText(jatkasyvyys)
+                    self.gui.maalajibutton.Enable()
+                    print("tämä lähetetään kks {}".format(jatkasyvyys))
+                    print("TÄHÄN PISTÄISI PISTÄÄ VIKAN PISTEEN SYVYYS KKSSÄLLE ETTÄ VOI JATKAA")
+                    print("kks odotustilaan")
+                    self.gui.graphbutton.SetLabelText("Piirto")
+                    os.chdir(self.root)
+                    return None
+                else:
+                    self.gui.alkukairausbutton.Enable()
+                    os.chdir(self.root)
+                    return None
+
+
+    #listataan pisteen syvyysmittaukset
+    def iparsipistesyvyydet(self, pistenimi):
+        piste = []
+        pistevalinta = pistenimi
+        syvyyslista = []
+        printtilista = []
+        parsilista = []
+        os.chdir(self.config["DEFAULT"]["polku"])
+        file = open("{}.txt".format(self.gui.hankenimiteksti.GetLabel()), "r")
+        tiedosto = file.readlines()
+        file.close()
+
+        for line in tiedosto:
+            if line.__contains__(pistevalinta):
+                piste.append(line)
+                alku = tiedosto.index(line) + 1
+                while alku < len(tiedosto):
+                    linepartindex = tiedosto[alku]
+                    if linepartindex[0:2] == ("ty"):
+                        break
+                    else:
+                        piste.append(linepartindex)
+                        alku = alku + 1
+
+        for rivi in piste[::-1]:
+            if rivi.__contains__("HM"):
+                continue
+            elif rivi == "\n":
+                continue
+            elif rivi.__contains__("ln"):
+                break
+            else:
+                syvyyslista.append(rivi)
+        syvyyslista.reverse()
+
+        for s in syvyyslista:
+            if s == "\n":
+                syvyyslista.remove(s)
+            elif s.__contains__("AL"):
+                alku = s.rsplit(None, 4)
+                parsilista.append(alku[2])
+            else:
+                parsilista.append(s.rsplit(None, 3))
+
+        for i in parsilista:
+            if len(printtilista) < len(syvyyslista):
+                printtilista.append(i[0])
+
+        if printtilista == []:
+            os.chdir(self.root)
+            return None
+        else:
+            self.gui.graphbutton.Enable()
+            self.gui.huombutton.Enable()
+            os.chdir(self.root)
+            return printtilista
 
     # luodaan piste käyttäjän antamalla nimellä
     def iluopiste(self, hanke):
@@ -969,6 +1074,19 @@ class TiedonKasittely(object):
         if pistenimi.ShowModal() == wx.ID_OK:
             nimi = pistenimi.GetValue()
             pistenimi.Destroy()
+            file = open("{}.txt".format(self.hanke), "r")
+            tiedosto = file.readlines()
+            file.close()
+            for i in tiedosto:
+                    if i.__contains__("ty = {}".format(nimi)):
+                        warning = wx.MessageDialog(None, "Piste {} on jo olemassa hankkeella {}".format(nimi, hanke)
+                                       , "Varoitus",
+                                       wx.OK | wx.ICON_INFORMATION)
+                        warning.ShowModal()
+                        warning.Destroy()
+                        os.chdir(self.root)
+                        return None
+            os.chdir(self.root)
             varmistus = wx.MessageDialog(None, "Luodaan piste {} hankkeelle {}".format(nimi, hanke)
                                          , "Luodaan..", wx.YES_NO)
             luo = varmistus.ShowModal()
@@ -1307,9 +1425,9 @@ class TiedonKasittely(object):
     def ihallinta(self):
         os.chdir(self.root)
         x = [config.replace(".ini", "") for config in os.listdir(os.curdir) if config.endswith(".ini")
-             and config != "USECONTROL.ini" and config != "HWCONTROL.ini"]
+             and config != "USECONTROL.ini"]
         valinta = wx.SingleChoiceDialog(None, "Valitse muokattavat tiedot", "Hallinta",
-                                        x,  wx.CHOICEDLG_STYLE)
+                                        x, wx.CHOICEDLG_STYLE)
         if valinta.ShowModal() == wx.ID_OK:
             muokattava = valinta.GetStringSelection()
             valinta.Destroy()
@@ -1319,9 +1437,49 @@ class TiedonKasittely(object):
                 self.ipisteheader()
             if muokattava == "TUTKIMUSTIEDOT":
                 self.itutkimusheader()
+            if muokattava == "HWCONTROL":
+                self.ihwasetus()
         else:
             print("Tietoja ei muutettu")
             return None
+
+    def ihwasetus(self):
+        self.config.read("HWCONTROL.ini")
+        uusi_logging = wx.TextEntryDialog(None, "logging", "HWCONTROL", self.config["DEFAULT"]["logging"])
+
+        if uusi_logging.ShowModal() == wx.ID_OK:
+            uusi_logging = uusi_logging.GetValue()
+        else:
+            return None
+
+        uusi_puls_cm = wx.TextEntryDialog(None, "puls_cm", "HWCONTROL", self.config["DEFAULT"]["puls_cm"])
+
+        if uusi_puls_cm.ShowModal() == wx.ID_OK:
+            uusi_puls_cm = uusi_puls_cm.GetValue()
+        else:
+            return None
+
+        uusi_puls_pk = wx.TextEntryDialog(None, "puls_pk", "HWCONTROL", self.config["DEFAULT"]["puls_pk"])
+
+        if uusi_puls_pk.ShowModal() == wx.ID_OK:
+            uusi_puls_pk = uusi_puls_pk.GetValue()
+        else:
+            return None
+
+        # lähetetään komennot KKS:lle
+        # paitsi logging, komento puuttuu...
+        # if uusi_logging != self.config["DEFAULT"]["logging"]:
+        # self.kks.
+
+        # TOISTAISEKSI NÄMÄKIN POIS, DEMOLAITE EI VASTAA KOMENTOIHIN
+        '''if uusi_puls_cm != self.config["DEFAULT"]["puls_cm"]:
+            self.kks.asetaSyvyydenVakio(uusi_puls_cm)
+
+        if uusi_puls_pk != self.config["DEFAULT"]["puls_pk"]:
+            self.kks.asetaPuolikierrostenVakio(uusi_puls_pk)'''
+
+        # tallennetaan hwcontrol.ini tiedostoon uudet muuttujat
+        sa.asetaHWcontrol(uusi_logging, uusi_puls_cm, uusi_puls_pk)
 
     def ihankeheader(self):
         self.config.read("HANKETIEDOT.ini")
