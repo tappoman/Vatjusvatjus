@@ -49,7 +49,6 @@ class windowClass(wx.Frame):
         self.Bind(wx.EVT_TIMER, self.update, self.timer)
         #self.Bind(wx.EVT_TIMER, self.updatepistearvot(self.data), self.timer2)
 
-
     def onClose(self):
         self.data.kks.closeConnection()
 
@@ -521,6 +520,18 @@ class windowClass(wx.Frame):
 
         if syvyysvalinta.ShowModal() == wx.ID_OK:
             syvyysvalinta = syvyysvalinta.GetStringSelection()
+            for indeksi in printtilista:
+                if indeksi.__contains__(syvyysvalinta):
+                    rivimatch = indeksi
+                    break
+            print(rivimatch)
+            print("monesko arvo syvyyslistassa")
+            for p in printtilista:
+                if p.__contains__(rivimatch):
+                    monesko = printtilista.index(p)
+            print(monesko)
+
+            print(printtilista[monesko])
             huomautus = wx.TextEntryDialog(None, "Kirjoita huomautus",
                                            "{}".format(syvyysvalinta))
             if huomautus.ShowModal() == wx.ID_OK:
@@ -530,7 +541,7 @@ class windowClass(wx.Frame):
                         syvyyshead = tiedosto.index(a) + 7
                         while syvyyshead < syvyyshead+len(printtilista):
                             syvyysindex = tiedosto[syvyyshead]
-                            if syvyysindex.strip("\t").__contains__(syvyysvalinta.strip("\t")):
+                            if syvyysindex.strip("\t").__contains__(rivimatch):
                                 tiedosto.insert(syvyyshead+1, "HM {}\n".format(huomautus))
                                 #self.linepanelille("HM {}\n".format(huomautus))
                                 file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "w")
@@ -859,6 +870,7 @@ class TiedonKasittely(object):
                     file.write("\nml = "+self.config["DEFAULT"]["ml"])
                     file.write("\norg = "+self.config["DEFAULT"]["org"])
                     file.close()
+                    self.gui.hankenimiteksti.SetLabelText(hankenimi)
                     self.ituhoatempconfig()
                     os.chdir(self.root)
             else:
@@ -991,6 +1003,7 @@ class TiedonKasittely(object):
                 syvyysdata = self.iparsipistesyvyydet(pistenimi)
                 if syvyysdata:
                     self.gui.lopetusbutton.Enable()
+                    self.kks.aloitaOdotustila()
                     self.gui.graphbutton.Enable()
                     self.gui.huombutton.Enable()
                     syvyysdata.reverse()
@@ -1017,7 +1030,7 @@ class TiedonKasittely(object):
         printtilista = []
         parsilista = []
         os.chdir(self.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.gui.hankenimiteksti.GetLabel()), "r")
+        file = open("{}.txt".format(self.hanke), "r")
         tiedosto = file.readlines()
         file.close()
 
@@ -1049,7 +1062,7 @@ class TiedonKasittely(object):
                 syvyyslista.remove(s)
             elif s.__contains__("AL"):
                 alku = s.rsplit(None, 4)
-                parsilista.append(alku[2])
+                parsilista.append(alku[1])
             else:
                 parsilista.append(s.rsplit(None, 3))
 
@@ -1111,7 +1124,8 @@ class TiedonKasittely(object):
                 self.ituhoatempconfig()
                 self.syvyys = 0
                 self.alkusyvyys = 0
-                self.iparsipiste(self.piste)
+                #self.iparsipiste(self.piste)
+                self.iparsiuusinpiste(self.piste)
                 os.chdir(self.root)
             else:
                 os.chdir(self.root)
