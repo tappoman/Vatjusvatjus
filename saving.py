@@ -1,7 +1,4 @@
-﻿#TODO
-#Hoida tallennus loppuun
-#alkukairauksen ja lopetussyyn tallennus?
-
+﻿
 """Tämä luokka vastaa tiedostonkäsittelystä.
 sisältää metodit
 kks-parametrien tallennukseen,
@@ -65,7 +62,7 @@ class Saving (object):
             self._config.write(cfgfile)
 
 
-    def asetaHWcontrol(self, LOGGING=20, PULS_CM=45.55, PULS_PK=30):
+    def asetaHWcontrol(self, LOGGING, PULS_CM, PULS_PK):
         self.logging = LOGGING
         self.puls_cm = PULS_CM
         self.puls_pk = PULS_PK
@@ -76,8 +73,8 @@ class Saving (object):
         with open ("HWCONTROL.ini", "w") as cfgfile:
             self._config.write(cfgfile)
 
-    #tee nämä joskus
-    def asetaANparams(self):
+    #NÄMÄ ON VIELÄ LAITTAMATTA, KOSKA EI OLLUT TARPEEKSI INFORMAATIOTA KANAVISTA / VOIMA, PAINE JNE
+    #def asetaANparams(self):
         '''PK-VOIMA	N256	K0.255	P25.01.2018	'AN2 nollaus, kerroin, kalibrointipäiväys
         # PH-VOIMA	N344	K1.245	P25.01.2018	'AN1  -- " --
         # PH-VÄÄNTÖ	N299	K1.945	P25.01.2018	'AN3  -- " --
@@ -88,11 +85,6 @@ class Saving (object):
 
     #Aina tiedoston alkuun, määritellään ylläpidosta
     def asetaHanketiedot(self, FO, KJ, OM, ML, ORG):
-        '''self.fo = FO
-        self.kj = KJ
-        self.om = OM
-        self.ml = ML
-        self.org = ORG'''
 
         self._config["DEFAULT"] = {"FO": FO,
                                    "KJ": KJ,
@@ -101,21 +93,6 @@ class Saving (object):
                                    "ORG": ORG}
         with open ("HANKETIEDOT.ini", "w") as cfgfile:
             self._config.write(cfgfile)
-
-#lisää nämä
-            '''Pisteen yleistiedot. Tiedosto voi sisältää useita pisteitä kairattuna
-            eri menetelmillä. Kunkin pisteen alkuun tarjotaan tallennettavaksi
-            tiedot ylläpidosta. Muuttuvat kentät päivitetään ylläpitoon.
-            Näitä voidaan myös tarkastella/muuttaa omana ikkunana.
-            Kentät ovat:
-            # TYÖNUMERO	12345678
-            # TYÖNIMI	POHJANTIE
-            # LAITTEET	GM65-sn13256		'monitoimikaira
-            # KAIRAAJA	S LAAKKONEN
-            	TY  123456             HAILA				'työnumero     työnimi
-	PK  0      MK						'pöytäkirja   0    kairaaja
-	LA  GM75GT						'laitteet
-            '''
 
 
     #pistekohtaiset tiedot, aina uuden pisteen alkuun
@@ -126,13 +103,6 @@ class Saving (object):
         with open ("PISTETIEDOT.ini", "w") as cfgfile:
             self._config.write(cfgfile)
 
-        '''self.ty = TY
-        self.pk = PK
-        self.la = LA
-        self.tiedosto = "PISTETIEDOT.txt"
-        self.fullpath = os.path.join(self.asetus_polku, self.tiedosto)
-        file = open(self.fullpath, "w")
-        file.write("TY \t" + self.ty + "\n" + "PK \t" + self.pk + "\n" + "LA \t" + self.la + "\n")'''
 
 
     def asetaTutkimustiedot(self, TT, TX, XY, LN="-\t" + "-\t"):
@@ -142,17 +112,6 @@ class Saving (object):
                                    "LN": LN}
         with open ("TUTKIMUSTIEDOT.ini", "w") as cfgfile:
             self._config.write(cfgfile)
-
-        '''self.tt = TT
-        self.tx = TX
-        self.xy = XY
-        self.ln = LN
-
-        self.tiedosto = "TUTKIMUSTIEDOT.txt"
-        self.fullpath = os.path.join(self.asetus_polku, self.tiedosto)
-        file = open(self.fullpath, "w")
-        file.write("TT \t" + self.tt + "\n" "TX \t" + self.tx + "\n" + "XY \t" + self.xy + "\n" + "LN \t" + self.ln + "\n")'''
-
 
 
     #METODIT JOTKA KOOSTAVAT VARSINAISEN TEKLATIEDOSTON
@@ -248,26 +207,3 @@ class Saving (object):
         self.fullpath = os.path.join(self.tal_polku, self.hanke)
         file = open(self.fullpath, "a")
         file.write(huomautus + "\n")
-
-
-
-
-#sa = Saving()
-#sa.asetaParams("COM3", "9500", "c:/tmp/", "hanke1.txt")
-#sa.asetaHWcontrol()
-#sa.asetaAloitustiedot()
-#sa.asetaPistetiedot("12344", "0 MK", "GM6364")
-#sa.asetaTutkimustiedot("PA", "KALIBBLAA", "LALLAA")
-
-#sa.koostaHankeheader()
-#sa.koostaPisteheader()
-#sa.koostaTutkimusheader()
-
-
-
-#config = configparser.ConfigParser()
-#config.read("USECONTROL.ini")
-#print(config["DEFAULT"]["port"])
-#sa.asetaAsetuspolku('C:/testi/')
-#sa.asetaKommunikaatio("COM1", "9600")
-

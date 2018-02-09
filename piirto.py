@@ -41,9 +41,6 @@ class CanvasPanel(wx.Panel):
         plt.gca().invert_yaxis()
         plt.axvline(0, color='k')
 
-        #plt.subplots_adjust(left=0.12, bottom=0.12, wspace=0.2, hspace=0.2)
-
-        #self.figure.gca().invert_yaxis()
 
     def setValues(self, hanke, piste):
         self.config.read("USECONTROL.ini")

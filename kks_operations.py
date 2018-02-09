@@ -1,11 +1,5 @@
 ﻿#Class which pass all the commands from gui to communication class
 
-#TODO: hoida vastausten parsinnat täällä jos tarvitsee:
-#KUUNNELLESSA HEADERIIN TULEE VASTAUS JOITA PARSITAAN 
-#(NÄMÄ ON TOISINSANOEN KOMENTOJA JOITA ANNETAAN KKS:LTÄ JA NIIHIN PITÄÄ REAGOIDA):
-#NOSTO, #KAIRAUS, MITÄ?
-
-
 from communication import *
 import threading
 import time
@@ -15,26 +9,11 @@ import os
 import time
 import queue
 
-"""luodaan communication olio com ja avataan yhteys sovittimelle"""
-
-
-
 class Kksoperations (object):
 
     def __init__(self, com=None):
 
-        """Thread for KKS-reader
-        # lck = threading.Lock()
-        #que = queue.Queue()
-        t1 = threading.Thread(target=self.com.readValues)
-        #t1 = threading.Thread(target=self.com.readValues)
-        #t1 = threading.Thread(target=lambda q, arg1: q.put(self.com.readValues(arg1)), args=(que, "t"))
-        #t1.start()
-        #result = que.get()
-        #print(result)"""
-
         self.com = com
-        #self.com = Communication()
         self.t1 = threading.Thread(target=self.com.readValues)
         self.t1.start()
 
@@ -42,10 +21,8 @@ class Kksoperations (object):
         print(results)
 
     def closeConnection(self):
-        print("suletaan")
+        #print("suletaan")
         self.com.closeConnection()
-        #self.com.Destroy()
-        #self.t1.Destroy()
 
     def lueThread(self):
         t1 = threading.Thread(target=self.com.readValues)
@@ -179,17 +156,6 @@ class Kksoperations (object):
     def aloitaOdotustila(self):
         self.com.setCommand("M-ODOTUS")
 
-
-    """ALKUKAIRAUSTILA"""
-
-    """Tilaan tulo	 				< - - - - - -    #ALKUKAIRAUS 
-    Alkukairaussyvyys 1s välein. 	< - - - - - -    #SYV:nnn
-    Nosto asetettu KKS:ssa.			< - - - - - -    #NOSTO
-    Nosto kuitattu KKS:ssa.			< - - - - - -    #NOSKU"""
-
-#    def kuunteleAlkukairausta(self):
-#        self.com.readValues()
-
     def asetaAlkusyvyys(self, syvyys):
         self.com.setCommand("ALKUSYV:" + syvyys)
 
@@ -234,39 +200,3 @@ class Kksoperations (object):
     def kuunteleKairausta(self):
         self.com.readValues()
 
-
-"""NOSTOTILA VAIKUTTAA HIEMAN SEKAVALTA
-tilaan tulaan KKS-Komennolla, lähettää headerin #NOSTO. TULEEKO GUI:n PUOLELLE SIIRTYMÄÄ???"""
-
-""""#STATE 	Tilan tiedustelu.		< - - - - - -   #NOSTO
- #TANKO 	Tangon kuittaus.		(< - - - - - -   #NOSKU)
-            Jatkuu kairaustilana. 	< - - - - - -   #MITTAUSTILA
-                                    
-Kuittaus [Fn] painikkeella
-Jatkuu kairaustilana.
-(< - - - - -    #NOSKU)
-< - - - - - -   #MITTAUSTILA"""
-
-
-#TESTINGZONE
-
-'''
-kks = Kksoperations()
-
-kks.kuittaaTanko()
-kks.pysaytaKairaus()
-kks.aloitaAlkutila()
-kks.tiedusteleAika()
-kks.aloitaAlkukairaus()
-time.sleep(5)
-kks.lopetaAlkukairaus()
-kks.aloitaKairaus()
-
-time.sleep(5)
-kks.kuittaaTanko()
-time.sleep(5)
-kks.pysaytaKairaus()
-time.sleep(.5)
-kks.aloitaAlkutila()
-kks.closeConnection()
-'''
