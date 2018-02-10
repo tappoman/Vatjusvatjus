@@ -1,0 +1,21 @@
+fo = 2.3
+kj = KKJ-N60
+om = TILAAJA
+ml = GEO
+org = GEOPOJAT
+ty = Piste
+pk = 0 MK
+la = GM6364
+tt = PA
+tx = KALIBBLAA
+xy = LALLAA
+ln = -	-
+
+alkukairaus ohitetaan
+	0.20	89	18
+	0.40	88	18
+	0.60	88	2
+HM rgvrgtrytgb
+	0.80	90	2
+	1.00	89	5
+	1.20	89	0

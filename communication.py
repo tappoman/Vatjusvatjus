@@ -41,8 +41,8 @@ class Communication (object):
         #print("COMCLOSE")
         self.keep_running = False
 
-        self.ser.flushOutput()
-        self.ser.flushInput()
+        #self.ser.flushOutput()
+        #self.ser.flushInput()
         self.ser.close()
         #return self.ser.isOpen
         

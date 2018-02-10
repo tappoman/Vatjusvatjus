@@ -50,7 +50,11 @@ class windowClass(wx.Frame):
         #self.Bind(wx.EVT_TIMER, self.updatepistearvot(self.data), self.timer2)
 
     def onClose(self):
+        self.data.kks.kuittaaTanko()
+        self.data.kks.lopetaKairaus()
+        self.data.kks.aloitaAlkutila()
         self.data.kks.closeConnection()
+
 
     def basicGUI(self):
 
@@ -141,7 +145,6 @@ class windowClass(wx.Frame):
         self.tankobutton = wx.Button(panel, label="Tanko", pos=(500, 215), size=(75, 75))
         self.tankobutton.SetFont(font1)
         self.tankobutton.Bind(wx.EVT_BUTTON, self.tanko)
-        self.tankobutton.Disable()
 
         # tietotekstien alustus
         self.hanketeksti = wx.StaticText(panel, -1, "Hanke: ", pos=(10, 120))
@@ -309,8 +312,12 @@ class windowClass(wx.Frame):
             self.lopetusbutton.Disable()
             self.huombutton.Disable()
             self.data.iavaahanke()
+            self.update(event)
+            self.timer.Start(50)
         else:
             self.data.iavaahanke()
+            self.update(event)
+            self.timer.Start(50)
             try:
                 self.hankenimiteksti.SetLabelText(self.data.hanke)
                 self.pistebutton.Enable()
@@ -328,8 +335,8 @@ class windowClass(wx.Frame):
         self.data.iavaapiste()
         self.syvyysarvoteksti.SetLabelText("")
         self.data.syvyys = 0
-        self.update(event)
-        self.timer.Start(50)
+        #self.update(event)
+        #self.timer.Start(50)
 
     #tarkistetaan onko pisteessä mittaustietoja
     def tarkistapiste(self):
@@ -400,6 +407,7 @@ class windowClass(wx.Frame):
             self.data.kks.asetaHanke(self.data.piste, self.data.hanke)
             self.data.kks.asetaPiste(self.data.piste)
             self.data.kks.asetaTapa(self.data.tutkimustapa)
+            self.graphbutton.Enable()
             os.chdir(self.data.root)
             z = []
             with open("alkukairaus.txt", "r") as textfile:
@@ -499,13 +507,17 @@ class windowClass(wx.Frame):
             else:
                 return None
         else:
+            self.data.kks.aloitaOdotustila()
             self.lopetusbutton.SetLabel("Lopeta\nkairaus")
             self.data.kks.asetaKairaussyvyys(self.data.alkusyvyys)
             self.data.kks.aloitaKairaus()
-            print("kuunnellaan kks")
+            self.graphbutton.Enable()
+            #print("kuunnellaan kks")
 
     def kommenttirivi(self, event):
 
+        rivimatch = 0
+        monesko = 0
         os.chdir(self.data.config["DEFAULT"]["polku"])
         file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "r")
         tiedosto = file.readlines()
@@ -516,7 +528,7 @@ class windowClass(wx.Frame):
 
         syvyysvalinta = wx.SingleChoiceDialog(None, "Valitse syvyys", "Kirjoita huomautus",
                                               printtilista, wx.CHOICEDLG_STYLE)
-        print(printtilista)
+
 
         if syvyysvalinta.ShowModal() == wx.ID_OK:
             syvyysvalinta = syvyysvalinta.GetStringSelection()
@@ -524,38 +536,36 @@ class windowClass(wx.Frame):
                 if indeksi.__contains__(syvyysvalinta):
                     rivimatch = indeksi
                     break
-            print(rivimatch)
-            print("monesko arvo syvyyslistassa")
+
             for p in printtilista:
                 if p.__contains__(rivimatch):
                     monesko = printtilista.index(p)
-            print(monesko)
 
-            print(printtilista[monesko])
+
             huomautus = wx.TextEntryDialog(None, "Kirjoita huomautus",
                                            "{}".format(syvyysvalinta))
             if huomautus.ShowModal() == wx.ID_OK:
                 huomautus = huomautus.GetValue()
-                for a in tiedosto:
-                    if a.__contains__(pistevalinta):
-                        syvyyshead = tiedosto.index(a) + 7
-                        while syvyyshead < syvyyshead+len(printtilista):
-                            syvyysindex = tiedosto[syvyyshead]
-                            if syvyysindex.strip("\t").__contains__(rivimatch):
-                                tiedosto.insert(syvyyshead+1, "HM {}\n".format(huomautus))
-                                #self.linepanelille("HM {}\n".format(huomautus))
-                                file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "w")
-                                for i in tiedosto:
-                                    file.write(i)
-                                file.close()
-                                #self.data.iparsipiste(self.pistenimiteksti.GetLabel())
-                                break
-                            else:
-                                syvyyshead = syvyyshead + 1
+                for i in tiedosto:
+                    if i.__contains__(pistevalinta):
+                        syvyyshead = tiedosto.index(i)+7 + monesko
+                        tiedosto.insert(syvyyshead+1, "HM {}\n".format(huomautus))
+                        #for m in tiedosto:
+                            #print(m)
+                        #self.linepanelille("kirjoitettu huomautus {}\n".format(huomautus))
+                        with open("{}.txt".format(self.hankenimiteksti.GetLabel()), "w", encoding="utf-8") as ifile:
+                            #for line in ifile:
+                                #print(line)
+                        #ifile = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "w")
+                            for i in tiedosto:
+                                ifile.write(i)
+                                print("{} kirjoitettu {}".format(i,ifile))
+                        ifile.close()
+                        break
 
-        else:
-            print("Kommenttia ei kirjoitettu")
-            return None
+            else:
+                print("Kommenttia ei kirjoitettu")
+                return None
 
     def tanko(self, event):
         self.data.kks.kuittaaTanko()
@@ -719,6 +729,8 @@ class windowClass(wx.Frame):
                 hanketextfile.close()
 
     def suljelistener(self, event):
+            self.timer.Stop()
+            self.timer = None
             event.Skip()
             self.onClose()
             #wx.EVT_WINDOW_DESTROY
@@ -754,7 +766,7 @@ class TiedonKasittely(object):
         self.tutkimustapa = tutkimustapa
 
         self.oldline = ""
-        ''''
+
         self.com = Communication()
 
         self.comcheck = self.com.openConnection()
@@ -765,7 +777,7 @@ class TiedonKasittely(object):
             sys.exit(0)
         
         self.kks = Kksoperations(self.com)
-        '''
+
         self.sa = Saving()
         self.gui = gui
 
@@ -1003,16 +1015,18 @@ class TiedonKasittely(object):
                 syvyysdata = self.iparsipistesyvyydet(pistenimi)
                 if syvyysdata:
                     self.gui.lopetusbutton.Enable()
-                    self.kks.aloitaOdotustila()
                     self.gui.graphbutton.Enable()
                     self.gui.huombutton.Enable()
+                    self.gui.pistebutton.Enable()
                     syvyysdata.reverse()
                     jatkasyvyys = syvyysdata[0]
                     self.gui.syvyysarvoteksti.SetLabelText(jatkasyvyys)
                     self.gui.maalajibutton.Enable()
-                    print("tämä lähetetään kks {}".format(jatkasyvyys))
-                    print("TÄHÄN PISTÄISI PISTÄÄ VIKAN PISTEEN SYVYYS KKSSÄLLE ETTÄ VOI JATKAA")
-                    print("kks odotustilaan")
+                    #print("tämä lähetetään kks {}".format(jatkasyvyys))
+                    #print("TÄHÄN PISTÄISI PISTÄÄ VIKAN PISTEEN SYVYYS KKSSÄLLE ETTÄ VOI JATKAA")
+                    #print("kks odotustilaan")
+                    self.kks.asetaKairaussyvyys(self.syvyys)
+
                     self.gui.graphbutton.SetLabelText("Piirto")
                     os.chdir(self.root)
                     return None
@@ -1273,7 +1287,7 @@ class TiedonKasittely(object):
                         linearvot = lineparts[0].rpartition(":")[2]
 
                         #kutsutaan saving luokan metodia joka tallettaa sanoman tekla-tiedostoon
-                        sa.tallennaTAL(self.hanke, linearvot)
+                        self.sa.tallennaTAL(self.hanke, linearvot)
 
                         self.arvot = linearvot.split()
                         self.apu = '{0:.2f}'.format(float(self.arvot[0]) / 100.00)
@@ -1296,7 +1310,7 @@ class TiedonKasittely(object):
                         #self.iparsitiedot(lineparts)
                         #TEHDÄÄN MITAMITA??
                         #EI TULE TALLAISTA SANOMAA DEMOLLA,
-                        sa.tallennaTAL(self.hanke, lineparts[0])
+                        self.sa.tallennaTAL(self.hanke, lineparts[0])
 
                     if lineparts[0][:4] == "#SYV":
                         #self.iparsitiedot(lineparts)
@@ -1486,14 +1500,14 @@ class TiedonKasittely(object):
         # self.kks.
 
         # TOISTAISEKSI NÄMÄKIN POIS, DEMOLAITE EI VASTAA KOMENTOIHIN
-        '''if uusi_puls_cm != self.config["DEFAULT"]["puls_cm"]:
+        if uusi_puls_cm != self.config["DEFAULT"]["puls_cm"]:
             self.kks.asetaSyvyydenVakio(uusi_puls_cm)
 
         if uusi_puls_pk != self.config["DEFAULT"]["puls_pk"]:
-            self.kks.asetaPuolikierrostenVakio(uusi_puls_pk)'''
+            self.kks.asetaPuolikierrostenVakio(uusi_puls_pk)
 
         # tallennetaan hwcontrol.ini tiedostoon uudet muuttujat
-        sa.asetaHWcontrol(uusi_logging, uusi_puls_cm, uusi_puls_pk)
+        self.sa.asetaHWcontrol(uusi_logging, uusi_puls_cm, uusi_puls_pk)
 
     def ihankeheader(self):
         self.config.read("HANKETIEDOT.ini")
@@ -1534,7 +1548,7 @@ class TiedonKasittely(object):
         else:
             return None
 
-        sa.asetaHanketiedot(uusifo, uusikj, uusiml, uusiom, uusiorg)
+        self.sa.asetaHanketiedot(uusifo, uusikj, uusiml, uusiom, uusiorg)
 
     def ipisteheader(self):
         self.config.read("PISTETIEDOT.ini")
@@ -1559,7 +1573,7 @@ class TiedonKasittely(object):
         else:
             return None
 
-        sa.asetaPistetiedot(uusity, uusipk, uusila)
+        self.sa.asetaPistetiedot(uusity, uusipk, uusila)
 
     def itutkimusheader(self):
         self.config.read("TUTKIMUSTIEDOT.ini")
@@ -1591,7 +1605,7 @@ class TiedonKasittely(object):
         else:
             return None
 
-        sa.asetaTutkimustiedot(uusitt, uusitx, uusixy, uusiln)
+        self.sa.asetaTutkimustiedot(uusitt, uusitx, uusixy, uusiln)
 
     def iluotempconfig(self):
         os.chdir(self.root)
