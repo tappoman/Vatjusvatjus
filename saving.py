@@ -173,11 +173,12 @@ class Saving (object):
         file.write(SYV + "\n")
 
 
-    def tallennaTAL(self, hanke, TAL):
+    def tallennaTAL(self, hanke, TAL, maalaji):
         self._config.read("USECONTROL.ini")
         self.tal_polku = self._config["DEFAULT"]["polku"]
         self.hanke = hanke + ".txt"
         self.fullpath = os.path.join(self.tal_polku, self.hanke)
+        self.maalaji = maalaji
 
         #Parsitaan arvot irti Stringista
         self.arvot = TAL.split()
@@ -187,7 +188,15 @@ class Saving (object):
         #self.TAL = "\t".join([str(x) for x in self.arvot])
 
         file = open(self.fullpath, "a")
-        file.write("\t" + self.TAL + "\n")
+
+        #tarkastetaan maalajin valinta ja lisataan peraan jos valittuna
+        if self.maalaji == "":
+            #print("ei maalajia asetettu")
+            file.write("\t" + self.TAL + "\n")
+
+        else:
+            #print("maalaji asetettu", self.maalaji)
+            file.write("\t" + self.TAL + "\t" + self.maalaji + "\n")
 
     #lisaa maalajin datarivin peraan vaihdettaessa
     def tallennaMaalaji(self, hanke, maalaji):

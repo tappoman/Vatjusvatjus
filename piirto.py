@@ -56,14 +56,15 @@ class CanvasPanel(wx.Panel):
         #if self.piste in open(self.fullpath).read():
          #   print("***LOYTYI***")
         self.muisti = False
-        haluttupiste = "ty = " + self.piste
-        #print(haluttupiste)
+        haluttupiste = "TY " + self.piste
+        print(haluttupiste)
 
         with open(self.fullpath, 'r') as textfile:
             for line in textfile:
                 #print(len(line))
                 if len(line) > 2:
-                    if "ty = " in line:
+                    if "TY" in line:
+                        #print("line: ", line.strip(), "haluttu: ", haluttupiste.strip());
                         #Tutkitaan onko tyonumero teklassa sama kuin annetussa hankeessa ja pisteessa
                         if line.strip() == haluttupiste.strip():
                             print("oikea TY: ", line.strip())
@@ -75,8 +76,8 @@ class CanvasPanel(wx.Panel):
                     #kun oikessa pisteessa
                     if self.muisti:
                         #tutkitaan teklasta kyseisen pisteen kairaustapa
-                        if "tt = " in line:
-                            apu = line.split("=")
+                        if "TT" in line:
+                            apu = line.split(" ")
                             self.tutkimustapa = str(apu[1]).strip()
                             print("TUTKIMUSTAPA: ", self.tutkimustapa)
 
