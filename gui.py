@@ -332,6 +332,7 @@ class windowClass(wx.Frame):
         self.lopetusbutton.Disable()
         self.graphbutton.SetLabelText("Piirto")
         self.graphbutton.Disable()
+        self.maalajibutton.Disable()
         self.data.iavaapiste()
         self.syvyysarvoteksti.SetLabelText("")
         self.data.syvyys = 0
@@ -714,17 +715,20 @@ class windowClass(wx.Frame):
     def valitsemaalaji(self, event):
         self.data.iluemaalajit()
         tagi = self.data.haemaalaji()
-        os.chdir(self.config["DEFAULT"]["polku"])
         if tagi == "":
             os.chdir(self.data.root)
             return None
         if tagi == "Lieju":
             self.maalajiarvoteksti.SetLabelText("Lj")
+            print(self.data.maalaji)
+            print("maalaji pitäisi lähettää tallennettavaksi seuraavan TAL sanoman kanssa")
+            '''
             with open("{}.txt".format(self.data.hanke), 'a') as hanketextfile:
                 hanketextfile.write(
                     "\n" + "{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(), self.data.syvyys))
                 os.chdir(self.data.root)
                 hanketextfile.close()
+            '''
         else:
             if tagi == "turve":
                  tagi = tagi.upper()
@@ -732,6 +736,7 @@ class windowClass(wx.Frame):
                 tagi = tagi.upper()
             if tagi == "humusmaa":
                 tagi = tagi.upper()
+
             with open("maalajit.txt", "r", encoding="utf-8") as maatextfile:
                 for line in maatextfile:
                     if len(line) > 1:
@@ -739,6 +744,9 @@ class windowClass(wx.Frame):
                         if lineparts.__contains__("{}".format(tagi)):
                             lyhenne = lineparts.rsplit(' ')[0].replace(',', "")
                             self.maalajiarvoteksti.SetLabelText(lyhenne)
+                            print(self.data.maalaji)
+                            print("maalaji pitäisi lähettää tallennettavaksi seuraavan TAL sanoman kanssa")
+                            '''
                             self.linepanelille("{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(),
                                                                          self.data.syvyys))
             with open("{}.txt".format(self.data.hanke), 'a') as hanketextfile:
@@ -747,6 +755,8 @@ class windowClass(wx.Frame):
                 os.chdir(self.data.root)
                 maatextfile.close()
                 hanketextfile.close()
+                '''
+            maatextfile.close()
 
     def suljelistener(self, event):
             self.timer.Stop()
@@ -984,6 +994,9 @@ class TiedonKasittely(object):
         else:
 
             data = self.iparsipistesyvyydet(pistenimi)
+            if data:
+                self.gui.maalajibutton.Enable()
+                self.gui.graphbutton.Enable()
             self.gui.linepanelille("")
             for i in pistedata:
                 self.gui.linepanelille(i)
@@ -1042,9 +1055,9 @@ class TiedonKasittely(object):
                     self.gui.graphbutton.Enable()
                     self.gui.huombutton.Enable()
                     self.gui.pistebutton.Enable()
+                    self.gui.maalajibutton.Enable()
                     syvyysdata.reverse()
                     jatkasyvyys = syvyysdata[0]
-                    print(jatkasyvyys)
                     self.gui.syvyysarvoteksti.SetLabelText(jatkasyvyys)
                     self.gui.maalajibutton.Enable()
                     #print("tämä lähetetään kks {}".format(jatkasyvyys))
@@ -1314,7 +1327,8 @@ class TiedonKasittely(object):
                         linearvot = lineparts[0].rpartition(":")[2]
 
                         #kutsutaan saving luokan metodia joka tallettaa sanoman tekla-tiedostoon
-                        self.sa.tallennaTAL(self.hanke, linearvot)
+                        self.sa.tallennaTAL(self.hanke, linearvot, self.maalaji)
+                        self.maalaji = ""
 
                         self.arvot = linearvot.split()
                         self.apu = '{0:.2f}'.format(float(self.arvot[0]) / 100.00)
