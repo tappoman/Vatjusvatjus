@@ -28,8 +28,8 @@ class CanvasPanel(wx.Panel):
         #plt.ion()
 
         self.axes = self.figure.add_subplot(111)
-        plt.axes(xlim=(-120, 150), ylim=(0, 5))
-        plt.subplots_adjust(left=0.12, bottom=0.12, wspace=0.2, hspace=0.2)
+        plt.axes(xlim=(-120, 120), ylim=(0, 20))
+        plt.subplots_adjust(left=0.1, right=0.85, bottom=0.10, wspace=0.2, hspace=0.2)
 
         self.canvas = FigureCanvas(self, -1, self.figure)
         self.sizer = wx.BoxSizer(wx.VERTICAL)
@@ -63,7 +63,8 @@ class CanvasPanel(wx.Panel):
             for line in textfile:
                 #print(len(line))
                 if len(line) > 2:
-                    if "TY" in line:
+                    #if "TY" in line:
+                    if line.startswith("TY"):
                         #print("line: ", line.strip(), "haluttu: ", haluttupiste.strip());
                         #Tutkitaan onko tyonumero teklassa sama kuin annetussa hankeessa ja pisteessa
                         if line.strip() == haluttupiste.strip():
@@ -76,7 +77,8 @@ class CanvasPanel(wx.Panel):
                     #kun oikessa pisteessa
                     if self.muisti:
                         #tutkitaan teklasta kyseisen pisteen kairaustapa
-                        if "TT" in line:
+                        #if "TT" in line:
+                        if line.startswith("TT"):
                             apu = line.split(" ")
                             self.tutkimustapa = str(apu[1]).strip()
                             print("TUTKIMUSTAPA: ", self.tutkimustapa)
@@ -87,21 +89,33 @@ class CanvasPanel(wx.Panel):
                         #JOS PAINOKAIRAUS (PA) --> muotoillaan chart ja arvot
                         if self.tutkimustapa == "PA":
                             if lineparts[0][:1] == "":
-                                #print(lineparts)
+                                #print("linepartsit: ", lineparts)
+                                #print ("LP_LENGTH: ", len(lineparts))
+
                                 self.syvyys = lineparts[1][:4]
-                                self.x2 = lineparts[2][:3]
-                                self.x1 = lineparts[3][:4]
 
-                                print(self.syvyys, " : ", self.x1, " : ", self.x2)
+                                if len(lineparts) > 3:
+                                    self.x2 = lineparts[2][:3]
+                                    self.x1 = lineparts[3][:4]
 
-                                plt.ylabel("syvyys")
-                                plt.xlabel('voima / puolikierrokset')
+                                    print(self.syvyys, " : ", self.x1, " : ", self.x2)
 
-                                plt.barh(float(self.syvyys), width=float(self.x1),
-                                         height=0.1, linewidth=1, color='b', edgecolor='k')
-                                plt.barh(float(self.syvyys), width=-float(self.x2),
-                                         height=0.1, linewidth=1, color='g', edgecolor='k')
-                                self.figure.canvas.draw()
+                                    plt.ylabel("syvyys")
+                                    plt.xlabel('voima / puolikierrokset')
+
+                                    if int(self.x1) != 0:
+                                        plt.barh(float(self.syvyys), width=float(self.x1),
+                                                 height=0.2, linewidth=1, color='b', edgecolor='k')
+                                    else:
+                                        plt.barh(float(self.syvyys), width=float(self.x1),
+                                                 height=0.2, linewidth=1, color='b', edgecolor='k')
+                                        plt.barh(float(self.syvyys), width=-float(self.x2),
+                                                 height=0.2, linewidth=1, color='g', edgecolor='k')
+                                    self.figure.canvas.draw()
+
+                                else:
+                                    pass
+
 
                         # JOS HEIJARIK (HE) --> muotoillaan chart ja arvot
                         elif self.tutkimustapa == "HE":
