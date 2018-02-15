@@ -874,7 +874,7 @@ class TiedonKasittely(object):
         self.config = configparser.ConfigParser()
         self.tutkimustapa = tutkimustapa
 
-        '''
+
         self.oldline = ""
 
         self.com = Communication()
@@ -888,7 +888,7 @@ class TiedonKasittely(object):
         
         self.kks = Kksoperations(self.com)
 
-        '''
+
         self.sa = Saving()
         self.gui = gui
 
@@ -987,11 +987,19 @@ class TiedonKasittely(object):
                     file = open("{}.txt".format(hankenimi), 'a')
                     self.hanke = hankenimi
                     self.config.read("HANKETIEDOT.ini")
-                    file.write("fo = " + self.config["DEFAULT"]["fo"])
-                    file.write("\nkj = "+self.config["DEFAULT"]["kj"])
-                    file.write("\nom = "+self.config["DEFAULT"]["om"])
-                    file.write("\nml = "+self.config["DEFAULT"]["ml"])
-                    file.write("\norg = "+self.config["DEFAULT"]["org"])
+
+                    #file.write("fo = " + self.config["DEFAULT"]["fo"])
+                    #file.write("\nkj = "+self.config["DEFAULT"]["kj"])
+                    #file.write("\nom = "+self.config["DEFAULT"]["om"])
+                    #file.write("\nml = "+self.config["DEFAULT"]["ml"])
+                    #file.write("\norg = "+self.config["DEFAULT"]["org"])
+
+                    file.write("FO\t" + self.config["DEFAULT"]["fo"])
+                    file.write("\nKJ\t" + self.config["DEFAULT"]["kj"])
+                    file.write("\nOM\t" + self.config["DEFAULT"]["om"])
+                    file.write("\nML\t" + self.config["DEFAULT"]["ml"])
+                    file.write("\nOR\t" + self.config["DEFAULT"]["org"])
+
                     file.close()
                     self.gui.hankenimiteksti.SetLabelText(hankenimi)
                     self.ituhoatempconfig()
@@ -1242,14 +1250,25 @@ class TiedonKasittely(object):
                 self.iluotempconfig()
                 file = open("{}.txt".format(hanke), "a", encoding="utf-8")
                 self.config.read("PISTETIEDOT.ini")
-                file.write("\n" + "TY = {}".format(nimi))
-                file.write("\nPK = " + self.config["DEFAULT"]["PK"])
-                file.write("\nLA = " + self.config["DEFAULT"]["LA"])
+
+                #file.write("\n" + "TY = {}".format(nimi))
+                #file.write("\nPK = " + self.config["DEFAULT"]["PK"])
+                #file.write("\nLA = " + self.config["DEFAULT"]["LA"])
+                #self.config.read("TUTKIMUSTIEDOT.ini")
+                #file.write("\nTT = " + tutkimustapa)
+                #file.write("\nTX = " + self.config["DEFAULT"]["TY"])
+                #file.write("\nXY = " + self.config["DEFAULT"]["XY"])
+                #file.write("\nLN = " + self.config["DEFAULT"]["LN"] + "\n")
+
+                file.write("\n" + "TY\t {}".format(nimi))
+                file.write("\nPK\t" + self.config["DEFAULT"]["PK"])
+                file.write("\nLA\t" + self.config["DEFAULT"]["LA"])
                 self.config.read("TUTKIMUSTIEDOT.ini")
-                file.write("\nTT = " + tutkimustapa)
-                file.write("\nTX = " + self.config["DEFAULT"]["TY"])
-                file.write("\nXY = " + self.config["DEFAULT"]["XY"])
-                file.write("\nLN = " + self.config["DEFAULT"]["LN"] + "\n")
+                file.write("\nTT\t" + tutkimustapa)
+                file.write("\nTX\t" + self.config["DEFAULT"]["TY"])
+                file.write("\nXY\t" + self.config["DEFAULT"]["XY"])
+                file.write("\nLN\t" + self.config["DEFAULT"]["LN"] + "\n")
+
                 file.close()
                 self.ituhoatempconfig()
                 self.syvyys = 0
