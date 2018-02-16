@@ -186,49 +186,42 @@ class windowClass(wx.Frame):
         self.syvyysteksti.SetFont(font1)
 
         # syvyysarvoteksti päivittyy alkusyvyys + listeneriltä tuleva syvyys
-        self.syvyysarvoteksti = wx.StaticText(panel, -1, "", pos=(15, 345))
+        self.syvyysarvoteksti = wx.StaticText(panel, -1, "", pos=(10, 345))
         self.syvyysarvoteksti.SetFont(font2)
 
-        self.voimateksti = wx.StaticText(panel, -1, "Voima", pos=(85, 315))
+        self.voimateksti = wx.StaticText(panel, -1, "Voima", pos=(120, 315))
         self.voimateksti.SetFont(font1)
 
         # voima-arvoteksti päivittyy listeneriltä tulevan voiman mukaan
-        self.voimaarvoteksti = wx.StaticText(panel, -1, "", pos=(95, 345))
+        self.voimaarvoteksti = wx.StaticText(panel, -1, "", pos=(120, 345))
         self.voimaarvoteksti.SetFont(font2)
 
-        self.puolikierroksetteksti = wx.StaticText(panel, -1, "P-kierr", pos=(165, 315))
+        self.puolikierroksetteksti = wx.StaticText(panel, -1, "P-kierr", pos=(200, 315))
         self.puolikierroksetteksti.SetFont(font1)
 
         # puolikierroksetarvoteksti päivittyy listeneriltä tulevan voiman mukaan
-        self.puolikierroksetarvoteksti = wx.StaticText(panel, -1, "", pos=(170, 345))
+        self.puolikierroksetarvoteksti = wx.StaticText(panel, -1, "", pos=(200, 345))
         self.puolikierroksetarvoteksti.SetFont(font2)
 
-        self.nopeusteksti = wx.StaticText(panel, -1, "Nopeus", pos=(235, 315))
+        self.nopeusteksti = wx.StaticText(panel, -1, "Nopeus", pos=(305, 315))
         self.nopeusteksti.SetFont(font1)
 
         # nopeusarvoteksti päivittyy listeneriltä tulevan voiman mukaan
-        self.nopeusarvoteksti = wx.StaticText(panel, -1, "", pos=(240, 345))
+        self.nopeusarvoteksti = wx.StaticText(panel, -1, "", pos=(305, 345))
         self.nopeusarvoteksti.SetFont(font2)
 
-        self.maalajiteksti = wx.StaticText(panel, -1, "Maalaji", pos=(315, 315))
+        self.maalajiteksti = wx.StaticText(panel, -1, "Maalaji", pos=(400, 315))
         self.maalajiteksti.SetFont(font1)
 
         # maalajiarvoteksti päivittyy käyttäjän valitessa maalaji
-        self.maalajiarvoteksti = wx.StaticText(panel, -1, "", pos=(320, 345))
+        self.maalajiarvoteksti = wx.StaticText(panel, -1, "", pos=(400, 345))
         self.maalajiarvoteksti.SetFont(font2)
 
-        self.iskuteksti = wx.StaticText(panel, -1, "Isku", pos=(455, 315))
-        self.iskuteksti.SetFont(font1)
-
-        # iskuarvoteksti päivittyy käyttäjän valitessa isku
-        self.iskuarvoteksti = wx.StaticText(panel, -1, "OFF", pos=(445, 345))
-        self.iskuarvoteksti.SetFont(font2)
-
-        self.tankoteksti = wx.StaticText(panel, -1, "Tanko", pos=(515, 315))
+        self.tankoteksti = wx.StaticText(panel, -1, "Tanko", pos=(525, 315))
         self.tankoteksti.SetFont(font1)
 
         #  tankoarvolaatikko vaihtaa väriä tarpeen mukaan
-        self.tankoarvolaatikko = wx.Panel(panel, pos=(515, 345), size=(50,50))
+        self.tankoarvolaatikko = wx.Panel(panel, pos=(525, 345), size=(50,50))
         self.tankoarvolaatikko.SetBackgroundColour('red')
 
         # kirjoituspaneelin ja tekstielementtien alustus
@@ -256,34 +249,48 @@ class windowClass(wx.Frame):
     def alustaarvopaneeli(self, kairaustapa):
 
         if kairaustapa == "PA":
-            self.puolikierroksetteksti.SetLabelText("P-kierr")
-            self.puolikierroksetarvoteksti.SetLabelText("0")
             self.syvyysteksti.SetLabelText("Syvyys")
             self.syvyysarvoteksti.SetLabelText("0")
             self.voimateksti.SetLabelText("Voima")
             self.voimaarvoteksti.SetLabelText("0")
+            self.puolikierroksetteksti.SetLabelText("P-kierr")
+            self.puolikierroksetarvoteksti.SetLabelText("0")
             self.nopeusteksti.SetLabelText("Nopeus")
             self.nopeusarvoteksti.SetLabelText("0")
-            self.maalajiteksti.SetLabelText("Maalaji")
-            self.maalajiarvoteksti.SetLabelText("")
 
         if kairaustapa == "HE":
+            self.syvyysteksti.SetLabelText("Syvyys")
+            self.syvyysarvoteksti.SetLabelText("0")
             self.voimateksti.SetLabelText("H / I")
-            self.voimaarvoteksti.SetLabelText("H")
+            self.voimaarvoteksti.SetLabelText("0")
             self.puolikierroksetteksti.SetLabelText("")
             self.puolikierroksetarvoteksti.SetLabelText("")
             self.nopeusteksti.SetLabelText("")
             self.nopeusarvoteksti.SetLabelText("")
 
         if kairaustapa == "PO":
+            self.syvyysteksti.SetLabelText("Syvyys")
+            self.syvyysarvoteksti.SetLabelText("0")
             self.voimateksti.SetLabelText("Aika")
             self.voimaarvoteksti.SetLabelText("0")
-            self.puolikierroksetteksti.SetLabelText("")
-            self.puolikierroksetarvoteksti.SetLabelText("")
-            self.nopeusteksti.SetLabelText("")
-            self.nopeusarvoteksti.SetLabelText("")
+            self.puolikierroksetteksti.SetLabelText("Tnk. nop")
+            self.puolikierroksetarvoteksti.SetLabelText("0")
+            self.nopeusteksti.SetLabelText("Pyör. nop")
+            self.nopeusarvoteksti.SetLabelText("0")
+            lista = ["KELLO","EI KELLOA"]
+            kello = wx.SingleChoiceDialog(None, "Aloitetaanko kello?", "Porakairaus kello", lista,
+                                            wx.CHOICEDLG_STYLE)
+            if kello.ShowModal() == wx.OK:
+                print("tässä pitäisi lähettää kkssälle tieto kellon aloituksesta")
+                kello.Destroy()
+                return None
+            else:
+                kello.Destroy()
+                return None
 
         if kairaustapa == "TR":
+            self.syvyysteksti.SetLabelText("Syvyys")
+            self.syvyysarvoteksti.SetLabelText("0")
             self.voimateksti.SetLabelText("")
             self.voimaarvoteksti.SetLabelText("")
             self.puolikierroksetteksti.SetLabelText("")
@@ -292,6 +299,8 @@ class windowClass(wx.Frame):
             self.nopeusarvoteksti.SetLabelText("")
 
         if kairaustapa == "PH":
+            self.syvyysteksti.SetLabelText("Syvyys")
+            self.syvyysarvoteksti.SetLabelText("0")
             self.voimateksti.SetLabelText("Voima")
             self.voimaarvoteksti.SetLabelText("0")
             self.puolikierroksetteksti.SetLabelText("Vääntö")
@@ -423,7 +432,6 @@ class windowClass(wx.Frame):
                     self.lopetusbutton.Enable()
                     self.tankobutton.Enable()
                     self.data.kks.aloitaOdotustila()
-
                     self.data.kks.asetaKairaussyvyys("0")
                     self.config.read("USECONTROL.ini")
                     os.chdir(self.config["DEFAULT"]["polku"])
@@ -440,16 +448,11 @@ class windowClass(wx.Frame):
                                                     style=wx.OK)
                     alkusyvyys.Centre()
                     alkusyvyys.ShowModal()
-
                     self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
                     self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
-
                     self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
                     print(alkusyvyys.GetValue())
                     self.data.kks.lopetaAlkukairaus()
-
-                    #self.data.kks.aloitaOdotustila()
-
                     alkusyvyys.Destroy()
                     self.alkukairausbutton.SetLabelText("Lopeta\nalkukair.")
                     self.config.read("USECONTROL.ini")
@@ -458,13 +461,7 @@ class windowClass(wx.Frame):
                         textfile.write("\n" + "alkukairaus: {} syvyydellä {}\n".format(self.data.syvyys, kairausvalinta))
                         textfile.close()
                     os.chdir(self.data.root)
-
-                    #print("lähetetään kkssälle: työnumero, kairausvalinta, piste, pvm(timestä?)")
                     self.data.kks.aloitaAlkukairaus()
-
-                    self.linepanelille("Alkukairaus {} syvyydellä {}".format(kairausvalinta, alkusyvyys.GetValue()))
-                    # print("lähetetään kkssälle: työnumero(hanke?), {}, {}, pvm(timestä?)".format(kairausvalinta)
-                    #       , self.data.piste)
             else:
                 return None
 
@@ -494,15 +491,12 @@ class windowClass(wx.Frame):
                                                    wx.CHOICEDLG_STYLE)
             if kairausvalinta.ShowModal() == wx.ID_OK:
                 kairausvalinta = kairausvalinta.GetStringSelection()
-                print("lähetetään kkssälle tieto kairaus lopetettiin syvyydellä {} syystä {}"
-                      .format(self.data.haesyvyys(), kairausvalinta))
                 self.config.read("USECONTROL.ini")
                 os.chdir(self.config["DEFAULT"]["polku"])
                 with open("{}.txt".format(self.data.hanke), 'a') as textfile:
-                    textfile.write("\n" + "lopetus: {} syvyydellä {}\n".format(self.data.syvyys, kairausvalinta))
+                    textfile.write("\n" + "-1\t{}\n".format(self.data.syvyys, kairausvalinta))
                     textfile.close()
                 os.chdir(self.data.root)
-                self.linepanelille("Kairaus lopetettiin {} syvyydellä {}".format(kairausvalinta, self.data.haesyvyys()))
                 self.lopetusbutton.SetLabel("Aloita\nkairaus")
                 self.lopetusbutton.Disable()
             else:
@@ -517,8 +511,6 @@ class windowClass(wx.Frame):
 
     def kommenttirivi(self, event):
 
-        piste = []
-        data = []
         printtilista = []
         parsilista = []
         headerit = ["FO","KJ","OM","ML","ORG","TY","PK","LA","TT","TX","XY","LN"]
@@ -720,15 +712,11 @@ class windowClass(wx.Frame):
             return None
         if tagi == "Lieju":
             self.maalajiarvoteksti.SetLabelText("Lj")
-            print(self.data.maalaji)
-            print("maalaji pitäisi lähettää tallennettavaksi seuraavan TAL sanoman kanssa")
-            '''
-            with open("{}.txt".format(self.data.hanke), 'a') as hanketextfile:
-                hanketextfile.write(
-                    "\n" + "{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(), self.data.syvyys))
-                os.chdir(self.data.root)
-                hanketextfile.close()
-            '''
+            self.data.maalaji = "Lj"
+        elif tagi == "EI PIIRRET":
+            self.maalajiarvoteksti.SetLabelText("Ei")
+            self.data.maalaji = "Ei"
+
         else:
             if tagi == "turve":
                  tagi = tagi.upper()
@@ -744,18 +732,7 @@ class windowClass(wx.Frame):
                         if lineparts.__contains__("{}".format(tagi)):
                             lyhenne = lineparts.rsplit(' ')[0].replace(',', "")
                             self.maalajiarvoteksti.SetLabelText(lyhenne)
-                            print(self.data.maalaji)
-                            print("maalaji pitäisi lähettää tallennettavaksi seuraavan TAL sanoman kanssa")
-                            '''
-                            self.linepanelille("{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(),
-                                                                         self.data.syvyys))
-            with open("{}.txt".format(self.data.hanke), 'a') as hanketextfile:
-                hanketextfile.write("\n" + "{} syvyydellä {}".format(self.maalajiarvoteksti.GetLabel(),
-                                                                     self.data.syvyys))
-                os.chdir(self.data.root)
-                maatextfile.close()
-                hanketextfile.close()
-                '''
+                            self.data.maalaji = lyhenne
             maatextfile.close()
 
     def suljelistener(self, event):
@@ -1158,6 +1135,21 @@ class TiedonKasittely(object):
                                          , "Luodaan..", wx.YES_NO)
             luo = varmistus.ShowModal()
             if luo == wx.ID_YES:
+                xkoordinaatti = wx.TextEntryDialog(None, "Anna X koordinaatti", "Pisteen koordinaatit X")
+                if xkoordinaatti.ShowModal() == wx.ID_OK:
+                    xkoord = xkoordinaatti.GetValue()
+                    xkoordinaatti.Destroy()
+                else:
+                    print("Pistettä ei luotu")
+                    return None
+                ykoordinaatti = wx.TextEntryDialog(None, "Anna Y koordinaatti", "Pisteen koordinaatit Y")
+                if ykoordinaatti.ShowModal() == wx.ID_OK:
+                    ykoord = ykoordinaatti.GetValue()
+                    ykoordinaatti.Destroy()
+                else:
+                    print("Pistettä ei luotu")
+                    return None
+
                 tutkimustapa = self.ivalitseohjelma()
                 self.tutkimustapa = tutkimustapa
                 self.gui.alustaarvopaneeli(tutkimustapa)
@@ -1172,7 +1164,7 @@ class TiedonKasittely(object):
                 self.config.read("TUTKIMUSTIEDOT.ini")
                 file.write("\nTT " + tutkimustapa)
                 file.write("\nTX " + self.config["DEFAULT"]["TY"])
-                file.write("\nXY " + self.config["DEFAULT"]["XY"])
+                file.write("\nXY " + "{} {}".format(xkoord, ykoord))
                 file.write("\nLN " + self.config["DEFAULT"]["LN"] + "\n")
                 file.close()
                 self.ituhoatempconfig()
@@ -1230,8 +1222,8 @@ class TiedonKasittely(object):
     # maalajit kakkosikkunaan valitaan tekstitiedostosta ensimmäisen ikkunan
     # valinnan kolmen ensimmäisen kirjaimen mukaan.
     def ivalitsemaalaji(self, lista):
-        maalista = []
-        temp_lista = []
+
+
         maalaji = wx.SingleChoiceDialog(None, "Valitse maalaji", "Maalaji", lista,
                                            wx.CHOICEDLG_STYLE)
         if maalaji.ShowModal() == wx.ID_CANCEL:
@@ -1252,50 +1244,61 @@ class TiedonKasittely(object):
                 else:
                     print("Maalajia ei valittu")
                     return None
-            elif maalaji == "Muut":
+            elif maalaji == "Muut ":
                 maalaji = wx.SingleChoiceDialog(None, "Valitse maalaji", "Muut maat", ['TÄYTEMAA', 'KIVI', 'LOHKARE',
                                                                                        'LAPIPOR.LOHK', 'KALLIO', 'VESI',
-                                                                                       'TUNTEMATON', 'EI PIIRRETÄ'])
+                                                                                       'TUNTEMATON', 'EI PIIRRET'])
                 if maalaji.ShowModal() == wx.ID_OK:
                     maalaji = maalaji.GetStringSelection()
                     self.asetamaalaji(maalaji)
-                    return None
-                elif maalaji.ShowModal() == wx.ID_CANCEL:
-                    print("Maalajia ei valittu")
-                    maalaji.Destroy()
                     return None
                 else:
                     print("Maalajia ei valittu")
                     return None
             else:
-                maalaji = maalaji.lower()
+                templista = []
+                maalista = []
+                printtilista = []
+                indeksi = 0
                 parseri_maski = maalaji[:3]
-                with open("maalajit.txt", "r", encoding="utf-8") as textfile:
-                    for line in textfile:
-                        if len(line) > 1:
-                            lineparts = line.replace("\n", "").split("\t")
-                            for line in lineparts:
-                                if line.__contains__(parseri_maski):
-                                    temp_lista.append(line)
-                textfile.close()
-                for alkio in temp_lista:
-                    parsittu = re.sub('[^a-zA-Z0-9 \n\.]', '', alkio)
-                    maalista.append(parsittu)
-                maatyyppi = wx.SingleChoiceDialog(None, "Valitse maatyyppi", "{}".format(maalaji),
-                                                  maalista, wx.CHOICEDLG_STYLE)
+                file = open("maalajit.txt", "r", encoding="utf-8")
+                tiedosto = file.readlines()
+                file.close()
+                for rivi in tiedosto:
+                    if rivi.__contains__(maalaji):
+                        indeksi = tiedosto.index(rivi)
+                        while tiedosto[indeksi]:
+                            if tiedosto[indeksi].startswith('\n'):
+                                break
 
-                if maatyyppi.ShowModal() == wx.ID_OK:
-                    maatyyppi = maatyyppi.GetStringSelection()
-                    self.asetamaalaji(maatyyppi)
-                    return None
-                elif maatyyppi == wx.ID_CANCEL:
-                    print("Maalajia ei valittu")
-                    maatyyppi.Destroy()
-                    return None
-                else:
-                    print("Maalajia ei valittu")
-                    maatyyppi.Destroy()
-                    return None
+                            else:
+                                templista.append(tiedosto[indeksi].rsplit("\t", 3))
+                                indeksi = indeksi + 1
+
+
+            for temp in templista:
+                    maalista.append(temp[0])
+
+            for maa in maalista:
+                parsittu = re.sub(r'^[^" "]*', '', maa)
+                printtilista.append(parsittu)
+
+
+            maatyyppi = wx.SingleChoiceDialog(None, "Valitse maatyyppi", "{}".format(maalaji),
+                                              printtilista, wx.CHOICEDLG_STYLE)
+
+            if maatyyppi.ShowModal() == wx.ID_OK:
+                maatyyppi = maatyyppi.GetStringSelection()
+                for line in tiedosto:
+                    if line.__contains__(maatyyppi):
+                        self.asetamaalaji(maatyyppi)
+                return None
+
+            else:
+                print("Maalajia ei valittu")
+                maatyyppi.Destroy()
+                return None
+
 
     # luetaan tiedot tekstitiedostosta, mockup communication listenistä
     def ikuuntele(self, event):

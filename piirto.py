@@ -1,5 +1,5 @@
 from numpy import arange, sin, pi, linspace
-#import matplotlib
+import matplotlib.ticker
 import matplotlib.pyplot as plt
 #matplotlib.use('WXAgg')
 
@@ -29,6 +29,11 @@ class CanvasPanel(wx.Panel):
 
         self.axes = self.figure.add_subplot(111)
         plt.axes(xlim=(-120, 120), ylim=(0, 20))
+        plt.gca().xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+        xticks = [-100,-50,0,50,100]
+        xticklabels = ['100','50','0','50','100']
+        plt.xticks(xticks, xticklabels)
+
         plt.subplots_adjust(left=0.1, right=0.85, bottom=0.10, wspace=0.2, hspace=0.2)
 
         self.canvas = FigureCanvas(self, -1, self.figure)
@@ -40,6 +45,7 @@ class CanvasPanel(wx.Panel):
         #kopsattu vanhasta
         plt.gca().invert_yaxis()
         plt.axvline(0, color='k')
+
 
 
     def setValues(self, hanke, piste):
@@ -100,9 +106,9 @@ class CanvasPanel(wx.Panel):
 
                                     print(self.syvyys, " : ", self.x1, " : ", self.x2)
 
+                                    plt.title(self.piste)
                                     plt.ylabel("syvyys")
                                     plt.xlabel('voima / puolikierrokset')
-
                                     if int(self.x1) != 0:
                                         plt.barh(float(self.syvyys), width=float(self.x1),
                                                  height=0.2, linewidth=1, color='b', edgecolor='k')
