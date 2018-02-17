@@ -337,14 +337,16 @@ class windowClass(wx.Frame):
     # avataan tekstifile, joka luetaan kunnes viimeinen pistenimi-tunnistin tulee
     # ja tämän perään jatketaan datan kirjoittamista
     def pisteenavaus(self, event):
+        self.data.piste = ""
+        self.pistenimiteksti.SetLabelText("")
         self.alkukairausbutton.Disable()
         self.lopetusbutton.Disable()
         self.graphbutton.SetLabelText("Piirto")
         self.graphbutton.Disable()
         self.maalajibutton.Disable()
-        self.data.iavaapiste()
         self.syvyysarvoteksti.SetLabelText("")
         self.data.syvyys = 0
+        self.data.iavaapiste()
         #self.update(event)
         #self.timer.Start(50)
 
@@ -657,6 +659,17 @@ class windowClass(wx.Frame):
             return None
 
     def graafinpiirto(self, event):
+
+        os.chdir(self.data.config["DEFAULT"]["polku"])
+        pisteet = []
+        file = open("{}.txt".format(self.data.hanke), "r")
+        tiedosto = file.readlines()
+        file.close()
+        os.chdir(self.data.root)
+        for i in tiedosto:
+            if i.__contains__("TY "):
+                pisteet.append(i.strip("TY "))
+        pisteet.reverse()
         if self.graphbutton.GetLabelText() =="Piirto":
             self.graphbutton.SetLabelText("Tekla")
             for i in range(20):
@@ -669,20 +682,24 @@ class windowClass(wx.Frame):
                 self.scrolled_panel.Refresh()
 
             # luodaan piirto-olio ja passataan meidän scrollipaneli sille
-            self.piirto = CanvasPanel(self.scrolled_panel)
-            self.piirto.setValues(self.data.hanke, self.data.piste)
-            self.piirto.draw()
+            if self.data.piste == pisteet[0]:
+                self.piirto = CanvasPanel(self.scrolled_panel)
+                self.piirto.setValues(self.data.hanke, self.data.piste)
+                self.piirto.draw()
+            else:
+                pistedata = self.data.iparsipistemittaukset(self.data.piste)
+                self.piirto = CanvasPanel(self.scrolled_panel)
+                self.piirto.setOldValues(pistedata, self.data.tutkimustapa)
+                self.piirto.draw()
 
         elif self.graphbutton.GetLabelText() == "Tekla":
             self.graphbutton.SetLabelText("Piirto")
             self.data.iparsipiste(self.pistenimiteksti.GetLabel().strip())
-            #self.pistetiedotpaneelille()
         else:
             return None
 
     def valitseohjelma(self, event):
         if self.hankenimiteksti.GetLabel() == "":
-
             varoitus = wx.MessageDialog(None, "Valitse ensin hanke ja piste", "Varoitus", wx.OK | wx.ICON_INFORMATION)
             varoitus.ShowModal()
             varoitus.Destroy()
@@ -691,14 +708,9 @@ class windowClass(wx.Frame):
                 ohjelma = self.data.ivalitseohjelma()
                 self.ohjelmaarvoteksti.SetLabelText(ohjelma)
                 self.alustaarvopaneeli(ohjelma)
-                #self.linepanelille("TT {} syvyydellä {}".format(ohjelma, self.data.haesyvyys()))
             except TypeError:
                 print("Tutkimustapaa ei valittu")
 
-            #komento kks:lle kairaustavan valinnasta
-            #self.tapa = "TEK-" + ohjelma
-            #print(self.tapa)
-            #self.data.kks.asetaTapa(self.data.tapa)
 
     def hallintamenu(self, event):
         self.data.ihallinta()
@@ -740,7 +752,6 @@ class windowClass(wx.Frame):
             self.timer = None
             event.Skip()
             self.onClose()
-            #wx.EVT_WINDOW_DESTROY
 
 #tietojenkäsittely luokka
 #tallentaa käyttäjän ja communicationin syöttämän datan ja syöttää sen eteenpäin windowclass luokalle
@@ -924,10 +935,12 @@ class TiedonKasittely(object):
                 os.chdir(self.root)
                 return None
             elif valinta.GetStringSelection() == pisteet[0]:
+                self.piste = valinta.GetStringSelection().strip()
                 self.iparsiuusinpiste(valinta.GetStringSelection())
                 os.chdir(self.root)
                 return None
             else:
+                self.piste = valinta.GetStringSelection().strip()
                 self.iparsipiste(valinta.GetStringSelection())
                 os.chdir(self.root)
                 return None
@@ -963,6 +976,9 @@ class TiedonKasittely(object):
                     alku = tiedosto.index(line) + 1
                     while alku < len(tiedosto):
                         linepartindex = tiedosto[alku]
+                        if linepartindex.__contains__("TT "):
+                            self.tutkimustapa = linepartindex.replace("TT ","").strip()
+                            self.gui.ohjelmaarvoteksti.SetLabelText(self.tutkimustapa)
                         if linepartindex[0:2] == "TY":
                             break
                         else:
@@ -971,6 +987,7 @@ class TiedonKasittely(object):
         else:
 
             data = self.iparsipistesyvyydet(pistenimi)
+
             if data:
                 self.gui.maalajibutton.Enable()
                 self.gui.graphbutton.Enable()
@@ -1009,6 +1026,10 @@ class TiedonKasittely(object):
                     alku = tiedosto.index(line) + 1
                     while alku < len(tiedosto):
                         linepartindex = tiedosto[alku]
+                        if linepartindex.__contains__("TT "):
+                            self.tutkimustapa = linepartindex.replace("TT ", "").strip()
+                            self.gui.ohjelmaarvoteksti.SetLabelText(self.tutkimustapa)
+                            self.gui.alustaarvopaneeli(self.tutkimustapa)
                         if linepartindex[0:2] == "TY":
                             break
                         else:
@@ -1024,7 +1045,6 @@ class TiedonKasittely(object):
                 for i in pistedata:
                     self.gui.linepanelille(i)
                 self.gui.pistenimiteksti.SetLabelText(pistenimi.strip())
-
                 syvyysdata = self.iparsipistesyvyydet(pistenimi)
 
                 if syvyysdata:
@@ -1037,15 +1057,11 @@ class TiedonKasittely(object):
                     jatkasyvyys = syvyysdata[0]
                     self.gui.syvyysarvoteksti.SetLabelText(jatkasyvyys)
                     self.gui.maalajibutton.Enable()
-                    #print("tämä lähetetään kks {}".format(jatkasyvyys))
-                    #print("TÄHÄN PISTÄISI PISTÄÄ VIKAN PISTEEN SYVYYS KKSSÄLLE ETTÄ VOI JATKAA")
-                    #print("kks odotustilaan")
-
                     self.kks.asetaKairaussyvyys(self.syvyys)
-
                     self.gui.graphbutton.SetLabelText("Piirto")
                     os.chdir(self.root)
                     return None
+
                 else:
                     self.gui.alkukairausbutton.Enable()
                     os.chdir(self.root)
@@ -1054,6 +1070,66 @@ class TiedonKasittely(object):
 
     #listataan pisteen syvyysmittaukset
     def iparsipistesyvyydet(self, pistenimi):
+        piste = []
+        pistevalinta = pistenimi
+        syvyyslista = []
+        printtilista = []
+        parsilista = []
+        os.chdir(self.config["DEFAULT"]["polku"])
+        file = open("{}.txt".format(self.hanke), "r")
+        tiedosto = file.readlines()
+        file.close()
+
+        for line in tiedosto:
+            if line.__contains__(pistevalinta):
+                piste.append(line)
+                alku = tiedosto.index(line) + 1
+                while alku < len(tiedosto):
+                    linepartindex = tiedosto[alku]
+                    if linepartindex[0:2] == ("TY"):
+                        break
+
+                    else:
+                        piste.append(linepartindex)
+                        alku = alku + 1
+
+        for rivi in piste[::-1]:
+            if rivi.__contains__("HM"):
+                continue
+            elif rivi == "\n":
+                continue
+            elif rivi.__contains__("LN"):
+                break
+            else:
+                syvyyslista.append(rivi)
+
+        syvyyslista.reverse()
+
+        for s in syvyyslista:
+            if s == "\n":
+                syvyyslista.remove(s)
+            elif s.__contains__("AL"):
+                alku = s.rsplit(None, 4)
+                parsilista.append(alku[1])
+            else:
+                parsilista.append(s.rsplit(None, 3))
+
+        for i in parsilista:
+            if len(printtilista) < len(syvyyslista):
+                printtilista.append(i[0])
+
+        if printtilista == []:
+            os.chdir(self.root)
+            return None
+
+        else:
+            self.gui.graphbutton.Enable()
+            self.gui.huombutton.Enable()
+            os.chdir(self.root)
+            return printtilista
+
+    #tämä parsii mit-datan piirtoa varten teklasta
+    def iparsipistemittaukset(self, pistenimi):
         piste = []
         pistevalinta = pistenimi
         syvyyslista = []
@@ -1093,7 +1169,7 @@ class TiedonKasittely(object):
                 syvyyslista.remove(s)
             elif s.__contains__("AL"):
                 alku = s.rsplit(None, 4)
-                parsilista.append(alku[1])
+                parsilista.append(alku[1:4])
             else:
                 parsilista.append(s.rsplit(None, 3))
 
@@ -1101,14 +1177,7 @@ class TiedonKasittely(object):
             if len(printtilista) < len(syvyyslista):
                 printtilista.append(i[0])
 
-        if printtilista == []:
-            os.chdir(self.root)
-            return None
-        else:
-            self.gui.graphbutton.Enable()
-            self.gui.huombutton.Enable()
-            os.chdir(self.root)
-            return printtilista
+            return parsilista
 
     # luodaan piste käyttäjän antamalla nimellä
     def iluopiste(self, hanke):
@@ -1170,7 +1239,6 @@ class TiedonKasittely(object):
                 self.ituhoatempconfig()
                 self.syvyys = 0
                 self.alkusyvyys = 0
-                #self.iparsipiste(self.piste)
                 self.iparsiuusinpiste(self.piste)
                 os.chdir(self.root)
             else:
@@ -1196,7 +1264,6 @@ class TiedonKasittely(object):
 
         if ohjelmavalinta.ShowModal() == wx.ID_OK:
             ohjelmavalinta = ohjelmavalinta.GetStringSelection()
-            print("lähetetään kkssälle tieto tt syvyydellä {} on {}".format(self.haesyvyys(), ohjelmavalinta))
 
             self.config.read("USECONTROL.ini")
             os.chdir(self.config["DEFAULT"]["polku"])
@@ -1436,7 +1503,6 @@ class TiedonKasittely(object):
     def iparsitiedot(self, line):
 
         tutkimustapa = self.palautatutkimustapa()
-
         linearvot = line[0].rpartition(":")[2]
         arvot = linearvot.split()
 

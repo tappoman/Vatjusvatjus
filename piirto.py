@@ -106,7 +106,6 @@ class CanvasPanel(wx.Panel):
 
                                     print(self.syvyys, " : ", self.x1, " : ", self.x2)
 
-                                    plt.title(self.piste)
                                     plt.ylabel("syvyys")
                                     plt.xlabel('voima / puolikierrokset')
                                     if int(self.x1) != 0:
@@ -211,6 +210,111 @@ class CanvasPanel(wx.Panel):
     def addValues(self, syvyys, voima, puolikierrokset):
         pass
 
+    def setOldValues(self, data, kairaustapa):
+
+        if kairaustapa == "PA":
+
+            floatsyvyys = []
+            floatvoima = []
+            floatpuolikierrokset = []
+            for i in data:
+                floatsyvyys.append(float(i[0]))
+                floatvoima.append(float(i[1]))
+                floatpuolikierrokset.append(float(i[2]))
+
+            plt.ylabel("syvyys")
+            plt.xlabel('voima / puolikierrokset')
+            s = 0
+            while s < len(floatsyvyys):
+                if floatvoima[s] != 0:
+                    plt.barh(floatsyvyys[s], width=-floatvoima[s],
+                             height=0.2, linewidth=1, color='b', edgecolor='k')
+                    s = s + 1
+                else:
+                    plt.barh(floatsyvyys[s], width=-floatvoima[s],
+                             height=0.2, linewidth=1, color='b', edgecolor='k')
+                    plt.barh(floatsyvyys[s], width=floatpuolikierrokset[s],
+                             height=0.2, linewidth=1, color='g', edgecolor='k')
+                    s = s + 1
+
+        elif kairaustapa == "HE":
+            floatsyvyys = []
+            floatisku = []
+            for i in data:
+                floatsyvyys.append(float(i[0]))
+                floatisku.append(float(i[1]))
+
+            plt.ylabel("syvyys")
+            plt.xlabel('heijari')
+            s = 0
+            while s < len(floatsyvyys):
+                    plt.barh(floatsyvyys[s], width=floatisku[s],
+                             height=0.2, linewidth=1, color='b', edgecolor='k')
+                    s = s + 1
+
+        elif kairaustapa == "PO":
+
+            floatsyvyys = []
+            floattnknopeus = []
+            for i in data:
+                floatsyvyys.append(float(i[0]))
+                floattnknopeus.append(float(i[2]))
+
+            plt.ylabel("syvyys")
+            plt.xlabel('tunkeutumisnopeus')
+
+            s = 0
+            while s < len(floatsyvyys):
+                    plt.barh(floatsyvyys[s], width=-floattnknopeus[s],
+                             height=0.2, linewidth=1, color='b', edgecolor='k')
+
+                    s = s + 1
+
+        elif kairaustapa == "TR":
+
+            plt.axes(xlim=(-10, 10), ylim=(0, 20))
+            plt.gca().invert_yaxis()
+            floatsyvyys = []
+            for i in data:
+                floatsyvyys.append(float(i[0]))
+            syvin = floatsyvyys.__getitem__(len(floatsyvyys)-1)
+            matalin = floatsyvyys[0]
+
+            self.axes.xaxis.set_major_formatter(plt.NullFormatter())
+            plt.axis('off')
+
+            plt.text(0.5,0.5,"{}".format(matalin))
+            plt.text(0.5,syvin+0.5,"{}(m)".format(syvin))
+            plt.bar(x=0,height=syvin, width=0.0001, color='b', edgecolor='k')
+
+
+        elif kairaustapa == "PH":
+
+            floatsyvyys = []
+            floatvoima = []
+            floatvaanto = []
+            for i in data:
+                floatsyvyys.append(float(i[0]))
+                floatvoima.append(float(i[1]))
+                floatvaanto.append(float(i[2]))
+
+            plt.ylabel("syvyys")
+            plt.xlabel('voima / vääntö')
+            plt.gca().xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+            xticks = [-100, -50, 0, 50, 100]
+            xticklabels = ['100', '50', '0', '50', '100']
+            plt.xticks(xticks, xticklabels)
+
+            s = 0
+            while s < len(floatsyvyys):
+                    plt.barh(floatsyvyys[s], width=-floatvoima[s],
+                             height=0.2, linewidth=1, color='b', edgecolor='k')
+                    plt.barh(floatsyvyys[s], width=floatvaanto[s],
+                             height=0.2, linewidth=1, color='g', edgecolor='k')
+                    s = s + 1
+
+        else:
+            return None
 
     def draw(self):
         self.figure.canvas.draw()
