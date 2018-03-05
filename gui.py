@@ -783,7 +783,7 @@ class TiedonKasittely(object):
         self.config = configparser.ConfigParser()
         self.tutkimustapa = tutkimustapa
 
-        '''
+
         self.oldline = ""
 
         self.com = Communication()
@@ -797,7 +797,7 @@ class TiedonKasittely(object):
         
         self.kks = Kksoperations(self.com)
 
-        '''
+
         self.sa = Saving()
         self.gui = gui
 
@@ -1425,7 +1425,7 @@ class TiedonKasittely(object):
 
                     if lineparts[0][:4] == "#SYV":
                         #self.iparsitiedot(lineparts)
-                        print("ENDI")
+                        print("SYVI")
                         #TEHDAAN MITAMITA
                         #Alkukairaussyvyys 1s välein. < - - - - - - #SYV:nnn
 
