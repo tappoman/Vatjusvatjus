@@ -110,12 +110,12 @@ class CanvasPanel(wx.Panel):
                                     plt.xlabel('voima / puolikierrokset')
                                     if int(self.x1) != 0:
                                         plt.barh(float(self.syvyys), width=float(self.x1),
-                                                 height=0.2, linewidth=1, color='b', edgecolor='k')
+                                                 height=0.2, linewidth=1, color='g', edgecolor='k')
                                     else:
                                         plt.barh(float(self.syvyys), width=float(self.x1),
-                                                 height=0.2, linewidth=1, color='b', edgecolor='k')
-                                        plt.barh(float(self.syvyys), width=-float(self.x2),
                                                  height=0.2, linewidth=1, color='g', edgecolor='k')
+                                        plt.barh(float(self.syvyys), width=-float(self.x2),
+                                                 height=0.2, linewidth=1, color='b', edgecolor='k')
                                     self.figure.canvas.draw()
 
                                 else:
@@ -135,8 +135,8 @@ class CanvasPanel(wx.Panel):
                                 plt.ylabel("syvyys")
                                 plt.xlabel('heijari / isku')
 
-                                plt.barh(float(self.syvyys), width=-float(self.x2),
-                                         height=0.1, linewidth=1, color='g', edgecolor='k')
+                                plt.barh(float(self.syvyys), width=float(self.x2),
+                                         height=0.1, linewidth=1, color='b', edgecolor='k')
                                 self.figure.canvas.draw()
 
                         # JOS PORAK (PO) --> muotoillaan chart ja arvot
@@ -158,10 +158,10 @@ class CanvasPanel(wx.Panel):
                                 plt.xlabel('aika')
 
                                 plt.barh(float(self.syvyys), width=float(self.x1),
-                                         height=0.1, linewidth=1, color='b', edgecolor='k')
+                                         height=0.1, linewidth=1, color='g', edgecolor='k')
 
                                 plt.barh(float(self.syvyys), width=-float(self.x2),
-                                         height=0.1, linewidth=1, color='g', edgecolor='k')
+                                         height=0.1, linewidth=1, color='b', edgecolor='k')
                                 self.figure.canvas.draw()
 
                         # JOS TARYK (TK) --> muotoillaan chart ja arvot
@@ -258,7 +258,7 @@ class CanvasPanel(wx.Panel):
             floattnknopeus = []
             for i in data:
                 floatsyvyys.append(float(i[0]))
-                floattnknopeus.append(float(i[2]))
+                floattnknopeus.append(float(i[1]))
 
             plt.ylabel("syvyys")
             plt.xlabel('tunkeutumisnopeus')

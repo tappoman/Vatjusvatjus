@@ -18,6 +18,7 @@ import saving
 from saving import *
 from kks_operations import *
 from piirto import *
+import time
 
 import communication
 # import guioperations
@@ -415,6 +416,8 @@ class windowClass(wx.Frame):
             self.tankobutton.Enable()
             self.alkukairausbutton.SetLabelText("Alku\nkairaus")
 
+
+
         else:
             self.data.kks.asetaHanke(self.data.piste, self.data.hanke)
             self.data.kks.asetaPiste(self.data.piste)
@@ -437,9 +440,9 @@ class windowClass(wx.Frame):
                     self.data.kks.asetaKairaussyvyys("0")
                     self.config.read("USECONTROL.ini")
                     os.chdir(self.config["DEFAULT"]["polku"])
-                    with open("{}.txt".format(self.data.hanke), 'a') as textfile:
-                        textfile.write("\n" + "alkukairaus ohitetaan\n")
-                        textfile.close()
+                    #with open("{}.txt".format(self.data.hanke), 'a') as textfile:
+                    #    textfile.write("\n" + "alkukairaus ohitetaan\n")
+                    #    textfile.close()
                     os.chdir(self.data.root)
                 else:
                     with open("alkukairaus.txt", "r") as textfile:
@@ -453,15 +456,18 @@ class windowClass(wx.Frame):
                     self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
                     self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
                     self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
+
                     print(alkusyvyys.GetValue())
                     self.data.kks.lopetaAlkukairaus()
                     alkusyvyys.Destroy()
                     self.alkukairausbutton.SetLabelText("Lopeta\nalkukair.")
                     self.config.read("USECONTROL.ini")
                     os.chdir(self.config["DEFAULT"]["polku"])
-                    with open("{}.txt".format(self.data.hanke), 'a') as textfile:
-                        textfile.write("\n" + "alkukairaus: {} syvyydellä {}\n".format(self.data.syvyys, kairausvalinta))
-                        textfile.close()
+
+                    #with open("{}.txt".format(self.data.hanke), 'a') as textfile:
+                    #    textfile.write("\n" + "alkukairaus: {} syvyydellä {}\n".format(self.data.syvyys, kairausvalinta))
+                    #    textfile.close()
+
                     os.chdir(self.data.root)
                     self.data.kks.aloitaAlkukairaus()
             else:
@@ -473,6 +479,8 @@ class windowClass(wx.Frame):
             warning.ShowModal()
             warning.Destroy()
         elif self.lopetusbutton.GetLabel() == "Lopeta\nkairaus":
+            self.data.kks.kuittaaTanko()
+            time.sleep(0.5)
             self.data.kks.lopetaKairaus()
             self.alkukairausbutton.Enable()
             self.tankobutton.Enable()
@@ -682,12 +690,15 @@ class windowClass(wx.Frame):
                 self.scrolled_panel.Refresh()
 
             # luodaan piirto-olio ja passataan meidän scrollipaneli sille
-            if self.data.piste == pisteet[0]:
+            piirratama = pisteet[0].strip()
+            if self.data.piste.strip() == piirratama:
                 self.piirto = CanvasPanel(self.scrolled_panel)
                 self.piirto.setValues(self.data.hanke, self.data.piste)
                 self.piirto.draw()
             else:
                 pistedata = self.data.iparsipistemittaukset(self.data.piste)
+                if pistedata[::-1][0][0] == "-1":
+                    del pistedata[-1]
                 self.piirto = CanvasPanel(self.scrolled_panel)
                 self.piirto.setOldValues(pistedata, self.data.tutkimustapa)
                 self.piirto.draw()
@@ -1204,14 +1215,14 @@ class TiedonKasittely(object):
                                          , "Luodaan..", wx.YES_NO)
             luo = varmistus.ShowModal()
             if luo == wx.ID_YES:
-                xkoordinaatti = wx.TextEntryDialog(None, "Anna X koordinaatti", "Pisteen koordinaatit X")
+                xkoordinaatti = wx.TextEntryDialog(None, "Anna N koordinaatti", "Pisteen koordinaatit X")
                 if xkoordinaatti.ShowModal() == wx.ID_OK:
                     xkoord = xkoordinaatti.GetValue()
                     xkoordinaatti.Destroy()
                 else:
                     print("Pistettä ei luotu")
                     return None
-                ykoordinaatti = wx.TextEntryDialog(None, "Anna Y koordinaatti", "Pisteen koordinaatit Y")
+                ykoordinaatti = wx.TextEntryDialog(None, "Anna E koordinaatti", "Pisteen koordinaatit Y")
                 if ykoordinaatti.ShowModal() == wx.ID_OK:
                     ykoord = ykoordinaatti.GetValue()
                     ykoordinaatti.Destroy()
