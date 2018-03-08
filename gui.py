@@ -416,8 +416,6 @@ class windowClass(wx.Frame):
             self.tankobutton.Enable()
             self.alkukairausbutton.SetLabelText("Alku\nkairaus")
 
-
-
         else:
             self.data.kks.asetaHanke(self.data.piste, self.data.hanke)
             self.data.kks.asetaPiste(self.data.piste)
@@ -1439,7 +1437,7 @@ class TiedonKasittely(object):
                         print("SYVI")
                         #TEHDAAN MITAMITA
                         #Alkukairaussyvyys 1s välein. < - - - - - - #SYV:nnn
-
+                        #self.sa.tallennaSYV(self.hanke, lineparts[0])
 
                     #OHJAUSTIEDOT KKS:LTA
                     if lineparts[0] == "#ALKUKAIRAUS":

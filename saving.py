@@ -29,6 +29,8 @@ class Saving (object):
         file = open(self.fullpath, "w")
         file.write("")
 
+        self.lastSYV = 0;
+
 
     #Määrittää tallenustiedoston kaikelle kks-laitteelta tulevalle datalle ja tallettaa sen
     def tallennaMIT(self, MIT):
@@ -42,6 +44,8 @@ class Saving (object):
         self.fullpath = os.path.join(self.tal_polku, self.tiedosto)
         file = open(self.fullpath, "w")
         file.write(MIT)
+
+
 
     #asettaa polun tallennettavalle datalle ja kommunikaation liittyville parametreille (baud, port)
     #ottaa polun vastaan muododssa 'C:/POLKU/'
