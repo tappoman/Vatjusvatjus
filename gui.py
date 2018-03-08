@@ -740,7 +740,7 @@ class windowClass(wx.Frame):
         else:
             return None
 			
-	def buffaa_paneelia(self):
+    def buffaa_paneelia(self):
         for i in range(5):
             line = ""
             new_text = wx.StaticText(self.scrolled_panel, -1, line, size=(550, 30))
@@ -838,6 +838,7 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
+        '''
         self.com = Communication()
 
         self.comcheck = self.com.openConnection()
@@ -848,7 +849,7 @@ class TiedonKasittely(object):
             sys.exit(0)
         
         self.kks = Kksoperations(self.com)
-
+        '''
 
         self.sa = Saving()
         self.gui = gui
@@ -1110,7 +1111,7 @@ class TiedonKasittely(object):
                     jatkasyvyys = syvyysdata[0]
                     self.gui.syvyysarvoteksti.SetLabelText(jatkasyvyys)
                     self.gui.maalajibutton.Enable()
-                    self.kks.asetaKairaussyvyys(self.syvyys)
+                    self.kks.asetaKairaussyvyys(jatkasyvyys)
                     self.gui.graphbutton.SetLabelText("Piirto")
                     os.chdir(self.root)
                     return None
