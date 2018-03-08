@@ -730,7 +730,7 @@ class windowClass(wx.Frame):
                 pistedata = self.data.iparsipistemittaukset(self.data.piste)
                 if pistedata[::-1][0][0] == "-1":
                     del pistedata[-1]
-                self.piirto = CanvasPanel(self.scrolled_panel)
+                self.piirto = CanvasPanel(self.scrolled_panel, gui=self)
                 self.piirto.setOldValues(pistedata, self.data.tutkimustapa)
                 self.piirto.draw()
 
@@ -739,6 +739,16 @@ class windowClass(wx.Frame):
             self.data.iparsipiste(self.pistenimiteksti.GetLabel().strip())
         else:
             return None
+			
+	def buffaa_paneelia(self):
+        for i in range(5):
+            line = ""
+            new_text = wx.StaticText(self.scrolled_panel, -1, line, size=(550, 30))
+            self.spSizer.Add(new_text)
+            self.scrolled_panel.ScrollLines(10)
+            self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
+            self.scrolled_panel.Layout()
+            self.scrolled_panel.Refresh()
 
     def valitseohjelma(self, event):
         if self.hankenimiteksti.GetLabel() == "":

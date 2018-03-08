@@ -17,15 +17,14 @@ import wx
 import configparser
 
 class CanvasPanel(wx.Panel):
-    def __init__(self, parent):
+    def __init__(self, parent, gui=None):
         wx.Panel.__init__(self, parent)
-        #self.figure = Figure()
-        self.figure = plt.figure()
-        #self.hanke = hanke
+
+        self.figure = plt.figure(1)
         self.config = configparser.ConfigParser()
+        self.gui = gui
 
         #interactive mode
-        #plt.ion()
 
         self.axes = self.figure.add_subplot(111)
         plt.axes(xlim=(-120, 120), ylim=(0, 20))
@@ -33,8 +32,8 @@ class CanvasPanel(wx.Panel):
         xticks = [-100,-50,0,50,100]
         xticklabels = ['100','50','0','50','100']
         plt.xticks(xticks, xticklabels)
-
         plt.subplots_adjust(left=0.1, right=0.85, bottom=0.10, wspace=0.2, hspace=0.2)
+
 
         self.canvas = FigureCanvas(self, -1, self.figure)
         self.sizer = wx.BoxSizer(wx.VERTICAL)
@@ -47,6 +46,46 @@ class CanvasPanel(wx.Panel):
         plt.axvline(0, color='k')
 
 
+        '''
+        self.figure2 = plt.figure(2)
+        self.axes2 = self.figure.add_subplot(111)
+        plt.axes(xlim=(-120, 120), ylim=(20, 40))
+        plt.gca().xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+        xticks = [-100,-50,0,50,100]
+        xticklabels = ['100','50','0','50','100']
+        plt.xticks(xticks, xticklabels)
+        plt.subplots_adjust(left=0.1, right=0.85, bottom=0.10, wspace=0.2, hspace=0.2)
+
+
+        self.canvas = FigureCanvas(self, -1, self.figure)
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+        self.sizer.Add(self.canvas, 1, wx.LEFT | wx.TOP | wx.GROW)
+        self.SetSizer(self.sizer)
+        self.Fit()
+
+        plt.gca().invert_yaxis()
+        plt.axvline(0, color='k')
+
+    
+        self.figure3 = plt.figure(3)
+        self.axes3 = self.figure.add_subplot(111)
+        plt.axes(xlim=(-120, 120), ylim=(40, 60))
+        plt.gca().xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+        xticks = [-100,-50,0,50,100]
+        xticklabels = ['100','50','0','50','100']
+        plt.xticks(xticks, xticklabels)
+        plt.subplots_adjust(left=0.1, right=0.85, bottom=0.10, wspace=0.2, hspace=0.2)
+
+
+        self.canvas = FigureCanvas(self, -1, self.figure)
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+        self.sizer.Add(self.canvas, 1, wx.LEFT | wx.TOP | wx.GROW)
+        self.SetSizer(self.sizer)
+        self.Fit()
+
+        plt.gca().invert_yaxis()
+        plt.axvline(0, color='k')
+        '''
 
     def setValues(self, hanke, piste):
         self.config.read("USECONTROL.ini")
@@ -206,13 +245,11 @@ class CanvasPanel(wx.Panel):
                                          height=0.1, linewidth=1, color='g', edgecolor='k')
                                 self.figure.canvas.draw()
 
-
-    def addValues(self, syvyys, voima, puolikierrokset):
-        pass
-
     def setOldValues(self, data, kairaustapa):
 
         if kairaustapa == "PA":
+
+            #if self.syvyys[:-1] < 20:
 
             floatsyvyys = []
             floatvoima = []
@@ -316,5 +353,11 @@ class CanvasPanel(wx.Panel):
         else:
             return None
 
+
     def draw(self):
         self.figure.canvas.draw()
+        #self.gui.buffaa_paneelia()
+        #self.figure.canvas.draw()
+        #plt.show()
+
+
