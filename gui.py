@@ -406,14 +406,10 @@ class windowClass(wx.Frame):
             return True
 
     def aloitaalkukairaus(self, event):
-        if self.hankenimiteksti.GetLabel() == "":
-            warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
-            warning.ShowModal()
-            warning.Destroy()
-        elif self.alkukairausbutton.GetLabelText()=="Lopeta\nalkukair.":
 
-            alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys sentteinä', "Alkusyvyys", str(self.data.alkusyvyys), style=wx.OK)
-            # alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys sentteinä',"Alkusyvyys","0", style=wx.OK)
+        if self.alkukairausbutton.GetLabelText()=="Lopeta\nalkukair.":
+            alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys sentteinä',
+                                            "Alkusyvyys", str(self.data.alkusyvyys), style=wx.OK)
 
             alkusyvyys.Centre()
             alkusyvyys.ShowModal()
@@ -425,7 +421,6 @@ class windowClass(wx.Frame):
             self.data.kks.lopetaAlkukairaus()
             alkusyvyys.Destroy()
 
-
             self.data.kks.lopetaAlkukairaus()
             self.lopetusbutton.Enable()
             self.alkukairausbutton.Enable()
@@ -433,9 +428,9 @@ class windowClass(wx.Frame):
             self.alkukairausbutton.SetLabelText("Alku\nkairaus")
 
         else:
-            self.data.kks.asetaHanke(self.data.piste, self.data.hanke)
-            self.data.kks.asetaPiste(self.data.piste)
-            self.data.kks.asetaTapa(self.data.tutkimustapa)
+            #self.data.kks.asetaHanke(self.data.piste, self.data.hanke)
+            #self.data.kks.asetaPiste(self.data.piste)
+            #self.data.kks.asetaTapa(self.data.tutkimustapa)
             self.graphbutton.Enable()
             os.chdir(self.data.root)
             z = []
@@ -444,55 +439,34 @@ class windowClass(wx.Frame):
                     if len(line) > 1:
                         z.append(line.rsplit(" ")[1].strip("\n"))
             textfile.close()
-            kairausvalinta = wx.SingleChoiceDialog(None, "Valitse alkukairaustapa", "Alkukairaus", z, wx.CHOICEDLG_STYLE)
+            kairausvalinta = wx.SingleChoiceDialog(None, "Valitse alkukairaustapa",
+                                                   "Alkukairaus", z, wx.CHOICEDLG_STYLE)
             if kairausvalinta.ShowModal() == wx.ID_OK:
                 kairausvalinta = kairausvalinta.GetStringSelection()
                 if kairausvalinta == "OHITETAAN":
                     self.lopetusbutton.Enable()
                     self.tankobutton.Enable()
-                    self.data.kks.aloitaOdotustila()
-                    self.data.kks.asetaKairaussyvyys("0")
+                    #self.data.kks.aloitaOdotustila()
+                    #self.data.kks.asetaKairaussyvyys("0")
                     self.config.read("USECONTROL.ini")
                     os.chdir(self.config["DEFAULT"]["polku"])
-                    #with open("{}.txt".format(self.data.hanke), 'a') as textfile:
-                    #    textfile.write("\n" + "alkukairaus ohitetaan\n")
-                    #    textfile.close()
-                    os.chdir(self.data.root)
+
                 else:
                     with open("alkukairaus.txt", "r") as textfile:
                         for line in textfile:
                             if line.__contains__(kairausvalinta):
                                 self.alkukairausarvoteksti.SetLabelText(line[1:3])
-                    #alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys sentteinä',"Alkusyvyys","0",
-                    #                                style=wx.OK)
-                    #alkusyvyys.Centre()
-                    #alkusyvyys.ShowModal()
-                    #self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
-                    #self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
-                    #self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
-
-                    #print(alkusyvyys.GetValue())
-                    #self.data.kks.lopetaAlkukairaus()
-                    #alkusyvyys.Destroy()
                     self.alkukairausbutton.SetLabelText("Lopeta\nalkukair.")
                     self.config.read("USECONTROL.ini")
                     os.chdir(self.config["DEFAULT"]["polku"])
-
-                    #with open("{}.txt".format(self.data.hanke), 'a') as textfile:
-                    #    textfile.write("\n" + "alkukairaus: {} syvyydellä {}\n".format(self.data.syvyys, kairausvalinta))
-                    #    textfile.close()
-
                     os.chdir(self.data.root)
                     self.data.kks.aloitaAlkukairaus()
             else:
                 return None
 
     def lopetakairaus(self, event):
-        if self.hankenimiteksti.GetLabel() == "":
-            warning = wx.MessageDialog(None, "Valitse ensin hanke", "Varoitus", wx.OK | wx.ICON_INFORMATION)
-            warning.ShowModal()
-            warning.Destroy()
-        elif self.lopetusbutton.GetLabel() == "Lopeta\nkairaus":
+
+        if self.lopetusbutton.GetLabel() == "Lopeta\nkairaus":
             self.data.kks.kuittaaTanko()
             time.sleep(0.5)
             self.data.kks.lopetaKairaus()
@@ -762,7 +736,6 @@ class windowClass(wx.Frame):
                 self.alustaarvopaneeli(ohjelma)
             except TypeError:
                 print("Tutkimustapaa ei valittu")
-
 
     def hallintamenu(self, event):
         self.data.ihallinta()
@@ -1109,9 +1082,10 @@ class TiedonKasittely(object):
                     self.gui.maalajibutton.Enable()
                     syvyysdata.reverse()
                     jatkasyvyys = syvyysdata[0]
+                    self.syvyys = syvyysdata[0]
                     self.gui.syvyysarvoteksti.SetLabelText(jatkasyvyys)
                     self.gui.maalajibutton.Enable()
-                    self.kks.asetaKairaussyvyys(jatkasyvyys)
+                    #self.kks.asetaKairaussyvyys(jatkasyvyys)
                     self.gui.graphbutton.SetLabelText("Piirto")
                     os.chdir(self.root)
                     return None
