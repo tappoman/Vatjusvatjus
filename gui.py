@@ -278,6 +278,7 @@ class windowClass(wx.Frame):
             self.puolikierroksetarvoteksti.SetLabelText("0")
             self.nopeusteksti.SetLabelText("Pyör. nop")
             self.nopeusarvoteksti.SetLabelText("0")
+            '''
             lista = ["KELLO","EI KELLOA"]
             kello = wx.SingleChoiceDialog(None, "Aloitetaanko kello?", "Porakairaus kello", lista,
                                             wx.CHOICEDLG_STYLE)
@@ -288,7 +289,7 @@ class windowClass(wx.Frame):
             else:
                 kello.Destroy()
                 return None
-
+'''
         if kairaustapa == "TR":
             self.syvyysteksti.SetLabelText("Syvyys")
             self.syvyysarvoteksti.SetLabelText("0")
@@ -410,6 +411,21 @@ class windowClass(wx.Frame):
             warning.ShowModal()
             warning.Destroy()
         elif self.alkukairausbutton.GetLabelText()=="Lopeta\nalkukair.":
+
+            alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys sentteinä', "Alkusyvyys", str(self.data.alkusyvyys), style=wx.OK)
+            # alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys sentteinä',"Alkusyvyys","0", style=wx.OK)
+
+            alkusyvyys.Centre()
+            alkusyvyys.ShowModal()
+            self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
+            self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
+            self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
+
+            print(alkusyvyys.GetValue())
+            self.data.kks.lopetaAlkukairaus()
+            alkusyvyys.Destroy()
+
+
             self.data.kks.lopetaAlkukairaus()
             self.lopetusbutton.Enable()
             self.alkukairausbutton.Enable()
@@ -447,17 +463,17 @@ class windowClass(wx.Frame):
                         for line in textfile:
                             if line.__contains__(kairausvalinta):
                                 self.alkukairausarvoteksti.SetLabelText(line[1:3])
-                    alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys sentteinä',"Alkusyvyys","",
-                                                    style=wx.OK)
-                    alkusyvyys.Centre()
-                    alkusyvyys.ShowModal()
-                    self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
-                    self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
-                    self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
+                    #alkusyvyys = wx.TextEntryDialog(None, 'Aseta alkusyvyys sentteinä',"Alkusyvyys","0",
+                    #                                style=wx.OK)
+                    #alkusyvyys.Centre()
+                    #alkusyvyys.ShowModal()
+                    #self.alkusyvyysarvoteksti.SetLabelText(alkusyvyys.GetValue())
+                    #self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
+                    #self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
 
-                    print(alkusyvyys.GetValue())
-                    self.data.kks.lopetaAlkukairaus()
-                    alkusyvyys.Destroy()
+                    #print(alkusyvyys.GetValue())
+                    #self.data.kks.lopetaAlkukairaus()
+                    #alkusyvyys.Destroy()
                     self.alkukairausbutton.SetLabelText("Lopeta\nalkukair.")
                     self.config.read("USECONTROL.ini")
                     os.chdir(self.config["DEFAULT"]["polku"])
@@ -512,10 +528,27 @@ class windowClass(wx.Frame):
         else:
             self.data.kks.aloitaOdotustila()
             self.lopetusbutton.SetLabel("Lopeta\nkairaus")
+            #self.data.kks.asetaKairaussyvyys(self.data.alkusyvyys)
             self.data.kks.asetaKairaussyvyys(self.data.alkusyvyys)
+
             self.data.kks.aloitaKairaus()
             self.graphbutton.Enable()
-            #print("kuunnellaan kks")
+
+            if self.data.tutkimustapa == "PO":
+                lista = ["KELLO", "EI KELLOA"]
+                kello = wx.SingleChoiceDialog(None, "Aloitetaanko kello?", "Porakairaus kello", lista,
+                                              wx.CHOICEDLG_STYLE)
+                if kello.ShowModal() == wx.ID_OK:
+                    if kello.GetStringSelection() == "KELLO":
+                        #print("tässä pitäisi lähettää kkssälle tieto kellon aloituksesta")
+                        self.data.kks.asetaSekuntiaskellus("1")
+                        kello.Destroy()
+                        return None
+                    else:
+                        #print("perse")
+                        self.data.kks.asetaSekuntiaskellus("0")
+                        kello.Destroy()
+                        return None
 
     def kommenttirivi(self, event):
 
@@ -766,7 +799,7 @@ class windowClass(wx.Frame):
 #tallentaa käyttäjän ja communicationin syöttämän datan ja syöttää sen eteenpäin windowclass luokalle
 #ja tallennettaviin tietoihin
 class TiedonKasittely(object):
-    def __init__(self, hanke = None, piste=None, maalaji="", tutkimustapa="", alkusyvyys=0, syvyys=0, voima=0,
+    def __init__(self, hanke = None, piste=None, maalaji="", tutkimustapa="", alkusyvyys = 0, syvyys=0, voima=0,
                  puolikierrokset=0, nopeus=0, figure=None, gui=None):
         super(TiedonKasittely, self).__init__()
 
@@ -782,7 +815,7 @@ class TiedonKasittely(object):
         self.hanke = hanke
         self.piste = piste
         self.maalaji = maalaji
-        self.alkusyvyys = alkusyvyys
+        self.alkusyvyys = syvyys
         self.syvyys = syvyys
         self.voima = voima
         self.puolikierrokset = puolikierrokset
@@ -940,6 +973,7 @@ class TiedonKasittely(object):
         if valinta.ShowModal() == wx.ID_OK:
             pistevalinta = valinta.GetStringSelection()
             if valinta.GetStringSelection() == "LUO UUSI PISTE":
+                self.gui.alkukairausbutton.Enable()
                 self.iluopiste(self.hanke)
                 os.chdir(self.root)
                 return None
@@ -1213,14 +1247,14 @@ class TiedonKasittely(object):
                                          , "Luodaan..", wx.YES_NO)
             luo = varmistus.ShowModal()
             if luo == wx.ID_YES:
-                xkoordinaatti = wx.TextEntryDialog(None, "Anna N koordinaatti", "Pisteen koordinaatit X")
+                xkoordinaatti = wx.TextEntryDialog(None, "Anna X koordinaatti", "Pisteen koordinaatit X")
                 if xkoordinaatti.ShowModal() == wx.ID_OK:
                     xkoord = xkoordinaatti.GetValue()
                     xkoordinaatti.Destroy()
                 else:
                     print("Pistettä ei luotu")
                     return None
-                ykoordinaatti = wx.TextEntryDialog(None, "Anna E koordinaatti", "Pisteen koordinaatit Y")
+                ykoordinaatti = wx.TextEntryDialog(None, "Anna Y koordinaatti", "Pisteen koordinaatit Y")
                 if ykoordinaatti.ShowModal() == wx.ID_OK:
                     ykoord = ykoordinaatti.GetValue()
                     ykoordinaatti.Destroy()
@@ -1228,8 +1262,8 @@ class TiedonKasittely(object):
                     print("Pistettä ei luotu")
                     return None
 
-                tutkimustapa = self.ivalitseohjelma()
-                self.tutkimustapa = tutkimustapa
+                self.tutkimustapa = self.ivalitseohjelma()
+                tutkimustapa = self.tutkimustapa
                 self.gui.alustaarvopaneeli(tutkimustapa)
                 self.gui.ohjelmaarvoteksti.SetLabelText(tutkimustapa)
                 self.piste = nimi
@@ -1435,9 +1469,18 @@ class TiedonKasittely(object):
                     if lineparts[0][:4] == "#SYV":
                         #self.iparsitiedot(lineparts)
                         print("SYVI")
+                        print(lineparts)
                         #TEHDAAN MITAMITA
                         #Alkukairaussyvyys 1s välein. < - - - - - - #SYV:nnn
                         #self.sa.tallennaSYV(self.hanke, lineparts[0])
+                        linearvot = lineparts[0].rpartition(":")[2]
+                        arvot = linearvot.split()
+                        print(arvot)
+                        syvyys = int(arvot[0])
+                        self.asetasyvyys(syvyys)
+                        if syvyys is not None:
+                            self.alkusyvyys = syvyys
+
 
                     #OHJAUSTIEDOT KKS:LTA
                     if lineparts[0] == "#ALKUKAIRAUS":

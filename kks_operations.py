@@ -189,7 +189,7 @@ class Kksoperations (object):
         #return "MIT-ODOTUS"
 
     def asetaSekuntiaskellus(self, askellus):
-        self.com.setCommand("TIMER:", askellus, ":")
+        self.com.setCommand("TIMER:" + askellus)
         #return "#1"
 
     """MITTAUSTILA-1"""
