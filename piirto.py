@@ -11,7 +11,7 @@ from matplotlib.backends.backend_wx import NavigationToolbar2Wx
 from matplotlib.figure import Figure
 #from matplotlib import style
 
-#matplotlib.rcParams['figure.figsize'] = (6.0, 12.0)
+matplotlib.rcParams['figure.figsize'] = (6.0, 12.0)
 
 #style.use('fivethirtyeight')
 
@@ -20,16 +20,26 @@ import configparser
 
 class CanvasPanel(wx.Panel):
     def __init__(self, parent, gui=None):
-        wx.Panel.__init__(self, parent)
+        #wx.Panel.__init__(self, parent)
+        wx.Panel.__init__(self, parent, size=wx.Size(600, 1000))
+
+        #self.wxpanel = wx.Panel(self)
+        #print(self.wxpanel.size())
 
         self.figure = plt.figure()
         self.config = configparser.ConfigParser()
         self.gui = gui
 
+        print(wx.DisplaySize());
+
+        #wx.Panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
+
+
+
 
         self.axes = self.figure.add_subplot(111)
-        #plt.axes(xlim=(-120, 120), ylim=(0, 100))
-        plt.gca().xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+        plt.axes(xlim=(-120, 120), ylim=(0, 100))
+        #plt.gca().xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
         xticks = [-100,-50,0,50,100]
         xticklabels = ['100', '50', '0', '50', '100']
         '''
@@ -41,11 +51,28 @@ class CanvasPanel(wx.Panel):
         plt.xticks(xticks, xticklabels)
         plt.subplots_adjust(left=0.1, right=0.85, bottom=0.10, wspace=0.2, hspace=0.2)
 
+
         self.canvas = FigureCanvas(self, -1, self.figure)
-        self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer.Add(self.canvas, 1, wx.LEFT | wx.TOP | wx.GROW)
+        self.Layout()
+        #tekstista
+        '''
+        self.spSizer = wx.BoxSizer(wx.VERTICAL)
+        self.scrolled_panel.SetSizer(self.spSizer)
+        
+        panelSizer = wx.BoxSizer(wx.VERTICAL)
+        panelSizer.AddSpacer(400)
+        panelSizer.Add(self.canvas, 1, wx.EXPAND)
+        panel.SetSizer(panelSizer)
+'''
+        #self.panel = wx.Panel(self.canvas, -1, size=(100, 500), style = wx.BORDER_RAISED)
+        self.sizer = wx.BoxSizer(wx.HORIZONTAL)
+        #self.sizer.Add(self.canvas, 1, wx.LEFT | wx.TOP | wx.GROW)
+        self.sizer.Add(self.canvas, 0, flag=wx.ALIGN_TOP)
+        #self.sizer.AddStretchSpacer(prop=15)
+        #self.sizer.Add(self.canvas, 0, wx.ALL, 5)
+        #self.sizer.Add(self.canvas, 0, wx.EXPAND)
         self.SetSizer(self.sizer)
-        self.Fit()
+        #self.Fit()
 
         #kopsattu vanhasta
         plt.gca().invert_yaxis()
@@ -98,6 +125,7 @@ class CanvasPanel(wx.Panel):
 
                         #JOS PAINOKAIRAUS (PA) --> muotoillaan chart ja arvot
                         if self.tutkimustapa == "PA":
+
                             if lineparts[0][:1] == "":
                                 #print("linepartsit: ", lineparts)
                                 #print ("LP_LENGTH: ", len(lineparts))
@@ -120,7 +148,8 @@ class CanvasPanel(wx.Panel):
                                                  height=0.2, linewidth=1, color='g', edgecolor='k')
                                         plt.barh(float(self.syvyys), width=-float(self.x2),
                                                  height=0.2, linewidth=1, color='b', edgecolor='k')
-                                    self.figure.canvas.draw()
+
+                                    #self.figure.canvas.draw()
 
                                 else:
                                     pass
@@ -141,7 +170,7 @@ class CanvasPanel(wx.Panel):
 
                                 plt.barh(float(self.syvyys), width=float(self.x2),
                                          height=0.1, linewidth=1, color='b', edgecolor='k')
-                                self.figure.canvas.draw()
+                                #self.figure.canvas.draw()
 
                         # JOS PORAK (PO) --> muotoillaan chart ja arvot
                         #PORAK ANTAA DATAA MUODOSSA ['#MIT:61      0    1.7   30']
@@ -166,7 +195,7 @@ class CanvasPanel(wx.Panel):
 
                                 plt.barh(float(self.syvyys), width=-float(self.x2),
                                          height=0.1, linewidth=1, color='b', edgecolor='k')
-                                self.figure.canvas.draw()
+                                #self.figure.canvas.draw()
 
                         # JOS TARYK (TK) --> muotoillaan chart ja arvot
                         #vain syvyytta, miten muotoillaan etta nakyy selkeästi
@@ -188,7 +217,7 @@ class CanvasPanel(wx.Panel):
 
                                 plt.barh(float(self.syvyys), width=-float(self.x2),
                                          height=0.1, linewidth=1, color='g', edgecolor='k')
-                                self.figure.canvas.draw()
+                                #self.figure.canvas.draw()
 
                         # JOS PURISTIHEIJARI (PH) --> muotoillaan chart ja arvot
                         # Vaikuttaisi tulevan vain yksi arvo #TAL sanomassa = syvyys
@@ -208,7 +237,7 @@ class CanvasPanel(wx.Panel):
 
                                 plt.barh(float(self.syvyys), width=-float(self.x2),
                                          height=0.1, linewidth=1, color='g', edgecolor='k')
-                                self.figure.canvas.draw()
+                                #self.figure.canvas.draw()
 
     def setOldValues(self, data, kairaustapa):
 
@@ -320,7 +349,8 @@ class CanvasPanel(wx.Panel):
 
 
     def draw(self):
-        self.figure.canvas.draw()
+        #self.figure.canvas.draw()
+        self.canvas.draw()
 
 
 

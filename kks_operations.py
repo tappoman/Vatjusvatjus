@@ -67,12 +67,12 @@ class Kksoperations (object):
     """HW-ASETUS / KYSELY"""
     def asetaSyvyydenVakio(self, pulssivakio):
     #palauttaa #1
-        self.com.setCommand("SYV-PV:", pulssivakio, ":")
+        self.com.setCommand("SYV-PV:" + str(pulssivakio))
         #return "#1"
 
     def asetaPuolikierrostenVakio(self, pulssivakio):
         #palautta #1
-        self.com.setCommand("PK-PV:", pulssivakio, ":")
+        self.com.setCommand("PK-PV:" + str(pulssivakio))
         #return "#1"
 
     def kysyHwVakiot(self):

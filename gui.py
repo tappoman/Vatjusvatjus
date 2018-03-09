@@ -489,20 +489,37 @@ class windowClass(wx.Frame):
                                                    wx.CHOICEDLG_STYLE)
             if kairausvalinta.ShowModal() == wx.ID_OK:
                 kairausvalinta = kairausvalinta.GetStringSelection()
-                self.config.read("USECONTROL.ini")
-                os.chdir(self.config["DEFAULT"]["polku"])
-                with open("{}.txt".format(self.data.hanke), 'a') as textfile:
-                    textfile.write("\n" + "-1\t{}\n".format(self.data.syvyys, kairausvalinta))
-                    textfile.close()
-                os.chdir(self.data.root)
-                self.lopetusbutton.SetLabel("Aloita\nkairaus")
-                self.lopetusbutton.Disable()
+
+                if kairausvalinta == "KAIR.JATKUU":
+
+                    self.lopetusbutton.SetLabel("Aloita\nkairaus")
+
+                    return None
+
+                else:
+
+                    self.config.read("USECONTROL.ini")
+
+                    os.chdir(self.config["DEFAULT"]["polku"])
+
+                    with open("{}.txt".format(self.data.hanke), 'a') as textfile:
+
+                        textfile.write("\n" + "-1\t{}\n".format(self.data.syvyys, kairausvalinta))
+
+                        textfile.close()
+
+                    os.chdir(self.data.root)
+
+                    self.lopetusbutton.SetLabel("Aloita\nkairaus")
+
+                    self.lopetusbutton.Disable()
             else:
                 return None
         else:
             self.data.kks.aloitaOdotustila()
             self.lopetusbutton.SetLabel("Lopeta\nkairaus")
             #self.data.kks.asetaKairaussyvyys(self.data.alkusyvyys)
+
             self.data.kks.asetaKairaussyvyys(self.data.alkusyvyys)
 
             self.data.kks.aloitaKairaus()
@@ -811,7 +828,7 @@ class TiedonKasittely(object):
 
         self.oldline = ""
 
-        '''
+
         self.com = Communication()
 
         self.comcheck = self.com.openConnection()
@@ -822,7 +839,7 @@ class TiedonKasittely(object):
             sys.exit(0)
         
         self.kks = Kksoperations(self.com)
-        '''
+
 
         self.sa = Saving()
         self.gui = gui
@@ -1083,9 +1100,21 @@ class TiedonKasittely(object):
                     syvyysdata.reverse()
                     jatkasyvyys = syvyysdata[0]
                     self.syvyys = syvyysdata[0]
+                    if jatkasyvyys == "-1":
+                        return None
+                    #    self.gui.alkukairausbutton.Disable()
+                    #    self.gui.lopetusbutton.Disable()
                     self.gui.syvyysarvoteksti.SetLabelText(jatkasyvyys)
                     self.gui.maalajibutton.Enable()
-                    #self.kks.asetaKairaussyvyys(jatkasyvyys)
+
+                    kairaussyvyys = float(jatkasyvyys)*100
+                    kairaussyvyys = int(kairaussyvyys)
+                    kairaussyvyys = str(kairaussyvyys)
+
+                    print("testi:", kairaussyvyys)
+                    #self.kks.aloitaOdotustila()
+                    #self.kks.asetaKairaussyvyys(kairaussyvyys)
+                    self.alkusyvyys = kairaussyvyys
                     self.gui.graphbutton.SetLabelText("Piirto")
                     os.chdir(self.root)
                     return None
