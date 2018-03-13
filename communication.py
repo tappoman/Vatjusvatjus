@@ -4,8 +4,6 @@
 #******pip install pyserial**************
 #****************************************
 
-#TODO FIksaa serial.serialutil.SerialEXCPE ei toimi jos ei jotaki laitetta ehkä
-
 import threading
 import time
 import sys

@@ -1,10 +1,21 @@
+'''
+Luokka joka toteuttaa piirtamisen KKS-datasta ja tekla-tiedostosta
+
+Kirjastot:
+numpy
+matplotlib
+wxpython
+configparser
+'''
+
+
 from numpy import arange, sin, pi, linspace
-import matplotlib.ticker
-import matplotlib.pyplot as plt
-#matplotlib.use('WXAgg')
 
 import time
 import os
+
+import matplotlib.ticker
+import matplotlib.pyplot as plt
 
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wx import NavigationToolbar2Wx
@@ -12,8 +23,6 @@ from matplotlib.figure import Figure
 #from matplotlib import style
 
 matplotlib.rcParams['figure.figsize'] = (6.0, 6.0)
-
-#style.use('fivethirtyeight')
 
 import wx
 import configparser
@@ -23,19 +32,11 @@ class CanvasPanel(wx.Panel):
         #wx.Panel.__init__(self, parent)
         wx.Panel.__init__(self, parent, size=wx.Size(600, 600), pos=(0,-60))
 
-        #self.wxpanel = wx.Panel()
-        #print(self.wxpanel.size())
-
         self.figure = plt.figure()
         self.config = configparser.ConfigParser()
         self.gui = gui
 
-        print(wx.DisplaySize());
-
-        #self.wxpanel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
-
-
-
+        #print(wx.DisplaySize());
 
         self.axes = self.figure.add_subplot(111)
         plt.axes(xlim=(-120, 120), ylim=(0, 50))
@@ -58,16 +59,7 @@ class CanvasPanel(wx.Panel):
 
         self.canvas = FigureCanvas(self, -1, self.figure)
         self.Layout()
-        #tekstista
-        '''
-        self.spSizer = wx.BoxSizer(wx.VERTICAL)
-        self.scrolled_panel.SetSizer(self.spSizer)
-        
-        panelSizer = wx.BoxSizer(wx.VERTICAL)
-        panelSizer.AddSpacer(400)
-        panelSizer.Add(self.canvas, 1, wx.EXPAND)
-        panel.SetSizer(panelSizer)
-'''
+
         #self.panel = wx.Panel(self.canvas, -1, size=(100, 500), style = wx.BORDER_RAISED)
         self.sizer = wx.BoxSizer(wx.HORIZONTAL)
         #self.sizer.Add(self.canvas, 1, wx.LEFT | wx.TOP | wx.GROW)
@@ -90,7 +82,7 @@ class CanvasPanel(wx.Panel):
         self.piste = piste
         self.tutkimustapa = ""
 
-        print(self.polku, self.tiedosto, self.piste)
+        #print(self.polku, self.tiedosto, self.piste)
 
         self.fullpath = os.path.join(self.polku, self.tiedosto + ".txt")
 
@@ -98,7 +90,7 @@ class CanvasPanel(wx.Panel):
          #   print("***LOYTYI***")
         self.muisti = False
         haluttupiste = "TY " + self.piste
-        print(haluttupiste)
+        #print(haluttupiste)
 
         with open(self.fullpath, 'r') as textfile:
             for line in textfile:
@@ -109,11 +101,11 @@ class CanvasPanel(wx.Panel):
                         #print("line: ", line.strip(), "haluttu: ", haluttupiste.strip());
                         #Tutkitaan onko tyonumero teklassa sama kuin annetussa hankeessa ja pisteessa
                         if line.strip() == haluttupiste.strip():
-                            print("oikea TY: ", line.strip())
+                            #print("oikea TY: ", line.strip())
                             self.muisti = True
                         else:
                             self.muisti = False
-                            print("vaara TY: ", line.strip())
+                            #print("vaara TY: ", line.strip())
 
                     #kun oikessa pisteessa
                     if self.muisti:
@@ -122,7 +114,7 @@ class CanvasPanel(wx.Panel):
                         if line.startswith("TT"):
                             apu = line.split(" ")
                             self.tutkimustapa = str(apu[1]).strip()
-                            print("TUTKIMUSTAPA: ", self.tutkimustapa)
+                            #print("TUTKIMUSTAPA: ", self.tutkimustapa)
 
                         #Splittaillaan arvot
                         lineparts = line.replace('\n', '').split('\t')
@@ -140,7 +132,7 @@ class CanvasPanel(wx.Panel):
                                     self.x2 = lineparts[2][:3]
                                     self.x1 = lineparts[3][:4]
 
-                                    print(self.syvyys, " : ", self.x1, " : ", self.x2)
+                                    #print(self.syvyys, " : ", self.x1, " : ", self.x2)
 
                                     plt.ylabel("syvyys")
                                     plt.xlabel('voima / puolikierrokset')
@@ -167,7 +159,7 @@ class CanvasPanel(wx.Panel):
                                 self.x2 = lineparts[2][:3]
                                 #self.x1 = lineparts[3][:4]
 
-                                print(self.syvyys, " : ", self.x2)
+                                #print(self.syvyys, " : ", self.x2)
 
                                 plt.ylabel("syvyys")
                                 plt.xlabel('heijari / isku')
@@ -189,7 +181,7 @@ class CanvasPanel(wx.Panel):
                                 self.x1 = 10
                                 self.x2 = 10
 
-                                print(self.syvyys, " : ", self.x2)
+                                #print(self.syvyys, " : ", self.x2)
 
                                 plt.ylabel("syvyys")
                                 plt.xlabel('aika')
@@ -211,7 +203,7 @@ class CanvasPanel(wx.Panel):
                                 self.x2 = 10
                                 self.x1 = 10
 
-                                print(self.syvyys, " : ", self.x2)
+                                #print(self.syvyys, " : ", self.x2)
 
                                 plt.ylabel("syvyys")
                                 plt.xlabel('')
@@ -232,7 +224,7 @@ class CanvasPanel(wx.Panel):
                                 self.x2 = 10
                                 self.x1 = 10
 
-                                print(self.syvyys, " : ", self.x2)
+                                #print(self.syvyys, " : ", self.x2)
 
                                 plt.ylabel("syvyys")
                                 plt.xlabel('')

@@ -3,7 +3,7 @@ luokka käyttöliittymän hallintaan
 parsii tiedot communications luokalta
 ja siirtää ne bar_graph luokalle
 
-tarvittavat kirjastot:
+Kirjastot:
 wxpython
 wx.lib.scrolledpanel
 '''
@@ -19,13 +19,7 @@ from saving import *
 from kks_operations import *
 from piirto import *
 import time
-
 import communication
-# import guioperations
-# import threading
-# import serial
-
-#com = Communication()
 
 class windowClass(wx.Frame):
 
@@ -35,11 +29,13 @@ class windowClass(wx.Frame):
         self.Centre()
         self.basicGUI()
         self.data = TiedonKasittely(gui=self)
+
         self.config = configparser.ConfigParser()
         self.sa = Saving
-        self.timer = wx.Timer(self)
 
+        self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.update, self.timer)
+
 
     def onClose(self):
         self.data.kks.kuittaaTanko()
@@ -59,6 +55,7 @@ class windowClass(wx.Frame):
         font2.SetPointSize(25)
         font3.SetPointSize(35)
 
+        # nappuloiden alustus
         self.Bind(wx.EVT_WINDOW_DESTROY, self.suljelistener)
 
         # hanke
@@ -325,7 +322,61 @@ class windowClass(wx.Frame):
         self.syvyysarvoteksti.SetLabelText("")
         self.data.syvyys = 0
         self.data.iavaapiste()
+        #self.update(event)
+        #self.timer.Start(50)
 
+    #tarkistetaan onko pisteessä mittaustietoja
+    def tarkistapiste(self):
+        piste = []
+        pistevalinta = self.pistenimiteksti.GetLabel().strip()
+        syvyyslista = []
+        printtilista = []
+        parsilista = []
+        os.chdir(self.data.config["DEFAULT"]["polku"])
+        file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "r")
+        tiedosto = file.readlines()
+        file.close()
+
+        for line in tiedosto:
+            if line.__contains__(pistevalinta):
+                piste.append(line)
+                alku = tiedosto.index(line) + 1
+                while alku < len(tiedosto):
+                    linepartindex = tiedosto[alku]
+                    if linepartindex[0:2] == ("ty"):
+                        break
+                    else:
+                        piste.append(linepartindex)
+                        alku = alku + 1
+
+        for rivi in piste[::-1]:
+            if rivi.__contains__("HM"):
+                continue
+            elif rivi == "\n":
+                continue
+            elif rivi.__contains__("ln"):
+                break
+            else:
+                syvyyslista.append(rivi)
+        syvyyslista.reverse()
+
+        for s in syvyyslista:
+            if s == "\n":
+                syvyyslista.remove(s)
+            else:
+                parsilista.append(s.rsplit(None, 3))
+
+        for i in parsilista:
+            if len(printtilista) < len(syvyyslista):
+                printtilista.append(i[0])
+
+        if printtilista == []:
+            varoitus = wx.MessageDialog(None, "Pisteessä ei ole mittaustuloksia", "Huom!")
+            varoitus.ShowModal()
+            varoitus.Destroy()
+            return None
+        else:
+            return True
 
     def aloitaalkukairaus(self, event):
 
@@ -339,7 +390,7 @@ class windowClass(wx.Frame):
             self.data.asetaalkusyvyys(int(alkusyvyys.GetValue()))
             self.data.kks.asetaAlkusyvyys(alkusyvyys.GetValue())
 
-            print(alkusyvyys.GetValue())
+            #print(alkusyvyys.GetValue())
             self.data.kks.lopetaAlkukairaus()
             alkusyvyys.Destroy()
 
@@ -413,7 +464,7 @@ class windowClass(wx.Frame):
                 kairausvalinta = kairausvalinta.GetStringSelection()
 
                 if kairausvalinta == "KAIR.JATKUU":
-
+                    self.data.iparsiuusinpiste(self.data.piste)
                     self.lopetusbutton.SetLabel("Aloita\nkairaus")
 
                     return None
@@ -1033,7 +1084,7 @@ class TiedonKasittely(object):
                     kairaussyvyys = int(kairaussyvyys)
                     kairaussyvyys = str(kairaussyvyys)
 
-                    print("testi:", kairaussyvyys)
+                    #print("testi:", kairaussyvyys)
                     #self.kks.aloitaOdotustila()
                     #self.kks.asetaKairaussyvyys(kairaussyvyys)
                     self.alkusyvyys = kairaussyvyys
@@ -1358,7 +1409,8 @@ class TiedonKasittely(object):
                     #MITTAUS- JA TALLENNUSSANOMAT KKS:LTA
                     if lineparts[0][:4] == "#MIT":
                         if lineparts[0][:11] == "#MIT_ODOTUS":
-                            print("MIT ODOTELLAAN")
+                            #print("MIT ODOTELLAAN")
+                            pass
                         else:
                             #print("MITTIA PUKKAA")
                             self.iparsitiedot(lineparts)
@@ -1396,14 +1448,14 @@ class TiedonKasittely(object):
 
                     if lineparts[0][:4] == "#SYV":
                         #self.iparsitiedot(lineparts)
-                        print("SYVI")
-                        print(lineparts)
+                        #print("SYVI")
+                        #print(lineparts)
                         #TEHDAAN MITAMITA
                         #Alkukairaussyvyys 1s välein. < - - - - - - #SYV:nnn
                         #self.sa.tallennaSYV(self.hanke, lineparts[0])
                         linearvot = lineparts[0].rpartition(":")[2]
                         arvot = linearvot.split()
-                        print(arvot)
+                        #print(arvot)
                         syvyys = int(arvot[0])
                         self.asetasyvyys(syvyys)
                         if syvyys is not None:
@@ -1412,30 +1464,33 @@ class TiedonKasittely(object):
 
                     #OHJAUSTIEDOT KKS:LTA
                     if lineparts[0] == "#ALKUKAIRAUS":
-                        print("alkuk")
+                        #print("ALKUKAIRAUS")
+                        pass
 
                     if lineparts[0] == "MIT-ODOTUS":
-                        print("MIT-ODOTUS")
+                        #print("MIT-ODOTUS")
+                        pass
 
                     if lineparts[0] == "#NOSTO":
-                        print("nosto")
+                        #print("NOSTO")
                         self.gui.vaihdatankovari('red')
 
                     if lineparts[0] == "#NOSKU":
-                        print("NOSTON KUITTAUS")
+                        #print("NOSTON KUITTAUS")
                         #self.gui.vaihdatankovari
+                        pass
 
                     if lineparts[0] == "#KAIRAUS":
-                        print("KAIRAUS")
+                        #print("KAIRAUS")
                         self.gui.vaihdatankovari('green')
 
 
                     if lineparts[0] == "#ALKUTILA":
-                        print("ALKUTILA")
+                        #print("ALKUTILA")
                         self.gui.vaihdatankovari('red')
 
                     if lineparts[0] =="#STOP":
-                        print("STOPPI")
+                        #print("STOPPI")
                         self.gui.vaihdatankovari('red')
                         self.gui.lopetusbutton.SetLabel("Aloita\nkairaus")
 
