@@ -35,20 +35,11 @@ class windowClass(wx.Frame):
         self.Centre()
         self.basicGUI()
         self.data = TiedonKasittely(gui=self)
-
-        #self.timer = wx.Timer(self)
-        #self.Bind(wx.EVT_TIMER, self.data.ikuuntele, self.timer)
         self.config = configparser.ConfigParser()
-
         self.sa = Saving
-        #self.com = Communication()
-
         self.timer = wx.Timer(self)
-        #self.timer2 = wx.Timer(self)
-        #self.Bind(wx.EVT_TIMER, self.data.ikuuntele, self.timer)
 
         self.Bind(wx.EVT_TIMER, self.update, self.timer)
-        #self.Bind(wx.EVT_TIMER, self.updatepistearvot(self.data), self.timer2)
 
     def onClose(self):
         self.data.kks.kuittaaTanko()
@@ -68,10 +59,6 @@ class windowClass(wx.Frame):
         font2.SetPointSize(25)
         font3.SetPointSize(35)
 
-        # nappuloiden alustus
-        #Framen sulkemisnappi
-        #closeBtn = wx.Button(panel, label="Close")
-        #closeBtn.Bind(wx.EVT_BUTTON, self.onClose)
         self.Bind(wx.EVT_WINDOW_DESTROY, self.suljelistener)
 
         # hanke
@@ -278,18 +265,7 @@ class windowClass(wx.Frame):
             self.puolikierroksetarvoteksti.SetLabelText("0")
             self.nopeusteksti.SetLabelText("Pyör. nop")
             self.nopeusarvoteksti.SetLabelText("0")
-            '''
-            lista = ["KELLO","EI KELLOA"]
-            kello = wx.SingleChoiceDialog(None, "Aloitetaanko kello?", "Porakairaus kello", lista,
-                                            wx.CHOICEDLG_STYLE)
-            if kello.ShowModal() == wx.OK:
-                print("tässä pitäisi lähettää kkssälle tieto kellon aloituksesta")
-                kello.Destroy()
-                return None
-            else:
-                kello.Destroy()
-                return None
-'''
+
         if kairaustapa == "TR":
             self.syvyysteksti.SetLabelText("Syvyys")
             self.syvyysarvoteksti.SetLabelText("0")
@@ -349,61 +325,7 @@ class windowClass(wx.Frame):
         self.syvyysarvoteksti.SetLabelText("")
         self.data.syvyys = 0
         self.data.iavaapiste()
-        #self.update(event)
-        #self.timer.Start(50)
 
-    #tarkistetaan onko pisteessä mittaustietoja
-    def tarkistapiste(self):
-        piste = []
-        pistevalinta = self.pistenimiteksti.GetLabel().strip()
-        syvyyslista = []
-        printtilista = []
-        parsilista = []
-        os.chdir(self.data.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "r")
-        tiedosto = file.readlines()
-        file.close()
-
-        for line in tiedosto:
-            if line.__contains__(pistevalinta):
-                piste.append(line)
-                alku = tiedosto.index(line) + 1
-                while alku < len(tiedosto):
-                    linepartindex = tiedosto[alku]
-                    if linepartindex[0:2] == ("ty"):
-                        break
-                    else:
-                        piste.append(linepartindex)
-                        alku = alku + 1
-
-        for rivi in piste[::-1]:
-            if rivi.__contains__("HM"):
-                continue
-            elif rivi == "\n":
-                continue
-            elif rivi.__contains__("ln"):
-                break
-            else:
-                syvyyslista.append(rivi)
-        syvyyslista.reverse()
-
-        for s in syvyyslista:
-            if s == "\n":
-                syvyyslista.remove(s)
-            else:
-                parsilista.append(s.rsplit(None, 3))
-
-        for i in parsilista:
-            if len(printtilista) < len(syvyyslista):
-                printtilista.append(i[0])
-
-        if printtilista == []:
-            varoitus = wx.MessageDialog(None, "Pisteessä ei ole mittaustuloksia", "Huom!")
-            varoitus.ShowModal()
-            varoitus.Destroy()
-            return None
-        else:
-            return True
 
     def aloitaalkukairaus(self, event):
 
@@ -1324,15 +1246,7 @@ class TiedonKasittely(object):
 
             self.config.read("USECONTROL.ini")
             os.chdir(self.config["DEFAULT"]["polku"])
-            #tähänkö uusi tutkimusheader?
-            '''
-            self.gui.linepanelille("{} vaihtui {} syvyydellä {}"
-                               .format(self.tutkimustapa, ohjelmavalinta, self.syvyys))
-            with open("{}.txt".format(self.hanke), 'a') as textfile:
-                textfile.write("{} vaihtui {} syvyydellä {}"
-                               .format(self.tutkimustapa, ohjelmavalinta, self.syvyys))
-                textfile.close()
-            '''
+
             os.chdir(self.root)
             with open("tutkimustavat.txt", "r", encoding="utf-8-sig") as textfile:
                 for line in textfile:
@@ -1612,19 +1526,6 @@ class TiedonKasittely(object):
             # print(syvyys, " syvyys")
             self.asetasyvyys(syvyys)
 
-            '''
-            voima = int(arvot[1])
-            # print(voima, " voima")
-            self.asetavoima(voima)
-
-            puolikierrokset = int(arvot[2])
-            self.asetapuolikierrokset(puolikierrokset)
-            # print(puolikierrokset, " puolik.")
-
-            nopeus = int(arvot[3])
-            # print(nopeus, " nopeus")
-            self.asetanopeus(nopeus)
-            '''
 
     def ihallinta(self):
         os.chdir(self.root)
