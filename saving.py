@@ -13,6 +13,7 @@ import sys
 import time
 import os.path
 import configparser
+import re
 
 class Saving (object):
 
@@ -34,6 +35,10 @@ class Saving (object):
 
     #Määrittää tallenustiedoston kaikelle kks-laitteelta tulevalle datalle ja tallettaa sen
     def tallennaMIT(self, MIT):
+        #MIT = MIT.strip(' \n\t')
+        APU = re.sub(r"[\\n\\t\s]*", "", MIT)
+        #if APU != "#1" and APU != "#0":
+        #print("MITTTI: ", MIT)
         self._config.read("USECONTROL.ini", encoding='UTF-8')
         self.tal_polku = self._config["DEFAULT"]["polku"]
         if not os.path.exists(self.tal_polku):
@@ -42,8 +47,9 @@ class Saving (object):
         self.tiedosto = "MIT_temp.txt"
 
         self.fullpath = os.path.join(self.tal_polku, self.tiedosto)
-        file = open(self.fullpath, "w")
+        file = open(self.fullpath, "a")
         file.write(MIT)
+        file.close()
 
 
 

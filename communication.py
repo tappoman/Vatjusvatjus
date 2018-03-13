@@ -48,6 +48,7 @@ class Communication (object):
     def setCommand(self, command):
         self.ser.flushInput()
         self.command = '#' + command + "\r"
+        print("<--\t", self.command)
         #self.ser.flushOutput()
 
         try:

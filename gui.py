@@ -139,7 +139,7 @@ class windowClass(wx.Frame):
         self.hankenimiteksti = wx.StaticText(panel, -1, "", pos=(120, 120))
         self.hankenimiteksti.SetFont(font2)
 
-        self.pisteteksti = wx.StaticText(panel, -1, "Työnro: ", pos=(10, 165))
+        self.pisteteksti = wx.StaticText(panel, -1, "Piste: ", pos=(10, 165))
         self.pisteteksti.SetFont(font2)
 
         # pistenimiteksti näyttää valitusta hankkeesta valitun pisteen
@@ -401,9 +401,11 @@ class windowClass(wx.Frame):
             self.alkukairausbutton.SetLabelText("Alku\nkairaus")
 
         else:
-            #self.data.kks.asetaHanke(self.data.piste, self.data.hanke)
-            #self.data.kks.asetaPiste(self.data.piste)
-            #self.data.kks.asetaTapa(self.data.tutkimustapa)
+            #KKS:lle hanke, piste, tapa
+            self.data.kks.asetaHanke(self.data.hanke)
+            self.data.kks.asetaPiste(self.data.piste)
+            self.data.kks.asetaTapa(self.data.tutkimustapa)
+
             self.graphbutton.Enable()
             os.chdir(self.data.root)
             z = []
@@ -656,7 +658,7 @@ class windowClass(wx.Frame):
         komento = wx.TextEntryDialog(None, "KKS Komento", "Kirjoita komento")
         if komento.ShowModal() == wx.ID_OK:
             komento = str(komento.GetValue())
-            print(komento)
+            #print(komento)
             self.data.kks.annaKasky(komento)
         else:
             return None
@@ -1392,18 +1394,27 @@ class TiedonKasittely(object):
     # luetaan tiedot tekstitiedostosta, mockup communication listenistä
     def ikuuntele(self, event):
         z = []
+        i = 1
+        j = 1
+        k = 0
         #with open("data0.txt", 'r', encoding="utf-8") as textfile:
         self.config.read("USECONTROL.ini")
         self.polku = self.config["DEFAULT"]["polku"]
         self.tiedosto = "MIT_temp.txt"
         self.fullpath = os.path.join(self.polku, self.tiedosto)
         with open(self.fullpath, 'r', encoding="utf-8") as textfile:
-#           for line in textfile:
-            line = textfile.read()
-            if len(line) > 1:
-                lineparts = line.replace('\n', '').split('\t')
 
-                if lineparts != self.oldline:
+            lines = textfile.readlines()
+            textfile.close()
+            for line in lines:
+
+            #for line in textfile.read():
+                #line = textfile.read()
+
+                if len(line) > 1:
+                    lineparts = line.replace('\n', '').split('\t')
+
+                    #if lineparts != self.oldline:
                     print("--> ", lineparts)
 
                     #MITTAUS- JA TALLENNUSSANOMAT KKS:LTA
@@ -1467,10 +1478,6 @@ class TiedonKasittely(object):
                         #print("ALKUKAIRAUS")
                         pass
 
-                    if lineparts[0] == "MIT-ODOTUS":
-                        #print("MIT-ODOTUS")
-                        pass
-
                     if lineparts[0] == "#NOSTO":
                         #print("NOSTO")
                         self.gui.vaihdatankovari('red')
@@ -1483,6 +1490,7 @@ class TiedonKasittely(object):
                     if lineparts[0] == "#KAIRAUS":
                         #print("KAIRAUS")
                         self.gui.vaihdatankovari('green')
+                        self.gui.lopetusbutton.SetLabel("Lopeta\nkairaus")
 
 
                     if lineparts[0] == "#ALKUTILA":
@@ -1503,8 +1511,25 @@ class TiedonKasittely(object):
                         print("JOKUKOMENTO")
                         #DO JOTAKI
 
+                    oldline = line
+
+                    print(i, " line done: ", oldline)
+                    i = i + 1
+                    #textfile.close()
                     self.oldline = lineparts
 
+                    with open(self.fullpath, 'w', encoding="utf-8") as textfile:
+
+                        for line in lines[k:]:
+                            if line != oldline and line != "#1\n" and lineparts != "#0\n" \
+                                    and line != "\n" and lineparts != None and lineparts != "" and lineparts != " ":
+                                print (j, " line stored:", line)
+                                j = j + 1
+                                textfile.write(line)
+
+
+                    textfile.close()
+                    k = k + 1
     def iparsiheader(self):
         headlista = []
         with open("data0.txt", 'r', encoding="utf-8") as textfile:

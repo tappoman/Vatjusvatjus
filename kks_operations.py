@@ -88,10 +88,10 @@ class Kksoperations (object):
 
 
     """PISTEEN ALUSTUS"""
-    def asetaHanke(self, tyonumero, hanke):
+    def asetaHanke(self, hanke):
         """#HANKE:nnn..n:		HANKE Ty�numero, hanke"""
         """palauttaa #1"""
-        self.com.setCommand("HANKE:" + tyonumero + ".." + hanke)
+        self.com.setCommand("HANKE:" + hanke)
         #return "#1"
 
     def asetaPiste(self, piste):
@@ -101,7 +101,7 @@ class Kksoperations (object):
 
     def asetaTapa(self, tapa):
         """#TAPA:ccc-cc:		Tutkimustapa (TEK-PA,TEK-HE,TEK-PH,TEK-PO ...). palauttaa (SGF-PA,SGF-HE,SGF-PH,SGF-PO ...)"""
-        print("TAPA:" + tapa)
+        #print("TAPA:" + tapa)
         self.com.setCommand("TAPA:TEK-" + tapa)
         #return "#1"
 
