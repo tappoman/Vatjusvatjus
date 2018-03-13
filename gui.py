@@ -1513,7 +1513,7 @@ class TiedonKasittely(object):
 
                     oldline = line
 
-                    print(i, " line done: ", oldline)
+                    #print(i, " line done: ", oldline)
                     i = i + 1
                     #textfile.close()
                     self.oldline = lineparts
@@ -1523,7 +1523,7 @@ class TiedonKasittely(object):
                         for line in lines[k:]:
                             if line != oldline and line != "#1\n" and lineparts != "#0\n" \
                                     and line != "\n" and lineparts != None and lineparts != "" and lineparts != " ":
-                                print (j, " line stored:", line)
+                                #print (j, " line stored:", line)
                                 j = j + 1
                                 textfile.write(line)
 
