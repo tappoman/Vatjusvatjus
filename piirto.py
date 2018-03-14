@@ -441,9 +441,9 @@ class CanvasPanel(wx.Panel):
             plt.xlabel('voima / puolikierrokset')
             s = 0
             while s < len(floatsyvyys):
-                if floatvoima[s] != 0:
-                    plt.barh(floatsyvyys[s], width=-floatvoima[s],
-                             height=0.2, linewidth=1, color='b', edgecolor='k')
+                if floatpuolikierrokset[s] != 0:
+                    plt.barh(floatsyvyys[s], width=floatpuolikierrokset[s],
+                             height=0.2, linewidth=1, color='g', edgecolor='k')
                     s = s + 1
                 else:
                     plt.barh(floatsyvyys[s], width=-floatvoima[s],
