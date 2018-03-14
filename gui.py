@@ -20,6 +20,7 @@ from kks_operations import *
 from piirto import *
 import time
 import communication
+import threading
 
 class windowClass(wx.Frame):
 
@@ -35,6 +36,8 @@ class windowClass(wx.Frame):
 
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.update, self.timer)
+
+        self.syvyysvalinta = 0
 
 
     def onClose(self):
@@ -57,6 +60,12 @@ class windowClass(wx.Frame):
 
         # nappuloiden alustus
         self.Bind(wx.EVT_WINDOW_DESTROY, self.suljelistener)
+
+        #piirrons syvyys
+        syvyydet = ['0-20m', '20-40m', '40-60m', '60-80m', '80-100m']
+        self.piirtocombo = wx.ComboBox(panel, pos=(501, 290), size=(75, -1), choices=syvyydet, style=wx.CB_READONLY)
+        self.piirtocombo.SetSelection(0)
+        self.Bind(wx.EVT_COMBOBOX, self.Onselect)
 
         # hanke
         # avaa hankkeen listalta
@@ -219,6 +228,42 @@ class windowClass(wx.Frame):
         panelSizer.Add(self.scrolled_panel, 1, wx.EXPAND)
         panel.SetSizer(panelSizer)
 
+    #syvyysvalinta
+    def Onselect(self, event):
+        #syvyysvalinta = self.piirtocombo.GetValue()
+        self.syvyysvalinta = event.GetSelection()
+
+        print(self.syvyysvalinta)
+        if self.graphbutton.GetLabelText() == "Tekla":
+            #self.graafinpiirto(event)
+            os.chdir(self.data.config["DEFAULT"]["polku"])
+            pisteet = []
+            file = open("{}.txt".format(self.data.hanke), "r")
+            tiedosto = file.readlines()
+            file.close()
+            os.chdir(self.data.root)
+            for i in tiedosto:
+                if i.__contains__("TY "):
+                    pisteet.append(i.strip("TY "))
+            pisteet.reverse()
+                # luodaan piirto-olio ja passataan meidän scrollipaneli sille
+            piirratama = pisteet[0].strip()
+            if self.data.piste.strip() == piirratama:
+                self.piirto = CanvasPanel(self.scrolled_panel, gui=self)
+                self.piirto.setValues(self.data.hanke, self.data.piste)
+                #self.piirto.draw()
+            else:
+                pistedata = self.data.iparsipistemittaukset(self.data.piste)
+                if pistedata[::-1][0][0] == "-1":
+                    del pistedata[-1]
+                self.piirto = CanvasPanel(self.scrolled_panel, gui=self)
+                self.piirto.setOldValues(pistedata, self.data.tutkimustapa)
+                #self.piirto.draw()
+        else:
+            pass
+
+        #self.update(event)
+
     #TANKOVARITYSTA
     def vaihdatankovari(self, color):
         self.tankoarvolaatikko.SetBackgroundColour(color)
@@ -297,11 +342,11 @@ class windowClass(wx.Frame):
             self.huombutton.Disable()
             self.data.iavaahanke()
             self.update(event)
-            self.timer.Start(50)
+            self.timer.Start(100)
         else:
             self.data.iavaahanke()
             self.update(event)
-            self.timer.Start(50)
+            self.timer.Start(100)
             try:
                 self.hankenimiteksti.SetLabelText(self.data.hanke)
                 self.pistebutton.Enable()
@@ -664,7 +709,6 @@ class windowClass(wx.Frame):
             return None
 
     def graafinpiirto(self, event):
-
         os.chdir(self.data.config["DEFAULT"]["polku"])
         pisteet = []
         file = open("{}.txt".format(self.data.hanke), "r")
@@ -689,16 +733,23 @@ class windowClass(wx.Frame):
             # luodaan piirto-olio ja passataan meidän scrollipaneli sille
             piirratama = pisteet[0].strip()
             if self.data.piste.strip() == piirratama:
-                self.piirto = CanvasPanel(self.scrolled_panel)
+                print("the values")
+                self.piirto = CanvasPanel(self.scrolled_panel, gui=self)
                 self.piirto.setValues(self.data.hanke, self.data.piste)
-                self.piirto.draw()
+                #self.t2 = threading.Thread(target=self.piirto.setValues(self.data.hanke, self.data.piste))
+                #self.t2.start()
+
             else:
                 pistedata = self.data.iparsipistemittaukset(self.data.piste)
                 if pistedata[::-1][0][0] == "-1":
                     del pistedata[-1]
                 self.piirto = CanvasPanel(self.scrolled_panel, gui=self)
+                print("the OLDvalues")
                 self.piirto.setOldValues(pistedata, self.data.tutkimustapa)
-                self.piirto.draw()
+
+                #self.t2 = threading.Thread(target=self.piirto.setOldValues(pistedata, self.data.tutkimustapa))
+                #self.t2 = threading.Thread(target=self.piirto.draw())
+                #self.t2.start()
 
         elif self.graphbutton.GetLabelText() == "Tekla":
             self.graphbutton.SetLabelText("Piirto")
@@ -1393,6 +1444,7 @@ class TiedonKasittely(object):
 
     # luetaan tiedot tekstitiedostosta, mockup communication listenistä
     def ikuuntele(self, event):
+        #print("uusi kutsu")
         z = []
         i = 1
         j = 1
@@ -1414,63 +1466,71 @@ class TiedonKasittely(object):
                 if len(line) > 1:
                     lineparts = line.replace('\n', '').split('\t')
 
-                    #if lineparts != self.oldline:
-                    print("--> ", lineparts)
+                    if line != self.oldline:
+                        print("--> ", lineparts)
 
-                    #MITTAUS- JA TALLENNUSSANOMAT KKS:LTA
-                    if lineparts[0][:4] == "#MIT":
-                        if lineparts[0][:11] == "#MIT_ODOTUS":
-                            #print("MIT ODOTELLAAN")
-                            pass
-                        else:
-                            #print("MITTIA PUKKAA")
-                            self.iparsitiedot(lineparts)
+                        #MITTAUS- JA TALLENNUSSANOMAT KKS:LTA
+                        if lineparts[0][:4] == "#MIT":
+                            if lineparts[0][:11] == "#MIT_ODOTUS":
+                                #print("MIT ODOTELLAAN")
+                                pass
+                            else:
+                                #print("MITTIA PUKKAA")
+                                self.iparsitiedot(lineparts)
 
-                    if lineparts[0][:4] == "#TAL":
-                        #parsitaan vain arvot TEKLAAN vietavaksi
-                        linearvot = lineparts[0].rpartition(":")[2]
+                        if lineparts[0][:4] == "#TAL":
+                            #parsitaan vain arvot TEKLAAN vietavaksi
+                            linearvot = lineparts[0].rpartition(":")[2]
 
-                        #kutsutaan saving luokan metodia joka tallettaa sanoman tekla-tiedostoon
-                        self.sa.tallennaTAL(self.hanke, linearvot, self.maalaji)
-                        self.maalaji = ""
+                            #kutsutaan saving luokan metodia joka tallettaa sanoman tekla-tiedostoon
+                            self.sa.tallennaTAL(self.hanke, linearvot, self.maalaji)
+                            self.maalaji = ""
 
-                        self.arvot = linearvot.split()
-                        self.apu = '{0:.2f}'.format(float(self.arvot[0]) / 100.00)
-                        self.arvot[0] = str(self.apu)
-                        self.TAL = "\t" + "\t" .join(self.arvot)
+                            self.arvot = linearvot.split()
+                            self.apu = '{0:.2f}'.format(float(self.arvot[0]) / 100.00)
+                            self.arvot[0] = str(self.apu)
+                            self.TAL = "\t" + "\t" .join(self.arvot)
 
-                        #paivitetaan arvot piirtajalle. PITAISI OLLA LUOTU;PAINETTU NAPPIA PIIRTO KOSKA LUODAAN VASTA SILLOIN
-                        if self.gui.graphbutton.GetLabelText() == "Tekla":
-                            self.gui.piirto.setValues(self.hanke, self.piste)
-                            self.gui.piirto.draw()
-                        else:
-                            #paivitetaan paneeli
-                            # paivitetaan arvot scrollipanelille.
-                            self.gui.linepanelille(self.TAL)
-                            self.gui.scrolled_panel.Refresh()
+                            #paivitetaan arvot piirtajalle. PITAISI OLLA LUOTU;PAINETTU NAPPIA PIIRTO KOSKA LUODAAN VASTA SILLOIN
+                            if self.gui.graphbutton.GetLabelText() == "Tekla":
+                                print("TALUPDATE")
+                                #self.t3 = threading.Thread(target=self.gui.piirto.setValues(self.hanke, self.piste))
+                                #self.t3.start()
+
+                                #self.gui.piirto.setValues(self.hanke, self.piste)
+                                #self.gui.piirto.draw()
+
+                                self.gui.piirto.setNewValues(self.TAL)
+                                self.gui.piirto.draw()
+
+                            else:
+                                #paivitetaan paneeli
+                                # paivitetaan arvot scrollipanelille.
+                                self.gui.linepanelille(self.TAL)
+                                self.gui.scrolled_panel.Refresh()
 
 
-                    if lineparts[0][:4] == "#END":
-                        print("ENDI")
-                        #self.iparsitiedot(lineparts)
-                        #TEHDÄÄN MITAMITA??
-                        #EI TULE TALLAISTA SANOMAA DEMOLLA,
-                        self.sa.tallennaTAL(self.hanke, lineparts[0])
+                        if lineparts[0][:4] == "#END":
+                            print("ENDI")
+                            #self.iparsitiedot(lineparts)
+                            #TEHDÄÄN MITAMITA??
+                            #EI TULE TALLAISTA SANOMAA DEMOLLA,
+                            self.sa.tallennaTAL(self.hanke, lineparts[0])
 
-                    if lineparts[0][:4] == "#SYV":
-                        #self.iparsitiedot(lineparts)
-                        #print("SYVI")
-                        #print(lineparts)
-                        #TEHDAAN MITAMITA
-                        #Alkukairaussyvyys 1s välein. < - - - - - - #SYV:nnn
-                        #self.sa.tallennaSYV(self.hanke, lineparts[0])
-                        linearvot = lineparts[0].rpartition(":")[2]
-                        arvot = linearvot.split()
-                        #print(arvot)
-                        syvyys = int(arvot[0])
-                        self.asetasyvyys(syvyys)
-                        if syvyys is not None:
-                            self.alkusyvyys = syvyys
+                        if lineparts[0][:4] == "#SYV":
+                            #self.iparsitiedot(lineparts)
+                            #print("SYVI")
+                            #print(lineparts)
+                            #TEHDAAN MITAMITA
+                            #Alkukairaussyvyys 1s välein. < - - - - - - #SYV:nnn
+                            #self.sa.tallennaSYV(self.hanke, lineparts[0])
+                            linearvot = lineparts[0].rpartition(":")[2]
+                            arvot = linearvot.split()
+                            #print(arvot)
+                            syvyys = int(arvot[0])
+                            self.asetasyvyys(syvyys)
+                            if syvyys is not None:
+                                self.alkusyvyys = syvyys
 
 
                     #OHJAUSTIEDOT KKS:LTA
@@ -1513,7 +1573,7 @@ class TiedonKasittely(object):
 
                     oldline = line
 
-                    #print(i, " line done: ", oldline)
+                    #print(i, " line used: ", oldline)
                     i = i + 1
                     #textfile.close()
                     self.oldline = lineparts
@@ -1527,9 +1587,9 @@ class TiedonKasittely(object):
                                 j = j + 1
                                 textfile.write(line)
 
-
                     textfile.close()
                     k = k + 1
+
     def iparsiheader(self):
         headlista = []
         with open("data0.txt", 'r', encoding="utf-8") as textfile:

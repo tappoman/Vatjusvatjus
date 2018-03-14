@@ -36,17 +36,48 @@ class CanvasPanel(wx.Panel):
         self.config = configparser.ConfigParser()
         self.gui = gui
 
+        self.apu = 0
 
         #print(wx.DisplaySize());
 
         self.axes = self.figure.add_subplot(111)
-        plt.axes(xlim=(-120, 120), ylim=(0, 50))
+        #plt.axes(xlim=(-120, 120), ylim=(0, 20))
         #plt.gca().xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
         xticks = [-100,-50,0,50,100]
         xticklabels = ['100', '50', '0', '50', '100']
 
-        yticks = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-        yticklabels = ['0','5','10','15','20','25','30','35','40','45','50']
+        #yticks = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+        #yticklabels = ['0','5','10','15','20','25','30','35','40','45','50']
+
+        if self.gui.syvyysvalinta == 0:
+            plt.axes(xlim=(-120, 120), ylim=(0, 20))
+            yticks = [0, 5, 10, 15, 20]
+            yticklabels = ['0', '5', '10', '15', '20']
+
+        elif self.gui.syvyysvalinta == 1:
+            plt.axes(xlim=(-120, 120), ylim=(20, 40))
+            yticks = [20, 25, 30, 35, 40]
+            yticklabels = ['20','25','30','35','40']
+
+        elif self.gui.syvyysvalinta == 2:
+            plt.axes(xlim=(-120, 120), ylim=(40, 60))
+            yticks = [40,45,50,55,60]
+            yticklabels = ['40','45','50','55','60']
+
+        elif self.gui.syvyysvalinta == 3:
+            plt.axes(xlim=(-120, 120), ylim=(60, 80))
+            yticks = [60,65,70,75,80]
+            yticklabels = ['60','65','70','75','80']
+
+        elif self.gui.syvyysvalinta == 4:
+            plt.axes(xlim=(-120, 120), ylim=(80, 100))
+            yticks = [80,85,90,95,100]
+            yticklabels = ['80','85','90','95','100']
+
+        else:
+            plt.axes(xlim=(-120, 120), ylim=(0, 20))
+            yticks = [0, 5, 10, 15, 20]
+            yticklabels = ['0', '5', '10', '15', '20']
 
         #yticks = [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100]
         #yticklabels = ['0','5','10','15','20','25','30','35','40','45','50'
@@ -75,6 +106,143 @@ class CanvasPanel(wx.Panel):
         plt.gca().invert_yaxis()
         plt.axvline(0, color='k')
 
+    def setNewValues(self, values):
+        print(values)
+        lineparts = values.replace('\n', '').split('\t')
+
+        # JOS PAINOKAIRAUS (PA) --> muotoillaan chart ja arvot
+        if self.tutkimustapa == "PA":
+
+            if lineparts[0][:1] == "":
+                # print("linepartsit: ", lineparts)
+                # print ("LP_LENGTH: ", len(lineparts))
+
+                self.syvyys = lineparts[1][:4]
+
+                if len(lineparts) > 3 and float(self.syvyys) > self.apu:
+                    self.apu = float(self.syvyys)
+
+                    self.x2 = lineparts[2][:3]
+                    self.x1 = lineparts[3][:4]
+
+                    # print(self.syvyys, " : ", self.x1, " : ", self.x2)
+
+                    plt.ylabel("syvyys")
+                    plt.xlabel('voima / puolikierrokset')
+                    if int(self.x1) != 0:
+                        plt.barh(float(self.syvyys), width=float(self.x1),
+                                 height=0.2, linewidth=1, color='g', edgecolor='k')
+                    else:
+                        plt.barh(float(self.syvyys), width=float(self.x1),
+                                 height=0.2, linewidth=1, color='g', edgecolor='k')
+                        plt.barh(float(self.syvyys), width=-float(self.x2),
+                                 height=0.2, linewidth=1, color='b', edgecolor='k')
+
+                        # self.figure.canvas.draw()
+
+                else:
+                    pass
+
+        # JOS HEIJARIK (HE) --> muotoillaan chart ja arvot
+        elif self.tutkimustapa == "HE":
+            if lineparts[0][:1] == "":
+                # print(lineparts)
+                self.syvyys = lineparts[1][:4]
+
+                if float(self.syvyys) > self.apu:
+                    self.apu = float(self.syvyys)
+
+                    self.x2 = lineparts[2][:3]
+                    # self.x1 = lineparts[3][:4]
+
+                    # print(self.syvyys, " : ", self.x2)
+
+                    plt.ylabel("syvyys")
+                    plt.xlabel('heijari / isku')
+
+                    plt.barh(float(self.syvyys), width=float(self.x2),
+                             height=0.1, linewidth=1, color='b', edgecolor='k')
+                    # self.figure.canvas.draw()
+
+        # JOS PORAK (PO) --> muotoillaan chart ja arvot
+        # PORAK ANTAA DATAA MUODOSSA ['#MIT:61      0    1.7   30']
+        # TAL KUITENKIN _AINA_ MUODOSSA ['#TAL:60      0    ']
+        # LAITETAAN NYT SYVYYS NÄKYVIIN ARVOILLA self.x1=10, self.x2=10
+        elif self.tutkimustapa == "PO":
+            if lineparts[0][:1] == "":
+                self.syvyys = lineparts[1][:4]
+
+                if float(self.syvyys) > self.apu:
+                    self.apu = float(self.syvyys)
+
+                    self.x2 = lineparts[2][:3]
+                    # self.x1 = lineparts[3][:4]
+
+                    # self.x1 = 10
+                    # self.x2 = 10
+
+                    # print(self.syvyys, " : ", self.x2)
+
+                    plt.ylabel("syvyys")
+                    plt.xlabel('aika')
+
+                    # plt.barh(float(self.syvyys), width=float(self.x1),
+                    #         height=0.1, linewidth=1, color='g', edgecolor='k')
+
+                    plt.barh(float(self.syvyys), width=float(self.x2),
+                             height=0.1, linewidth=1, color='b', edgecolor='k')
+                    # self.figure.canvas.draw()
+
+        # JOS TARYK (TK) --> muotoillaan chart ja arvot
+        # vain syvyytta, miten muotoillaan etta nakyy selkeästi
+        # TARYKAIRAUS EI ANNA TAL SANOMAA: EI VOIDA NÄYTTÄÄ
+        if self.tutkimustapa == "TR":
+            if lineparts[0][:1] == "":
+                # print(lineparts)
+                self.syvyys = lineparts[1][:4]
+
+                if float(self.syvyys) > self.apu:
+                    self.apu = float(self.syvyys)
+
+                    self.x2 = 10
+                    self.x1 = 10
+
+                    # print(self.syvyys, " : ", self.x2)
+
+                    plt.ylabel("syvyys")
+                    plt.xlabel('')
+
+                    plt.barh(float(self.syvyys), width=float(self.x1),
+                             height=0.1, linewidth=1, color='b', edgecolor='k')
+
+                    plt.barh(float(self.syvyys), width=-float(self.x2),
+                             height=0.1, linewidth=1, color='g', edgecolor='k')
+                    # self.figure.canvas.draw()
+
+        # JOS PURISTIHEIJARI (PH) --> muotoillaan chart ja arvot
+        # Vaikuttaisi tulevan vain yksi arvo #TAL sanomassa = syvyys
+        if self.tutkimustapa == "PH":
+            if lineparts[0][:1] == "":
+                # print(lineparts)
+                self.syvyys = lineparts[1][:4]
+
+                if float(self.syvyys) > self.apu:
+                    self.apu = float(self.syvyys)
+
+                    self.x2 = 10
+                    self.x1 = 10
+
+                    # print(self.syvyys, " : ", self.x2)
+
+                    plt.ylabel("syvyys")
+                    plt.xlabel('')
+                    plt.barh(float(self.syvyys), width=float(self.x1),
+                             height=0.1, linewidth=1, color='b', edgecolor='k')
+
+                    plt.barh(float(self.syvyys), width=-float(self.x2),
+                             height=0.1, linewidth=1, color='g', edgecolor='k')
+
+
 
     def setValues(self, hanke, piste):
         self.config.read("USECONTROL.ini")
@@ -82,7 +250,7 @@ class CanvasPanel(wx.Panel):
         self.tiedosto = hanke
         self.piste = piste
         self.tutkimustapa = ""
-        self.apu = 0
+
 
         #print(self.polku, self.tiedosto, self.piste)
 
@@ -94,6 +262,7 @@ class CanvasPanel(wx.Panel):
         haluttupiste = "TY " + self.piste
         #print(haluttupiste)
 
+        #tähän vauhtia lisää, skippaillaan linet whilessä jos väärää kamaa
         with open(self.fullpath, 'r') as textfile:
             for line in textfile:
                 #print(len(line))
@@ -200,7 +369,7 @@ class CanvasPanel(wx.Panel):
                                     #plt.barh(float(self.syvyys), width=float(self.x1),
                                     #         height=0.1, linewidth=1, color='g', edgecolor='k')
 
-                                    plt.barh(float(self.syvyys), width=float(-self.x2),
+                                    plt.barh(float(self.syvyys), width=float(self.x2),
                                              height=0.1, linewidth=1, color='b', edgecolor='k')
                                     #self.figure.canvas.draw()
 
