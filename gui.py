@@ -886,7 +886,7 @@ class TiedonKasittely(object):
         self.oldline = ""
 
 
-        '''
+
         self.com = Communication()
 
         self.comcheck = self.com.openConnection()
@@ -897,7 +897,7 @@ class TiedonKasittely(object):
             sys.exit(0)
         
         self.kks = Kksoperations(self.com)
-        '''
+
 
         self.sa = Saving()
         self.gui = gui

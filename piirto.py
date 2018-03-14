@@ -338,10 +338,13 @@ class CanvasPanel(wx.Panel):
                                     #print(self.syvyys, " : ", self.x2)
 
                                     plt.ylabel("syvyys")
-                                    plt.xlabel('heijari / isku')
+                                    plt.xlabel('heijari')
 
-                                    plt.barh(float(self.syvyys), width=float(self.x2),
-                                             height=0.1, linewidth=1, color='b', edgecolor='k')
+                                    plt.barh(floats(self.syvyys), width=float(self.x2),
+                                             height=0.2, linewidth=1, color='b', edgecolor='k')
+
+                                    #plt.barh(float(self.syvyys), width=float(self.x2),
+                                    #         height=0.1, linewidth=1, color='b', edgecolor='k')
                                     #self.figure.canvas.draw()
 
                         # JOS PORAK (PO) --> muotoillaan chart ja arvot
@@ -364,7 +367,7 @@ class CanvasPanel(wx.Panel):
                                     #print(self.syvyys, " : ", self.x2)
 
                                     plt.ylabel("syvyys")
-                                    plt.xlabel('aika')
+                                    plt.xlabel('tunkeutumisnopeus')
 
                                     #plt.barh(float(self.syvyys), width=float(self.x1),
                                     #         height=0.1, linewidth=1, color='g', edgecolor='k')
@@ -384,8 +387,8 @@ class CanvasPanel(wx.Panel):
                                 if float(self.syvyys) > self.apu:
                                     self.apu = float(self.syvyys)
 
-                                    self.x2 = 10
-                                    self.x1 = 10
+                                    self.x2 = 2
+                                    self.x1 = 2
 
                                     #print(self.syvyys, " : ", self.x2)
 
@@ -409,8 +412,8 @@ class CanvasPanel(wx.Panel):
                                 if float(self.syvyys) > self.apu:
                                     self.apu = float(self.syvyys)
 
-                                    self.x2 = 10
-                                    self.x1 = 10
+                                    self.x2 = 2
+                                    self.x1 = 2
 
                                     #print(self.syvyys, " : ", self.x2)
 
@@ -433,6 +436,8 @@ class CanvasPanel(wx.Panel):
             floatvoima = []
             floatpuolikierrokset = []
             for i in data:
+                if len(i) != 3:
+                    i.append(0)
                 floatsyvyys.append(float(i[0]))
                 floatvoima.append(float(i[1]))
                 floatpuolikierrokset.append(float(i[2]))
@@ -480,7 +485,7 @@ class CanvasPanel(wx.Panel):
 
             s = 0
             while s < len(floatsyvyys):
-                    plt.barh(floatsyvyys[s], width=-floattnknopeus[s],
+                    plt.barh(floatsyvyys[s], width=floattnknopeus[s],
                              height=0.2, linewidth=1, color='b', edgecolor='k')
 
                     s = s + 1
