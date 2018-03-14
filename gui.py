@@ -490,7 +490,7 @@ class windowClass(wx.Frame):
 
         if self.lopetusbutton.GetLabel() == "Lopeta\nkairaus":
             self.data.kks.kuittaaTanko()
-            time.sleep(0.5)
+            time.sleep(0.8)
             self.data.kks.lopetaKairaus()
             self.alkukairausbutton.Enable()
             self.tankobutton.Enable()
@@ -672,8 +672,8 @@ class windowClass(wx.Frame):
             self.voimaarvoteksti.SetLabelText(str(data.voima))
         elif self.data.tutkimustapa == "PO":
             self.syvyysarvoteksti.SetLabelText(str(data.syvyys))
-            self.voimaarvoteksti.SetLabelText(str(data.voima))
-            self.voimaarvoteksti.SetLabelText(str(data.nopeus))
+            self.puolikierroksetarvoteksti.SetLabelText(str(data.voima))
+            self.nopeusarvoteksti.SetLabelText(str(data.nopeus))
             self.voimaarvoteksti.SetLabelText(str(data.puolikierrokset))
         elif self.data.tutkimustapa == "TR":
             self.syvyysarvoteksti.SetLabelText(str(data.syvyys))
@@ -737,7 +737,7 @@ class windowClass(wx.Frame):
             # luodaan piirto-olio ja passataan meidän scrollipaneli sille
             piirratama = pisteet[0].strip()
             if self.data.piste.strip() == piirratama:
-                print("the values")
+                #print("the values")
                 self.piirto = CanvasPanel(self.scrolled_panel, gui=self)
                 self.piirto.setValues(self.data.hanke, self.data.piste)
                 #self.t2 = threading.Thread(target=self.piirto.setValues(self.data.hanke, self.data.piste))
@@ -748,7 +748,7 @@ class windowClass(wx.Frame):
                 if pistedata[::-1][0][0] == "-1":
                     del pistedata[-1]
                 self.piirto = CanvasPanel(self.scrolled_panel, gui=self)
-                print("the OLDvalues")
+                #print("the OLDvalues")
                 self.piirto.setOldValues(pistedata, self.data.tutkimustapa)
 
                 #self.t2 = threading.Thread(target=self.piirto.setOldValues(pistedata, self.data.tutkimustapa))
@@ -1676,10 +1676,21 @@ class TiedonKasittely(object):
 
         if tutkimustapa == "PO":
             syvyys = int(arvot[0])
+            # print(syvyys, " syvyys")
             self.asetasyvyys(syvyys)
 
-            voima = int(arvot[1])
+            puolikierrokset = int(arvot[1])
+            self.asetapuolikierrokset(puolikierrokset)
+            # print(puolikierrokset, " puolik.")
+
+            voima = float(arvot[2])
+            #print(voima, " voima")
+            #print(self.tutkimustapa)
             self.asetavoima(voima)
+
+            nopeus = float(arvot[3])
+            #print(nopeus, " nopeus")
+            self.asetanopeus(nopeus)
 
         if tutkimustapa == "PH":
             syvyys = int(arvot[0])
