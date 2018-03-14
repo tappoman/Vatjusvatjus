@@ -85,6 +85,7 @@ class windowClass(wx.Frame):
         self.ohjelmabutton = wx.Button(panel, label="Tutkimus-\ntapa", pos=(235, 10), size=(110, 110))
         self.ohjelmabutton.SetFont(font1)
         self.ohjelmabutton.Bind(wx.EVT_BUTTON, self.valitseohjelma)
+        self.ohjelmabutton.Disable()
 
         # Tietojen hallinta
         # muokataan .ini-tiedostoja
@@ -444,6 +445,7 @@ class windowClass(wx.Frame):
             self.alkukairausbutton.Enable()
             self.tankobutton.Enable()
             self.alkukairausbutton.SetLabelText("Alku\nkairaus")
+            self.ohjelmabutton.Disable()
 
         else:
             #KKS:lle hanke, piste, tapa
@@ -671,6 +673,8 @@ class windowClass(wx.Frame):
         elif self.data.tutkimustapa == "PO":
             self.syvyysarvoteksti.SetLabelText(str(data.syvyys))
             self.voimaarvoteksti.SetLabelText(str(data.voima))
+            self.voimaarvoteksti.SetLabelText(str(data.nopeus))
+            self.voimaarvoteksti.SetLabelText(str(data.puolikierrokset))
         elif self.data.tutkimustapa == "TR":
             self.syvyysarvoteksti.SetLabelText(str(data.syvyys))
         elif self.data.tutkimustapa == "PH":
@@ -775,8 +779,22 @@ class windowClass(wx.Frame):
         else:
             try:
                 ohjelma = self.data.ivalitseohjelma()
+                os.chdir(self.data.config["DEFAULT"]["polku"])
+                with open("{}.txt".format(self.data.hanke)) as hankefile:
+                    tiedosto = hankefile.readlines()
+                for line in tiedosto:
+                    if line.__contains__("{}".format(self.data.piste)):
+                        indeksi = tiedosto.index(line)
+                        del tiedosto[indeksi+3]
+                        tiedosto.insert(indeksi+3, "TT {}\n".format(self.data.tutkimustapa))
+                        with open("{}.txt".format(self.data.hanke), "w") as hankefile:
+                            for i in tiedosto:
+                                hankefile.write(i)
+                        break
                 self.ohjelmaarvoteksti.SetLabelText(ohjelma)
                 self.alustaarvopaneeli(ohjelma)
+                self.data.iparsiuusinpiste(self.data.piste)
+
             except TypeError:
                 print("Tutkimustapaa ei valittu")
 
@@ -855,6 +873,7 @@ class TiedonKasittely(object):
         self.oldline = ""
 
 
+        
         self.com = Communication()
 
         self.comcheck = self.com.openConnection()
@@ -946,7 +965,7 @@ class TiedonKasittely(object):
     # erikoismerkit parsittu pois
     # estetään ylikirjoitus try-exceptillä
     def iluohanke(self):
-        hankenimi = wx.TextEntryDialog(None, "Anna uudelle hankkeelle nimi", "Uuden hankkeen luonti")
+        hankenimi = wx.TextEntryDialog(None, "Kirjoita hankkeen nimi ja numero", "Uuden hankkeen luonti")
         if hankenimi.ShowModal() == wx.ID_OK:
             hankenimi = hankenimi.GetValue()
             hankenimi = ''.join(e for e in hankenimi if e.isalnum())
@@ -1118,6 +1137,7 @@ class TiedonKasittely(object):
                 syvyysdata = self.iparsipistesyvyydet(pistenimi)
 
                 if syvyysdata:
+                    self.gui.ohjelmabutton.Disable()
                     self.gui.lopetusbutton.Enable()
                     self.gui.graphbutton.Enable()
                     self.gui.huombutton.Enable()
@@ -1146,6 +1166,7 @@ class TiedonKasittely(object):
                     return None
 
                 else:
+                    self.gui.ohjelmabutton.Enable()
                     self.gui.alkukairausbutton.Enable()
                     os.chdir(self.root)
                     return None
@@ -1352,8 +1373,8 @@ class TiedonKasittely(object):
             os.chdir(self.config["DEFAULT"]["polku"])
 
             os.chdir(self.root)
-            with open("tutkimustavat.txt", "r", encoding="utf-8-sig") as textfile:
-                for line in textfile:
+            with open("tutkimustavat.txt", "r", encoding="utf-8-sig") as ttfile:
+                for line in ttfile:
                     if line.__contains__(ohjelmavalinta):
                         self.tutkimustapa = line[:2]
                         return line[:2]
@@ -1364,7 +1385,6 @@ class TiedonKasittely(object):
     # maalajit kakkosikkunaan valitaan tekstitiedostosta ensimmäisen ikkunan
     # valinnan kolmen ensimmäisen kirjaimen mukaan.
     def ivalitsemaalaji(self, lista):
-
 
         maalaji = wx.SingleChoiceDialog(None, "Valitse maalaji", "Maalaji", lista,
                                            wx.CHOICEDLG_STYLE)
