@@ -41,7 +41,9 @@ class windowClass(wx.Frame):
 
 
     def onClose(self):
+
         self.data.kks.kuittaaTanko()
+        time.sleep(0.8)
         self.data.kks.lopetaKairaus()
         self.data.kks.aloitaAlkutila()
         self.data.kks.closeConnection()
@@ -446,6 +448,9 @@ class windowClass(wx.Frame):
             self.tankobutton.Enable()
             self.alkukairausbutton.SetLabelText("Alku\nkairaus")
             self.ohjelmabutton.Disable()
+            self.hankebutton.Disable()
+            self.pistebutton.Disable()
+            self.ohjelmabutton.Disable()
 
         else:
             #KKS:lle hanke, piste, tapa
@@ -468,6 +473,9 @@ class windowClass(wx.Frame):
                 if kairausvalinta == "OHITETAAN":
                     self.lopetusbutton.Enable()
                     self.tankobutton.Enable()
+                    self.ohjelmabutton.Disable()
+                    self.hankebutton.Disable()
+                    self.pistebutton.Disable()
                     #self.data.kks.aloitaOdotustila()
                     #self.data.kks.asetaKairaussyvyys("0")
                     self.config.read("USECONTROL.ini")
@@ -493,6 +501,8 @@ class windowClass(wx.Frame):
             time.sleep(0.8)
             self.data.kks.lopetaKairaus()
             self.alkukairausbutton.Enable()
+            self.hankebutton.Disable()
+            self.pistebutton.Disable()
             self.tankobutton.Enable()
             self.vaihdatankovari('red')
             os.chdir(self.data.root)
@@ -535,6 +545,9 @@ class windowClass(wx.Frame):
                     self.lopetusbutton.SetLabel("Aloita\nkairaus")
 
                     self.lopetusbutton.Disable()
+                    self.hankebutton.Enable()
+                    self.pistebutton.Enable()
+
             else:
                 return None
         else:
@@ -873,7 +886,7 @@ class TiedonKasittely(object):
         self.oldline = ""
 
 
-        
+        '''
         self.com = Communication()
 
         self.comcheck = self.com.openConnection()
@@ -884,7 +897,7 @@ class TiedonKasittely(object):
             sys.exit(0)
         
         self.kks = Kksoperations(self.com)
-
+        '''
 
         self.sa = Saving()
         self.gui = gui
