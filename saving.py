@@ -27,7 +27,7 @@ class Saving (object):
             os.mkdir(self.tal_polku)
         self.tiedosto = "MIT_temp.txt"
         self.fullpath = os.path.join(self.tal_polku, self.tiedosto)
-        file = open(self.fullpath, "w")
+        file = open(self.fullpath, "w", encoding='UTF-8')
         file.write("")
         file.close()
         self.lastSYV = 0;
@@ -36,7 +36,7 @@ class Saving (object):
     #Määrittää tallenustiedoston kaikelle kks-laitteelta tulevalle datalle ja tallettaa sen
     def tallennaMIT(self, MIT):
         #MIT = MIT.strip(' \n\t')
-        APU = re.sub(r"[\\n\\t\s]*", "", MIT)
+        APU = re.sub(r"[\n\t\s]*", "", MIT)
         if APU != "#1" and APU != "#0":
             #print("MITTTI: ", MIT)
             self._config.read("USECONTROL.ini", encoding='UTF-8')
@@ -47,7 +47,7 @@ class Saving (object):
             self.tiedosto = "MIT_temp.txt"
 
             self.fullpath = os.path.join(self.tal_polku, self.tiedosto)
-            file = open(self.fullpath, "a")
+            file = open(self.fullpath, "a", encoding='UTF-8')
             file.write(MIT)
             file.close()
 
@@ -132,7 +132,7 @@ class Saving (object):
         self.hanke = self._config["DEFAULT"]["hanke"]
 
         self.fullpath = os.path.join(self.tal_polku, self.hanke)
-        file = open(self.fullpath, "w")
+        file = open(self.fullpath, "w", encoding='UTF-8')
 
         #TIEDOSTOKOHTAISET
         self._config.read("HANKETIEDOT.ini")
@@ -141,7 +141,7 @@ class Saving (object):
                     "OM\t" + self._config["DEFAULT"]["om"] + "\n" +
                     "ML\t" + self._config["DEFAULT"]["ml"] + "\n" +
                     "OR\t" + self._config["DEFAULT"]["org"] + "\n")
-
+        file.close()
 
     def koostaPisteheader(self):
         self._config.read("USECONTROL.ini")
@@ -149,14 +149,14 @@ class Saving (object):
         self.hanke = self._config["DEFAULT"]["hanke"]
 
         self.fullpath = os.path.join(self.tal_polku, self.hanke)
-        file = open(self.fullpath, "a")
+        file = open(self.fullpath, "a", encoding='UTF-8')
 
         self._config.read("PISTETIEDOT.ini")
 
         file.write("TY\t" + self._config["DEFAULT"]["ty"] + "\n" +
                     "PK\t" + self._config["DEFAULT"]["pk"] + "\n" +
                     "LA\t" + self._config["DEFAULT"]["la"] + "\n")
-
+        file.close()
 
     def koostaTutkimusheader(self):
         self._config.read("USECONTROL.ini")
@@ -164,7 +164,7 @@ class Saving (object):
         self.hanke = self._config["DEFAULT"]["hanke"]
 
         self.fullpath = os.path.join(self.tal_polku, self.hanke)
-        file = open(self.fullpath, "a")
+        file = open(self.fullpath, "a", encoding='UTF-8')
 
         self._config.read("TUTKIMUSTIEDOT.ini")
 
@@ -172,6 +172,7 @@ class Saving (object):
                     "TX\t" + self._config["DEFAULT"]["tx"] + "\n" +
                     "XY\t" + self._config["DEFAULT"]["xy"] + "\n" +
                     "LN\t" + self._config["DEFAULT"]["ln"] + "\n")
+        file.close()
 
     def tallennaSYV(self, hanke, SYV):
         self._config.read("USECONTROL.ini")
@@ -179,9 +180,9 @@ class Saving (object):
         #self.hanke = self._config["DEFAULT"]["hanke"]
 
         self.fullpath = os.path.join(self.tal_polku, self.hanke)
-        file = open(self.fullpath, "a")
+        file = open(self.fullpath, "a", encoding='UTF-8')
         file.write(SYV + "\n")
-
+        file.close()
 
     def tallennaTAL(self, hanke, TAL, maalaji):
         self._config.read("USECONTROL.ini")
@@ -197,7 +198,7 @@ class Saving (object):
         self.TAL = "\t".join(self.arvot)
         #self.TAL = "\t".join([str(x) for x in self.arvot])
 
-        file = open(self.fullpath, "a")
+        file = open(self.fullpath, "a", encoding='UTF-8')
 
         #tarkastetaan maalajin valinta ja lisataan peraan jos valittuna
         if self.maalaji == "":
@@ -208,14 +209,16 @@ class Saving (object):
             #print("maalaji asetettu", self.maalaji)
             file.write("\t" + self.TAL + "\t" + self.maalaji + "\n")
 
+        file.close()
     #lisaa maalajin datarivin peraan vaihdettaessa
     def tallennaMaalaji(self, hanke, maalaji):
         self._config.read("USECONTROL.ini")
         self.tal_polku = self._config["DEFAULT"]["polku"]
         self.hanke = hanke
         self.fullpath = os.path.join(self.tal_polku, self.hanke)
-        file = open(self.fullpath, "a")
+        file = open(self.fullpath, "a", encoding='UTF-8')
         file.write(maalaji + "\n")
+        file.close()
 
     # lisaa huomautuksen datarivin peraan annettaessa
     def tallennaHM(self, hanke, huomautus):
@@ -223,5 +226,6 @@ class Saving (object):
         self.tal_polku = self._config["DEFAULT"]["polku"]
         self.hanke = hanke
         self.fullpath = os.path.join(self.tal_polku, self.hanke)
-        file = open(self.fullpath, "a")
+        file = open(self.fullpath, "a", encoding='UTF-8')
         file.write(huomautus + "\n")
+        file.close()

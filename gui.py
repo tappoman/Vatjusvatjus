@@ -241,7 +241,7 @@ class windowClass(wx.Frame):
             #self.graafinpiirto(event)
             os.chdir(self.data.config["DEFAULT"]["polku"])
             pisteet = []
-            file = open("{}.txt".format(self.data.hanke), "r")
+            file = open("{}.txt".format(self.data.hanke), "r", encoding='UTF-8')
             tiedosto = file.readlines()
             file.close()
             os.chdir(self.data.root)
@@ -381,7 +381,7 @@ class windowClass(wx.Frame):
         printtilista = []
         parsilista = []
         os.chdir(self.data.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "r")
+        file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "r", encoding='UTF-8')
         tiedosto = file.readlines()
         file.close()
 
@@ -476,6 +476,7 @@ class windowClass(wx.Frame):
                     self.ohjelmabutton.Disable()
                     self.hankebutton.Disable()
                     self.pistebutton.Disable()
+                    self.huombutton.Enable()
                     #self.data.kks.aloitaOdotustila()
                     #self.data.kks.asetaKairaussyvyys("0")
                     self.config.read("USECONTROL.ini")
@@ -491,6 +492,7 @@ class windowClass(wx.Frame):
                     os.chdir(self.config["DEFAULT"]["polku"])
                     os.chdir(self.data.root)
                     self.data.kks.aloitaAlkukairaus()
+                    self.huombutton.Enable()
             else:
                 return None
 
@@ -582,7 +584,7 @@ class windowClass(wx.Frame):
         parsilista = []
         headerit = ["FO","KJ","OM","ML","ORG","TY","PK","LA","TT","TX","XY","LN"]
         os.chdir(self.data.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "r")
+        file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "r", encoding='UTF-8')
         tiedosto = file.readlines()
         file.close()
 
@@ -639,7 +641,7 @@ class windowClass(wx.Frame):
                                            self.hankenimiteksti.GetLabel()+".txt"))
                     luotavahanke = self.hankenimiteksti.GetLabel()
                     os.chdir(self.data.config["DEFAULT"]["polku"])
-                    file = open(luotavahanke+".txt", "w")
+                    file = open(luotavahanke+".txt", "w", encoding='UTF-8')
                     for i in tiedosto:
                         file.write(i)
                     file.close()
@@ -728,7 +730,7 @@ class windowClass(wx.Frame):
     def graafinpiirto(self, event):
         os.chdir(self.data.config["DEFAULT"]["polku"])
         pisteet = []
-        file = open("{}.txt".format(self.data.hanke), "r")
+        file = open("{}.txt".format(self.data.hanke), "r", encoding='UTF-8')
         tiedosto = file.readlines()
         file.close()
         os.chdir(self.data.root)
@@ -738,14 +740,14 @@ class windowClass(wx.Frame):
         pisteet.reverse()
         if self.graphbutton.GetLabelText() =="Piirto":
             self.graphbutton.SetLabelText("Tekla")
-            #for i in range(20):
-            line = ""
-            new_text = wx.StaticText(self.scrolled_panel, -1, line, size=(550, 30))
-            self.spSizer.Add(new_text)
-            self.scrolled_panel.ScrollLines(10)
-            self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
-            self.scrolled_panel.Layout()
-            self.scrolled_panel.Refresh()
+            for i in range(20):
+                line = ""
+                new_text = wx.StaticText(self.scrolled_panel, -1, line, size=(550, 30))
+                self.spSizer.Add(new_text)
+                self.scrolled_panel.ScrollLines(10)
+                self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
+                self.scrolled_panel.Layout()
+                self.scrolled_panel.Refresh()
 
             # luodaan piirto-olio ja passataan meidän scrollipaneli sille
             piirratama = pisteet[0].strip()
@@ -770,10 +772,12 @@ class windowClass(wx.Frame):
 
         elif self.graphbutton.GetLabelText() == "Tekla":
             self.graphbutton.SetLabelText("Piirto")
-            self.data.iparsipiste(self.pistenimiteksti.GetLabel().strip())
+            pistearvo = re.sub(r"[\n\t\s]*", "", self.data.piste)
+            print(pistearvo)
+            self.data.iparsipiste(pistearvo)
         else:
             return None
-			
+
     def buffaa_paneelia(self):
         for i in range(5):
             line = ""
@@ -793,14 +797,14 @@ class windowClass(wx.Frame):
             try:
                 ohjelma = self.data.ivalitseohjelma()
                 os.chdir(self.data.config["DEFAULT"]["polku"])
-                with open("{}.txt".format(self.data.hanke)) as hankefile:
+                with open("{}.txt".format(self.data.hanke), "r", encoding="utf-8") as hankefile:
                     tiedosto = hankefile.readlines()
                 for line in tiedosto:
                     if line.__contains__("{}".format(self.data.piste)):
                         indeksi = tiedosto.index(line)
                         del tiedosto[indeksi+3]
                         tiedosto.insert(indeksi+3, "TT {}\n".format(self.data.tutkimustapa))
-                        with open("{}.txt".format(self.data.hanke), "w") as hankefile:
+                        with open("{}.txt".format(self.data.hanke), "w", encoding="utf-8") as hankefile:
                             for i in tiedosto:
                                 hankefile.write(i)
                         break
@@ -895,7 +899,7 @@ class TiedonKasittely(object):
             warning.ShowModal()
             warning.Destroy()
             sys.exit(0)
-        
+
         self.kks = Kksoperations(self.com)
 
 
@@ -953,7 +957,7 @@ class TiedonKasittely(object):
                 self.hanke = tiedostonvalinta.GetStringSelection()
                 self.gui.hankenimiteksti.SetLabelText(self.hanke)
                 os.chdir(self.config["DEFAULT"]["polku"])
-                file = open("{}.txt".format(self.hanke), "r")
+                file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
                 tiedosto = file.readlines()
                 file.close()
                 if len(tiedosto) == 5:
@@ -994,7 +998,7 @@ class TiedonKasittely(object):
                     os.chdir(self.root)
                 else:
                     self.iluotempconfig()
-                    file = open("{}.txt".format(hankenimi), 'a')
+                    file = open("{}.txt".format(hankenimi), 'a', encoding='UTF-8')
                     self.hanke = hankenimi
                     self.config.read("HANKETIEDOT.ini")
                     file.write("FO " + self.config["DEFAULT"]["fo"])
@@ -1018,7 +1022,7 @@ class TiedonKasittely(object):
         pisteet = []
         piste = []
         os.chdir(self.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.hanke), "r")
+        file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
         tiedosto = file.readlines()
         file.close()
         for i in tiedosto:
@@ -1057,7 +1061,7 @@ class TiedonKasittely(object):
         pisteet = []
         self.config.read("USECONTROL.ini")
         os.chdir(self.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.hanke), "r")
+        file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
         tiedosto = file.readlines()
         file.close()
         for line in tiedosto:
@@ -1097,7 +1101,7 @@ class TiedonKasittely(object):
             for i in pistedata:
                 self.gui.linepanelille(i)
 
-            pistearvo = re.sub(r"[\\n\\t\s]*", "", pistenimi)
+            pistearvo = re.sub(r"[\n\t\s]*", "", pistenimi)
 
             self.gui.pistenimiteksti.SetLabelText(pistearvo)
             os.chdir(self.root)
@@ -1110,7 +1114,7 @@ class TiedonKasittely(object):
         pisteet = []
         self.config.read("USECONTROL.ini")
         os.chdir(self.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.hanke), "r")
+        file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
         tiedosto = file.readlines()
         file.close()
         for line in tiedosto:
@@ -1149,7 +1153,7 @@ class TiedonKasittely(object):
                 self.gui.linepanelille("")
                 for i in pistedata:
                     self.gui.linepanelille(i)
-                pistearvo = re.sub(r"[\\n\\t\s]*", "", pistenimi)
+                pistearvo = re.sub(r"[\n\t\s]*", "", pistenimi)
                 self.gui.pistenimiteksti.SetLabelText(pistearvo)
 
                 syvyysdata = self.iparsipistesyvyydet(pistenimi)
@@ -1198,7 +1202,7 @@ class TiedonKasittely(object):
         printtilista = []
         parsilista = []
         os.chdir(self.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.hanke), "r")
+        file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
         tiedosto = file.readlines()
         file.close()
 
@@ -1258,7 +1262,7 @@ class TiedonKasittely(object):
         printtilista = []
         parsilista = []
         os.chdir(self.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.hanke), "r")
+        file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
         tiedosto = file.readlines()
         file.close()
 
@@ -1309,11 +1313,11 @@ class TiedonKasittely(object):
         if pistenimi.ShowModal() == wx.ID_OK:
             nimi = pistenimi.GetValue()
             pistenimi.Destroy()
-            file = open("{}.txt".format(self.hanke), "r")
+            file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
             tiedosto = file.readlines()
             file.close()
             for i in tiedosto:
-                    if i.__contains__("TY {}".format(nimi)):
+                    if i is ("TY {}".format(nimi)):
                         warning = wx.MessageDialog(None, "Piste {} on jo olemassa hankkeella {}".format(nimi, hanke)
                                        , "Varoitus",
                                        wx.OK | wx.ICON_INFORMATION)
@@ -1492,7 +1496,7 @@ class TiedonKasittely(object):
         self.polku = self.config["DEFAULT"]["polku"]
         self.tiedosto = "MIT_temp.txt"
         self.fullpath = os.path.join(self.polku, self.tiedosto)
-        with open(self.fullpath, 'r', encoding="utf-8") as textfile:
+        with open(self.fullpath, 'r') as textfile:
 
             lines = textfile.readlines()
             textfile.close()
@@ -1531,7 +1535,7 @@ class TiedonKasittely(object):
 
                             #paivitetaan arvot piirtajalle. PITAISI OLLA LUOTU;PAINETTU NAPPIA PIIRTO KOSKA LUODAAN VASTA SILLOIN
                             if self.gui.graphbutton.GetLabelText() == "Tekla":
-                                print("TALUPDATE")
+                                #print("TALUPDATE")
                                 #self.t3 = threading.Thread(target=self.gui.piirto.setValues(self.hanke, self.piste))
                                 #self.t3.start()
 
@@ -1616,7 +1620,7 @@ class TiedonKasittely(object):
                     #textfile.close()
                     self.oldline = lineparts
 
-                    with open(self.fullpath, 'w', encoding="utf-8") as textfile:
+                    with open(self.fullpath, 'w') as textfile:
 
                         for line in lines[k:]:
                             if line != oldline and line != "#1\n" and lineparts != "#0\n" \
@@ -1630,7 +1634,7 @@ class TiedonKasittely(object):
 
     def iparsiheader(self):
         headlista = []
-        with open("data0.txt", 'r', encoding="utf-8") as textfile:
+        with open("data0.txt", 'r') as textfile:
             for line in textfile:
                 if len(line) > 1:
                     lineparts = line.replace('\n', '')
@@ -1642,7 +1646,7 @@ class TiedonKasittely(object):
         os.chdir(self.root)
         lajit = []
         temp_list = []
-        with open("maalajit.txt", "r", encoding="utf-8") as textfile:
+        with open("maalajit.txt", "r") as textfile:
             for line in textfile:
                 if len(line) > 1:
                     lineparts = line.replace('\n', '').split('\t')
