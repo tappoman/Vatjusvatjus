@@ -766,8 +766,9 @@ class windowClass(wx.Frame):
 
         elif self.graphbutton.GetLabelText() == "Tekla":
             self.graphbutton.SetLabelText("Piirto")
-            uusitekla = self.data.piste
-            self.data.iparsipiste(self.data.piste)
+            pistearvo = re.sub(r"[\n\t\s]*", "", self.data.piste)
+            print(pistearvo)
+            self.data.iparsipiste(pistearvo)
         else:
             return None
 
@@ -833,7 +834,7 @@ class windowClass(wx.Frame):
             if tagi == "humusmaa":
                 tagi = tagi.upper()
 
-            with open("maalajit.txt", "r", encoding="utf-8") as maatextfile:
+            with open("maalajit.txt", "r", encoding="utf-8-sig") as maatextfile:
                 for line in maatextfile:
                     if len(line) > 1:
                         lineparts = line.replace("\n", "").strip("\t")
@@ -883,7 +884,7 @@ class TiedonKasittely(object):
         self.oldline = ""
 
 
-        '''
+
         self.com = Communication()
 
         self.comcheck = self.com.openConnection()
@@ -894,7 +895,7 @@ class TiedonKasittely(object):
             sys.exit(0)
 
         self.kks = Kksoperations(self.com)
-        '''
+
 
         self.sa = Saving()
         self.gui = gui
@@ -1036,12 +1037,12 @@ class TiedonKasittely(object):
                 os.chdir(self.root)
                 return None
             elif valinta.GetStringSelection() == pisteet[0]:
-                self.piste = valinta.GetStringSelection()
+                self.piste = valinta.GetStringSelection().strip()
                 self.iparsiuusinpiste(valinta.GetStringSelection())
                 os.chdir(self.root)
                 return None
             else:
-                self.piste = valinta.GetStringSelection()
+                self.piste = valinta.GetStringSelection().strip()
                 self.iparsipiste(valinta.GetStringSelection())
                 os.chdir(self.root)
                 return None
@@ -1072,7 +1073,9 @@ class TiedonKasittely(object):
             if line.__contains__("ORG "):
                 pistedata.append(line)
             if alku == 0:
-                if line == "TY {}".format(pistenimi):
+                apuline = re.sub(r"[\n\t\s]*", "", line)
+                apupistenimi = re.sub(r"[\n\t\s]*", "", pistenimi)
+                if apuline == "TY" + pistenimi:
                     pistedata.append(line)
                     pisteet.append(line)
                     alku = tiedosto.index(line) + 1
@@ -1126,7 +1129,9 @@ class TiedonKasittely(object):
             if line.__contains__("ORG "):
                 pistedata.append(line)
             if alku == 0:
-                if line == "TY {}".format(pistenimi):
+                apuline = re.sub(r"[\n\t\s]*", "", line)
+                apupistenimi = re.sub(r"[\n\t\s]*", "", pistenimi)
+                if apuline == "TY" + pistenimi:
                     pistedata.append(line)
                     pisteet.append(line)
                     alku = tiedosto.index(line) + 1
@@ -1260,7 +1265,8 @@ class TiedonKasittely(object):
         printtilista = []
         parsilista = []
         os.chdir(self.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
+        #file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
+        file = open("{}.txt".format(self.hanke), "r")
         tiedosto = file.readlines()
         file.close()
 
