@@ -573,7 +573,8 @@ class windowClass(wx.Frame):
         parsilista = []
         headerit = ["FO","KJ","OM","ML","ORG","TY","PK","LA","TT","TX","XY","LN"]
         os.chdir(self.data.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "r", encoding='UTF-8')
+        #file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "r", encoding='UTF-8')
+        file = open("{}.txt".format(self.hankenimiteksti.GetLabel()), "r")
         tiedosto = file.readlines()
         file.close()
 
@@ -1056,7 +1057,8 @@ class TiedonKasittely(object):
         pisteet = []
         self.config.read("USECONTROL.ini")
         os.chdir(self.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
+        #file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
+        file = open("{}.txt".format(self.hanke), "r")
         tiedosto = file.readlines()
         file.close()
         for line in tiedosto:
