@@ -1526,7 +1526,7 @@ class TiedonKasittely(object):
 
                             #paivitetaan arvot piirtajalle. PITAISI OLLA LUOTU;PAINETTU NAPPIA PIIRTO KOSKA LUODAAN VASTA SILLOIN
                             if self.gui.graphbutton.GetLabelText() == "Tekla":
-                                print("TALUPDATE")
+                                #print("TALUPDATE")
                                 #self.t3 = threading.Thread(target=self.gui.piirto.setValues(self.hanke, self.piste))
                                 #self.t3.start()
 

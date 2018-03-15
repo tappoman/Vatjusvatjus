@@ -107,7 +107,7 @@ class CanvasPanel(wx.Panel):
         plt.axvline(0, color='k')
 
     def setNewValues(self, values):
-        print(values)
+        #print(values)
         lineparts = values.replace('\n', '').split('\t')
 
         # JOS PAINOKAIRAUS (PA) --> muotoillaan chart ja arvot
@@ -340,7 +340,7 @@ class CanvasPanel(wx.Panel):
                                     plt.ylabel("syvyys")
                                     plt.xlabel('heijari')
 
-                                    plt.barh(floats(self.syvyys), width=float(self.x2),
+                                    plt.barh(float(self.syvyys), width=float(self.x2),
                                              height=0.2, linewidth=1, color='b', edgecolor='k')
 
                                     #plt.barh(float(self.syvyys), width=float(self.x2),
