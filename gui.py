@@ -622,7 +622,10 @@ class windowClass(wx.Frame):
         if huomautus.ShowModal() == wx.ID_OK:
             huomautus = huomautus.GetValue()
             for a in tiedosto:
-                if a is "TY {}".format(pistevalinta):
+                #if a is "TY {}".format(pistevalinta):
+                apua = re.sub(r"[\n\t\s]*", "", a)
+                apupistevalinta = re.sub(r"[\n\t\s]*", "", pistevalinta)
+                if apua == "TY" + apupistevalinta:
                     syvyyshead = tiedosto.index(a)+7 + indeksi
                     tiedosto.insert(syvyyshead + 1, "HM {}\n\n".format(huomautus))
 
@@ -879,7 +882,7 @@ class TiedonKasittely(object):
         self.oldline = ""
 
 
-        '''
+
         self.com = Communication()
 
         self.comcheck = self.com.openConnection()
@@ -890,7 +893,7 @@ class TiedonKasittely(object):
             sys.exit(0)
 
         self.kks = Kksoperations(self.com)
-        '''
+
 
         self.sa = Saving()
         self.gui = gui
@@ -946,7 +949,8 @@ class TiedonKasittely(object):
                 self.hanke = tiedostonvalinta.GetStringSelection()
                 self.gui.hankenimiteksti.SetLabelText(self.hanke)
                 os.chdir(self.config["DEFAULT"]["polku"])
-                file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
+                #file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
+                file = open("{}.txt".format(self.hanke), "r")
                 tiedosto = file.readlines()
                 file.close()
                 if len(tiedosto) == 5:
@@ -1011,7 +1015,8 @@ class TiedonKasittely(object):
         pisteet = []
         piste = []
         os.chdir(self.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
+        #file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
+        file = open("{}.txt".format(self.hanke), "r")
         tiedosto = file.readlines()
         file.close()
         for i in tiedosto:
@@ -1065,7 +1070,9 @@ class TiedonKasittely(object):
             if line.__contains__("ORG "):
                 pistedata.append(line)
             if alku == 0:
-                if line is "TY {}".format(pistenimi):
+                apuline = re.sub(r"[\n\t\s]*", "", line)
+                apupistenimi = re.sub(r"[\n\t\s]*", "", pistenimi)
+                if apuline == "TY" + pistenimi:
                     pistedata.append(line)
                     pisteet.append(line)
                     alku = tiedosto.index(line) + 1
@@ -1103,7 +1110,8 @@ class TiedonKasittely(object):
         pisteet = []
         self.config.read("USECONTROL.ini")
         os.chdir(self.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
+        #file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
+        file = open("{}.txt".format(self.hanke), "r")
         tiedosto = file.readlines()
         file.close()
         for line in tiedosto:
@@ -1118,7 +1126,9 @@ class TiedonKasittely(object):
             if line.__contains__("ORG "):
                 pistedata.append(line)
             if alku == 0:
-                if line is "TY {}".format(pistenimi):
+                apuline = re.sub(r"[\n\t\s]*", "", line)
+                apupistenimi = re.sub(r"[\n\t\s]*", "", pistenimi)
+                if apuline == "TY" + pistenimi:
                     pistedata.append(line)
                     pisteet.append(line)
                     alku = tiedosto.index(line) + 1
@@ -1302,7 +1312,8 @@ class TiedonKasittely(object):
         if pistenimi.ShowModal() == wx.ID_OK:
             nimi = pistenimi.GetValue()
             pistenimi.Destroy()
-            file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
+            #file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
+            file = open("{}.txt".format(self.hanke), "r")
             tiedosto = file.readlines()
             file.close()
             for i in tiedosto:
