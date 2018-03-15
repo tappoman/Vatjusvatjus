@@ -29,7 +29,7 @@ class Saving (object):
         self.fullpath = os.path.join(self.tal_polku, self.tiedosto)
         file = open(self.fullpath, "w")
         file.write("")
-
+        file.close()
         self.lastSYV = 0;
 
 
