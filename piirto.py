@@ -106,7 +106,9 @@ class CanvasPanel(wx.Panel):
         plt.gca().invert_yaxis()
         plt.axvline(0, color='k')
 
-    def setNewValues(self, values):
+
+    def setNewValues(self, values, tutkimustapa):
+        self.tutkimustapa = tutkimustapa
         #print(values)
         lineparts = values.replace('\n', '').split('\t')
 

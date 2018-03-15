@@ -722,7 +722,8 @@ class windowClass(wx.Frame):
     def graafinpiirto(self, event):
         os.chdir(self.data.config["DEFAULT"]["polku"])
         pisteet = []
-        file = open("{}.txt".format(self.data.hanke), "r", encoding='UTF-8')
+        #file = open("{}.txt".format(self.data.hanke), "r", encoding='UTF-8')
+        file = open("{}.txt".format(self.data.hanke), "r")
         tiedosto = file.readlines()
         file.close()
         os.chdir(self.data.root)
@@ -1201,7 +1202,8 @@ class TiedonKasittely(object):
         printtilista = []
         parsilista = []
         os.chdir(self.config["DEFAULT"]["polku"])
-        file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
+        #file = open("{}.txt".format(self.hanke), "r", encoding='UTF-8')
+        file = open("{}.txt".format(self.hanke), "r")
         tiedosto = file.readlines()
         file.close()
 
@@ -1542,7 +1544,7 @@ class TiedonKasittely(object):
                                 #self.gui.piirto.setValues(self.hanke, self.piste)
                                 #self.gui.piirto.draw()
 
-                                self.gui.piirto.setNewValues(self.TAL)
+                                self.gui.piirto.setNewValues(self.TAL, self.tutkimustapa)
                                 self.gui.piirto.draw()
 
                             else:
