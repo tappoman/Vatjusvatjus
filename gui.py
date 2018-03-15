@@ -386,12 +386,12 @@ class windowClass(wx.Frame):
         file.close()
 
         for line in tiedosto:
-            if line.__contains__(pistevalinta):
+            if line is "TY {}".format(pistevalinta):
                 piste.append(line)
                 alku = tiedosto.index(line) + 1
                 while alku < len(tiedosto):
                     linepartindex = tiedosto[alku]
-                    if linepartindex[0:2] == ("ty"):
+                    if linepartindex[0:2] is "TY":
                         break
                     else:
                         piste.append(linepartindex)
@@ -402,7 +402,7 @@ class windowClass(wx.Frame):
                 continue
             elif rivi == "\n":
                 continue
-            elif rivi.__contains__("ln"):
+            elif rivi.__contains__("LN"):
                 break
             else:
                 syvyyslista.append(rivi)
@@ -527,29 +527,18 @@ class windowClass(wx.Frame):
                 if kairausvalinta == "KAIR.JATKUU":
                     self.data.iparsiuusinpiste(self.data.piste)
                     self.lopetusbutton.SetLabel("Aloita\nkairaus")
-
                     return None
 
                 else:
-
                     self.config.read("USECONTROL.ini")
-
                     os.chdir(self.config["DEFAULT"]["polku"])
-
                     with open("{}.txt".format(self.data.hanke), 'a') as textfile:
-
-                        textfile.write("\n" + "-1\t{}\n".format(self.data.syvyys, kairausvalinta))
-
-                        textfile.close()
-
+                        textfile.write("\n" + "-1\t{}\n".format(kairausvalinta))
                     os.chdir(self.data.root)
-
                     self.lopetusbutton.SetLabel("Aloita\nkairaus")
-
                     self.lopetusbutton.Disable()
                     self.hankebutton.Enable()
                     self.pistebutton.Enable()
-
             else:
                 return None
         else:
@@ -599,7 +588,7 @@ class windowClass(wx.Frame):
                     pistedata.remove(rivi)
 
         for s in pistedata:
-            if s.__contains__("AL"):
+            if s[:2] is "AL":
                 alku = s.rsplit(None, 4)
                 parsilista.append(alku[1])
             else:
@@ -633,7 +622,7 @@ class windowClass(wx.Frame):
         if huomautus.ShowModal() == wx.ID_OK:
             huomautus = huomautus.GetValue()
             for a in tiedosto:
-                if a.__contains__(pistevalinta):
+                if a is "TY {}".format(pistevalinta):
                     syvyyshead = tiedosto.index(a)+7 + indeksi
                     tiedosto.insert(syvyyshead + 1, "HM {}\n\n".format(huomautus))
 
@@ -800,7 +789,7 @@ class windowClass(wx.Frame):
                 with open("{}.txt".format(self.data.hanke), "r", encoding="utf-8") as hankefile:
                     tiedosto = hankefile.readlines()
                 for line in tiedosto:
-                    if line.__contains__("{}".format(self.data.piste)):
+                    if line is "TY {}".format(self.data.piste):
                         indeksi = tiedosto.index(line)
                         del tiedosto[indeksi+3]
                         tiedosto.insert(indeksi+3, "TT {}\n".format(self.data.tutkimustapa))
@@ -890,7 +879,7 @@ class TiedonKasittely(object):
         self.oldline = ""
 
 
-
+        '''
         self.com = Communication()
 
         self.comcheck = self.com.openConnection()
@@ -901,7 +890,7 @@ class TiedonKasittely(object):
             sys.exit(0)
 
         self.kks = Kksoperations(self.com)
-
+        '''
 
         self.sa = Saving()
         self.gui = gui
@@ -1065,18 +1054,18 @@ class TiedonKasittely(object):
         tiedosto = file.readlines()
         file.close()
         for line in tiedosto:
-            if line.__contains__("FO"):
+            if line.__contains__("FO "):
                 pistedata.append(line)
-            if line.__contains__("KJ"):
+            if line.__contains__("KJ "):
                 pistedata.append(line)
-            if line.__contains__("OM"):
+            if line.__contains__("OM "):
                 pistedata.append(line)
-            if line.__contains__("ML"):
+            if line.__contains__("ML "):
                 pistedata.append(line)
-            if line.__contains__("ORG"):
+            if line.__contains__("ORG "):
                 pistedata.append(line)
             if alku == 0:
-                if line.__contains__("TY {}".format(pistenimi)):
+                if line is "TY {}".format(pistenimi):
                     pistedata.append(line)
                     pisteet.append(line)
                     alku = tiedosto.index(line) + 1
@@ -1118,18 +1107,18 @@ class TiedonKasittely(object):
         tiedosto = file.readlines()
         file.close()
         for line in tiedosto:
-            if line.__contains__("FO"):
+            if line.__contains__("FO "):
                 pistedata.append(line)
-            if line.__contains__("KJ"):
+            if line.__contains__("KJ "):
                 pistedata.append(line)
-            if line.__contains__("OM"):
+            if line.__contains__("OM "):
                 pistedata.append(line)
-            if line.__contains__("ML"):
+            if line.__contains__("ML "):
                 pistedata.append(line)
-            if line.__contains__("ORG"):
+            if line.__contains__("ORG "):
                 pistedata.append(line)
             if alku == 0:
-                if line.__contains__("TY {}".format(pistenimi)):
+                if line is "TY {}".format(pistenimi):
                     pistedata.append(line)
                     pisteet.append(line)
                     alku = tiedosto.index(line) + 1
@@ -1234,7 +1223,7 @@ class TiedonKasittely(object):
         for s in syvyyslista:
             if s == "\n":
                 syvyyslista.remove(s)
-            elif s.__contains__("AL"):
+            elif s[:2] == "AL":
                 alku = s.rsplit(None, 4)
                 parsilista.append(alku[1])
             else:
@@ -1279,11 +1268,11 @@ class TiedonKasittely(object):
                         alku = alku + 1
 
         for rivi in piste[::-1]:
-            if rivi.__contains__("HM"):
+            if rivi.__contains__("HM "):
                 continue
             elif rivi == "\n":
                 continue
-            elif rivi.__contains__("LN"):
+            elif rivi.__contains__("LN "):
                 break
             else:
                 syvyyslista.append(rivi)
@@ -1293,7 +1282,7 @@ class TiedonKasittely(object):
         for s in syvyyslista:
             if s == "\n":
                 syvyyslista.remove(s)
-            elif s.__contains__("AL"):
+            elif s[:2] == "AL":
                 alku = s.rsplit(None, 4)
                 parsilista.append(alku[1:4])
             else:
