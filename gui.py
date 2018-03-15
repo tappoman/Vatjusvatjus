@@ -556,9 +556,9 @@ class windowClass(wx.Frame):
             #self.data.kks.asetaKairaussyvyys(self.data.alkusyvyys)
 
             self.data.kks.asetaKairaussyvyys(self.data.alkusyvyys)
-
             self.data.kks.aloitaKairaus()
             self.graphbutton.Enable()
+            self.maalajibutton.Enable()
 
             if self.data.tutkimustapa == "PO":
                 lista = ["KELLO", "EI KELLOA"]
@@ -738,14 +738,14 @@ class windowClass(wx.Frame):
         pisteet.reverse()
         if self.graphbutton.GetLabelText() =="Piirto":
             self.graphbutton.SetLabelText("Tekla")
-            for i in range(20):
-                line = ""
-                new_text = wx.StaticText(self.scrolled_panel, -1, line, size=(550, 30))
-                self.spSizer.Add(new_text)
-                self.scrolled_panel.ScrollLines(10)
-                self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
-                self.scrolled_panel.Layout()
-                self.scrolled_panel.Refresh()
+            #for i in range(20):
+            line = ""
+            new_text = wx.StaticText(self.scrolled_panel, -1, line, size=(550, 30))
+            self.spSizer.Add(new_text)
+            self.scrolled_panel.ScrollLines(10)
+            self.scrolled_panel.SetupScrolling(scrollToTop=False, scrollIntoView=False)
+            self.scrolled_panel.Layout()
+            self.scrolled_panel.Refresh()
 
             # luodaan piirto-olio ja passataan meidän scrollipaneli sille
             piirratama = pisteet[0].strip()
@@ -1096,7 +1096,10 @@ class TiedonKasittely(object):
             self.gui.linepanelille("")
             for i in pistedata:
                 self.gui.linepanelille(i)
-            self.gui.pistenimiteksti.SetLabelText(pistenimi.strip())
+
+            pistearvo = re.sub(r"[\\n\\t\s]*", "", pistenimi)
+
+            self.gui.pistenimiteksti.SetLabelText(pistearvo)
             os.chdir(self.root)
             return pistedata
 
@@ -1146,7 +1149,9 @@ class TiedonKasittely(object):
                 self.gui.linepanelille("")
                 for i in pistedata:
                     self.gui.linepanelille(i)
-                self.gui.pistenimiteksti.SetLabelText(pistenimi.strip())
+                pistearvo = re.sub(r"[\\n\\t\s]*", "", pistenimi)
+                self.gui.pistenimiteksti.SetLabelText(pistearvo)
+
                 syvyysdata = self.iparsipistesyvyydet(pistenimi)
 
                 if syvyysdata:
@@ -1526,7 +1531,7 @@ class TiedonKasittely(object):
 
                             #paivitetaan arvot piirtajalle. PITAISI OLLA LUOTU;PAINETTU NAPPIA PIIRTO KOSKA LUODAAN VASTA SILLOIN
                             if self.gui.graphbutton.GetLabelText() == "Tekla":
-                                #print("TALUPDATE")
+                                print("TALUPDATE")
                                 #self.t3 = threading.Thread(target=self.gui.piirto.setValues(self.hanke, self.piste))
                                 #self.t3.start()
 
