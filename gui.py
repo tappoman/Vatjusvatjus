@@ -1098,9 +1098,7 @@ class TiedonKasittely(object):
             for i in pistedata:
                 self.gui.linepanelille(i)
 
-            pistearvo = re.sub(r"[\n\t\s]*", "", pistenimi)
-
-            self.gui.pistenimiteksti.SetLabelText(pistearvo)
+            self.gui.pistenimiteksti.SetLabelText(pistenimi)
             os.chdir(self.root)
             return pistedata
 
