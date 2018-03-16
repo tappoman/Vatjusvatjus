@@ -1,7 +1,7 @@
 '''
 luokka käyttöliittymän hallintaan
 parsii tiedot communications luokalta
-ja siirtää ne bar_graph luokalle
+ja siirtää ne piirto.py luokalle
 
 Kirjastot:
 wxpython
@@ -338,6 +338,7 @@ class windowClass(wx.Frame):
             self.syvyysarvoteksti.SetLabelText("")
             self.voimaarvoteksti.SetLabelText("")
             self.puolikierroksetarvoteksti.SetLabelText("")
+            self.maalajiarvoteksti.SetLabelText("")
             self.nopeusarvoteksti.SetLabelText("")
             self.graphbutton.Disable()
             self.alkukairausbutton.Disable()
@@ -362,6 +363,7 @@ class windowClass(wx.Frame):
     def pisteenavaus(self, event):
         self.data.piste = ""
         self.pistenimiteksti.SetLabelText("")
+        self.maalajiarvoteksti.SetLabelText("")
         self.alkukairausbutton.Disable()
         self.lopetusbutton.Disable()
         self.graphbutton.SetLabelText("Piirto")
@@ -525,8 +527,17 @@ class windowClass(wx.Frame):
                 kairausvalinta = kairausvalinta.GetStringSelection()
 
                 if kairausvalinta == "KAIR.JATKUU":
-                    self.data.iparsiuusinpiste(self.data.piste)
+
+                    huijaus = self.data.piste + "\n"
+
+                    self.data.iparsiuusinpiste(huijaus)
+
                     self.lopetusbutton.SetLabel("Aloita\nkairaus")
+
+                    self.hankebutton.Enable()
+
+                    self.pistebutton.Enable()
+
                     return None
 
                 else:
@@ -550,6 +561,7 @@ class windowClass(wx.Frame):
             self.data.kks.aloitaKairaus()
             self.graphbutton.Enable()
             self.maalajibutton.Enable()
+
 
             if self.data.tutkimustapa == "PO":
                 lista = ["KELLO", "EI KELLOA"]
@@ -765,12 +777,28 @@ class windowClass(wx.Frame):
                 #self.t2.start()
 
         elif self.graphbutton.GetLabelText() == "Tekla":
+
             self.graphbutton.SetLabelText("Piirto")
-            pistearvo = re.sub(r"[\n\t\s]*", "", self.data.piste)
-            print(pistearvo)
-            self.data.iparsipiste(pistearvo)
+
+            if self.data.piste + "\n" == pisteet[0]:
+
+                huijaus = self.data.piste + "\n"
+
+                self.data.iparsipiste(huijaus)
+
+            else:
+
+                self.data.iparsipiste(self.data.piste)
+
         else:
+
             return None
+
+        '''elif self.graphbutton.GetLabelText() == "Tekla":
+            self.graphbutton.SetLabelText("Piirto")
+            self.data.iparsipiste(self.data.piste)'''
+
+
 
     def buffaa_paneelia(self):
         for i in range(5):
@@ -884,7 +912,7 @@ class TiedonKasittely(object):
         self.oldline = ""
 
 
-        '''
+
         self.com = Communication()
 
         self.comcheck = self.com.openConnection()
@@ -895,7 +923,7 @@ class TiedonKasittely(object):
             sys.exit(0)
 
         self.kks = Kksoperations(self.com)
-        '''
+
 
         self.sa = Saving()
         self.gui = gui
@@ -1037,12 +1065,12 @@ class TiedonKasittely(object):
                 os.chdir(self.root)
                 return None
             elif valinta.GetStringSelection() == pisteet[0]:
-                self.piste = valinta.GetStringSelection().strip()
+                self.piste = valinta.GetStringSelection()
                 self.iparsiuusinpiste(valinta.GetStringSelection())
                 os.chdir(self.root)
                 return None
             else:
-                self.piste = valinta.GetStringSelection().strip()
+                self.piste = valinta.GetStringSelection()
                 self.iparsipiste(valinta.GetStringSelection())
                 os.chdir(self.root)
                 return None
@@ -1160,8 +1188,10 @@ class TiedonKasittely(object):
                     self.gui.pistebutton.Enable()
                     self.gui.maalajibutton.Enable()
                     syvyysdata.reverse()
+                    self.alkusyvyys = syvyysdata[0]
                     jatkasyvyys = syvyysdata[0]
                     self.syvyys = syvyysdata[0]
+                    #print("JALA: ", self.syvyys)
                     if jatkasyvyys == "-1":
                         return None
                     #    self.gui.alkukairausbutton.Disable()
@@ -1171,7 +1201,7 @@ class TiedonKasittely(object):
 
                     kairaussyvyys = float(jatkasyvyys)*100
                     kairaussyvyys = int(kairaussyvyys)
-                    kairaussyvyys = str(kairaussyvyys)
+                    #   kairaussyvyys = str(kairaussyvyys)
 
                     #print("testi:", kairaussyvyys)
                     #self.kks.aloitaOdotustila()
@@ -1362,6 +1392,10 @@ class TiedonKasittely(object):
                 self.ituhoatempconfig()
                 self.syvyys = 0
                 self.alkusyvyys = 0
+
+                huijaus = self.piste + "\n"
+                self.iparsipiste(huijaus)
+
                 self.iparsiuusinpiste(self.piste)
                 os.chdir(self.root)
             else:
